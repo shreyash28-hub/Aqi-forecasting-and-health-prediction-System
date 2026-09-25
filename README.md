@@ -110,3 +110,31 @@ score implies a neighbouring level), `risk_range` (e.g. `Moderate-High`) and
 | `src/health/train.py` | CV selection, test evaluation, boundary-rule evaluation, final refit and save |
 | `src/health/store.py` | Save/load; `HealthRiskPredictor.predict(profile, air_forecast)` |
 | `src/health/backtest.py` | Health models on forecast inputs vs measured air |
+
+## API (FastAPI)
+
+```bash
+uvicorn src.api.main:app --reload     # http://localhost:8000/docs (interactive docs)
+python -m pytest tests -q             # API tests
+```
+
+All saved models load once at startup (~20 s) and each city's 30-day forecast is cached,
+so requests are fast. CORS origins come from `ALLOWED_ORIGINS` (comma-separated; default
+`http://localhost:3000`). All endpoints below are public; saved profiles and prediction
+history arrive with the Supabase integration.
+
+| Method | Path | Returns |
+|---|---|---|
+| GET | `/api/health` | Status, number of loaded models, startup time |
+| GET | `/api/cities` | Cities, forecast origin date, deployed model per target |
+| GET | `/api/forecast/{city}?horizon=7` | Daily AQI (+ CPCB category), PM2.5, NO2 for 1-30 days |
+| POST | `/api/risk/predict` | Per-day risk level, confidence, probabilities, score, borderline/range/alert level, summary (incl. `show_hospitals`), disclaimer |
+| GET | `/api/profile/schema` | Profile fields, allowed values, training ranges, defaults |
+| GET | `/api/leaderboard/forecast?target=AQI` | Multi-window ranking and deployed model per city (AQI, PM2.5, NO2) |
+| GET | `/api/leaderboard/health` | Health model rankings (CV + test), selected models, boundary-rule stats |
+
+Profile fields (snake_case, matching the planned `profiles` table): `age`, `gender`,
+`condition`, `smoker`, `occupation`, `area_type`, `mask_usage` and `outdoor_hours` are
+required. The exposure fields are required because filling them with typical values badly
+understated risk. `bmi`, `exercise_hours` and `family_history` are optional and filled with
+typical values when missing (listed in the response's `imputed_fields`).

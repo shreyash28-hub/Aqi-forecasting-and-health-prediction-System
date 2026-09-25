@@ -28,7 +28,7 @@ The health pipeline uses `synthetic_person_health.csv` (real AQI values joined t
 
 1. User signs in via Supabase Auth.
 2. User selects/detects their city — current + forecasted AQI for that city is **public**, no login needed.
-3. User fills a health profile **once** (age, gender, pre-existing condition, smoker, optionally BMI/exercise/mask usage/occupation/area type). Saved to Supabase, reused automatically on later visits — never re-entered.
+3. User fills a health profile **once** (required: age, gender, pre-existing condition, smoker, occupation, area type, mask usage, outdoor hours per day; optional: BMI, exercise hours, family history of respiratory disease). Saved to Supabase, reused automatically on later visits — never re-entered.
 4. Backend combines the saved profile with the forecasted AQI/pollutants for the selected horizon (7-day / 30-day).
 5. Health models return a risk level (Low/Moderate/High/Severe) from classification, a risk score from regression, and per-class confidence — not just a bare label.
 6. Result shown day-by-day following the forecast curve (e.g. "Tue: Moderate, Fri: High").
@@ -131,6 +131,7 @@ This schema is a sketch — refine exact column types/indexes/RLS policy syntax 
 - 2026-09-26: PM2.5 and NO2 are now forecast per city (same multi-window pipeline, `--target`), saved under `models/pm25/` and `models/no2/`. When no model beats the naive baseline on mean RMSE, the baseline is deployed (Hyderabad PM2.5, Ahmedabad NO2). PM10/SO2/O3 aren't forecast: too little data in several cities, and they don't improve the health model.
 - 2026-09-26: Health models deployed in two variants: profile + AQI + PM2.5 + NO2 (primary) and profile + AQI (fallback). MLP selected for both tasks in both variants. Boundary rule: classifier level is the headline; when the score implies a different level the day is `borderline`, shown as a range, and `alert_level` (the higher level) drives High/Severe actions. Backtest on real forecast inputs: primary beats fallback, but air-forecast error is now the main source of health-risk error.
 - 2026-09-25: Health models first trained (`python -m src.health.train`). `VulnerabilityScore` and `HospitalVisitsLastYear` are excluded as target leakage. The model needs `OutdoorExposureHours`, which is not yet in the `profiles` schema sketch above: add an `outdoor_hours` column when building the database. Load with `src.health.store.load_health_predictor()`.
+- 2026-09-26: FastAPI backend started in `src/api/` (public endpoints: cities, forecast, risk prediction, profile schema, leaderboards; tests in `tests/`). Profile exposure fields (occupation, area type, mask usage, outdoor hours) are **required**: filling them with typical values made a 67-year-old COPD patient Low instead of Moderate. BMI, exercise and family history stay optional (filled with typical values, reported in `imputed_fields`).
 
 ## Working conventions for this repo
 
