@@ -39,6 +39,10 @@ HOURLY_CSV_PATH = DATA_DIR / "city_hour.csv"
 CITIES = ["Delhi", "Bengaluru", "Chennai", "Hyderabad", "Lucknow", "Ahmedabad"]
 POLLUTANTS = ["PM2.5", "PM10", "NO2", "SO2", "O3", "CO"]
 DEFAULT_MAX_GAP = 21  # days
+# Series that can be forecast: city_day.csv column -> short slug used in paths/columns.
+# PM2.5 and NO2 feed the health model (together with AQI); they're the only
+# pollutants with usable history in all six cities.
+TARGETS = {"AQI": "aqi", "PM2.5": "pm25", "NO2": "no2"}
 # Pollutants left out when recomputing a city's AQI (see module docstring).
 AQI_EXCLUDED_POLLUTANTS = {"Ahmedabad": ("CO",)}
 
@@ -69,6 +73,16 @@ def load_hourly(cities: list[str]) -> pd.DataFrame:
     return df[df["City"].isin(cities)].reset_index(drop=True)
 
 
+def daily_series(city: str, raw: pd.DataFrame, hourly: pd.DataFrame | None = None,
+                 target: str = "AQI") -> pd.Series:
+    """Raw daily values of ``target`` (AQI or a pollutant column) for one city."""
+    if target == "AQI":
+        return daily_aqi(city, raw, hourly)
+    if target not in TARGETS:
+        raise ValueError(f"Unknown target {target!r}; expected one of {list(TARGETS)}")
+    return raw[raw["City"] == city].set_index("Date")[target]
+
+
 def daily_aqi(city: str, raw: pd.DataFrame, hourly: pd.DataFrame | None = None) -> pd.Series:
     """Daily AQI: published values, or recomputed from hourly data for excluded-pollutant cities."""
     exclude = AQI_EXCLUDED_POLLUTANTS.get(city)
@@ -97,28 +111,29 @@ def clean_series(s: pd.Series, max_gap: int = DEFAULT_MAX_GAP) -> pd.DataFrame:
         missing = missing.loc[s.index]
 
     filled = s.interpolate(method="time", limit_area="inside")
-    return pd.DataFrame({"aqi": filled, "is_interpolated": missing})
+    return pd.DataFrame({"value": filled, "is_interpolated": missing})
 
 
 def load_city_series(city: str, max_gap: int = DEFAULT_MAX_GAP, raw: pd.DataFrame | None = None,
-                     hourly: pd.DataFrame | None = None) -> pd.DataFrame:
-    """Daily AQI for one city: DataFrame indexed by date with ``aqi`` and ``is_interpolated``."""
+                     hourly: pd.DataFrame | None = None, target: str = "AQI") -> pd.DataFrame:
+    """Daily ``target`` for one city: DataFrame indexed by date with ``value`` and ``is_interpolated``."""
     raw = load_raw([city]) if raw is None else raw[raw["City"] == city]
     if raw.empty:
         raise ValueError(f"No rows for city {city!r}")
-    out = clean_series(daily_aqi(city, raw, hourly), max_gap=max_gap)
+    out = clean_series(daily_series(city, raw, hourly, target), max_gap=max_gap)
     out.index.name = "date"
     return out
 
 
-def load_all_cities(cities: list[str] | None = None,
-                    max_gap: int = DEFAULT_MAX_GAP) -> dict[str, pd.DataFrame]:
+def load_all_cities(cities: list[str] | None = None, max_gap: int = DEFAULT_MAX_GAP,
+                    target: str = "AQI") -> dict[str, pd.DataFrame]:
     """``{city: load_city_series(city)}`` for every selected city, reading the CSV once."""
     cities = cities or CITIES
     raw = load_raw(cities)
-    recomputed = [c for c in cities if c in AQI_EXCLUDED_POLLUTANTS]
+    recomputed = [c for c in cities if c in AQI_EXCLUDED_POLLUTANTS] if target == "AQI" else []
     hourly = load_hourly(recomputed) if recomputed else None
-    return {c: load_city_series(c, max_gap=max_gap, raw=raw, hourly=hourly) for c in cities}
+    return {c: load_city_series(c, max_gap=max_gap, raw=raw, hourly=hourly, target=target)
+            for c in cities}
 
 
 def load_city_pollutants(city: str, max_gap: int = DEFAULT_MAX_GAP) -> pd.DataFrame:
@@ -131,6 +146,8 @@ def load_city_pollutants(city: str, max_gap: int = DEFAULT_MAX_GAP) -> pd.DataFr
 
 
 if __name__ == "__main__":
-    for city, df in load_all_cities().items():
+    import sys
+    target = sys.argv[1] if len(sys.argv) > 1 else "AQI"
+    for city, df in load_all_cities(target=target).items():
         print(f"{city:<10} {df.index.min().date()} -> {df.index.max().date()}  "
               f"n={len(df):>4}  interpolated={int(df['is_interpolated'].sum()):>3}")

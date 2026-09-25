@@ -1,0 +1,92 @@
+{
+  "task": "classification",
+  "feature_set": "aqi_only",
+  "model": "MLP",
+  "files": [
+    "preprocessor.joblib",
+    "estimator.joblib"
+  ],
+  "saved_at": "2026-09-25T18:56:11+00:00",
+  "target": "HealthRiskLevel",
+  "features": {
+    "numeric": [
+      "Age",
+      "BMI",
+      "ExerciseHoursPerWeek",
+      "OutdoorExposureHours",
+      "AQI"
+    ],
+    "categorical": [
+      "Gender",
+      "Occupation",
+      "AreaType",
+      "PreexistingCondition",
+      "FamilyHistoryRespiratory",
+      "Smoker",
+      "MaskUsage"
+    ]
+  },
+  "classes": [
+    "Low",
+    "Moderate",
+    "High",
+    "Severe"
+  ],
+  "selection": "best mean 5-fold CV f1_weighted among ['Random Forest', 'XGBoost', 'MLP'] on aqi_only",
+  "cv": {
+    "accuracy_mean": 0.82,
+    "precision_weighted_mean": 0.8230300837196228,
+    "recall_weighted_mean": 0.82,
+    "f1_weighted_mean": 0.8205899838695455,
+    "recall_low_mean": 0.8783172655565294,
+    "recall_moderate_mean": 0.7385041551246538,
+    "recall_high_mean": 0.7745454545454545,
+    "recall_severe_mean": 0.865358401880141,
+    "accuracy_std": 0.009912814377808613,
+    "precision_weighted_std": 0.010316057512112335,
+    "recall_weighted_std": 0.009912814377808613,
+    "f1_weighted_std": 0.00929636948770801,
+    "recall_low_std": 0.021629529126112934,
+    "recall_moderate_std": 0.019251579339494812,
+    "recall_high_std": 0.039370622470088976,
+    "recall_severe_std": 0.033833544051852835,
+    "mse_mean": NaN,
+    "rmse_mean": NaN,
+    "mae_mean": NaN,
+    "r2_mean": NaN,
+    "level_accuracy_from_score_mean": NaN,
+    "mse_std": NaN,
+    "rmse_std": NaN,
+    "mae_std": NaN,
+    "r2_std": NaN,
+    "level_accuracy_from_score_std": NaN
+  },
+  "test": {
+    "accuracy": 0.838,
+    "precision_weighted": 0.8419751664659064,
+    "recall_weighted": 0.838,
+    "f1_weighted": 0.8394155322758955,
+    "recall_low": 0.8823529411764706,
+    "recall_moderate": 0.8119469026548672,
+    "recall_high": 0.7427184466019418,
+    "recall_severe": 0.8565217391304348,
+    "mse": NaN,
+    "rmse": NaN,
+    "mae": NaN,
+    "r2": NaN,
+    "level_accuracy_from_score": NaN
+  },
+  "n_train_final": 7500,
+  "evaluation_split": {
+    "test_size": 0.2,
+    "stratified_by": "HealthRiskLevel",
+    "seed": 42
+  },
+  "library_versions": {
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "numpy": "2.1.3",
+    "pandas": "3.0.6",
+    "joblib": "1.6.0"
+  }
+}

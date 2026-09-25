@@ -1,0 +1,163 @@
+{
+  "task": "no2_forecast",
+  "target": "NO2",
+  "updated_at": "2026-09-25T19:09:16+00:00",
+  "cities": {
+    "Ahmedabad": {
+      "model": "Naive (last value)",
+      "config": "Naive (last value)",
+      "dir": "models/no2/ahmedabad",
+      "files": [],
+      "trained_at": "2026-09-25T19:09:16+00:00",
+      "train_start": "2017-10-25",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "naive baseline: best model (SARIMA) did not beat it on mean RMSE over the multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 34.77936520037146,
+        "std_rmse": 16.824971282511104,
+        "mean_mae": 27.94586666666667,
+        "mean_mape": 31.97320040429853,
+        "mean_rank": 4.0,
+        "win_rate": 0.4,
+        "beat_baseline_rate": null,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 34.77936520037146
+      }
+    },
+    "Bengaluru": {
+      "model": "LSTM",
+      "config": "LSTM(1x64) lookback=60, direct 30-step, 24 epochs (early stop), ensemble of seeds [42, 43, 44]",
+      "dir": "models/no2/bengaluru",
+      "files": [
+        "lstm_seed42.pt",
+        "lstm_seed43.pt",
+        "lstm_seed44.pt"
+      ],
+      "trained_at": "2026-09-25T19:08:16+00:00",
+      "train_start": "2015-01-01",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 6.643385770441007,
+        "std_rmse": 2.6264456495027417,
+        "mean_mae": 5.28814656450021,
+        "mean_mape": 19.21994177851101,
+        "mean_rank": 3.5,
+        "win_rate": 0.0,
+        "beat_baseline_rate": 0.6666666666666666,
+        "best_baseline": "Seasonal naive (weekly)",
+        "best_baseline_mean_rmse": 9.143147220596559
+      }
+    },
+    "Chennai": {
+      "model": "SARIMA",
+      "config": "SARIMA(2, 0, 1)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+      "dir": "models/no2/chennai",
+      "files": [
+        "model.joblib"
+      ],
+      "trained_at": "2026-09-25T19:08:33+00:00",
+      "train_start": "2015-01-01",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 4.414043971738709,
+        "std_rmse": 2.075913429785585,
+        "mean_mae": 3.531491927833265,
+        "mean_mape": 20.864360723602008,
+        "mean_rank": 2.3333333333333335,
+        "win_rate": 0.3333333333333333,
+        "beat_baseline_rate": 0.6666666666666666,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 4.6632849249449295
+      }
+    },
+    "Delhi": {
+      "model": "Prophet",
+      "config": "Prophet (yearly + weekly, additive)",
+      "dir": "models/no2/delhi",
+      "files": [
+        "model.json"
+      ],
+      "trained_at": "2026-09-25T19:08:34+00:00",
+      "train_start": "2015-01-01",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 8.730571772479776,
+        "std_rmse": 3.3513881726666086,
+        "mean_mae": 7.286171483273471,
+        "mean_mape": 17.085997399668525,
+        "mean_rank": 2.1666666666666665,
+        "win_rate": 0.5,
+        "beat_baseline_rate": 0.8333333333333334,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 13.200171317503012
+      }
+    },
+    "Hyderabad": {
+      "model": "XGBoost",
+      "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar)",
+      "dir": "models/no2/hyderabad",
+      "files": [
+        "model.ubj"
+      ],
+      "trained_at": "2026-09-25T19:08:35+00:00",
+      "train_start": "2015-01-04",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 6.5810978116837555,
+        "std_rmse": 2.36619303703777,
+        "mean_mae": 5.524546278026453,
+        "mean_mape": 22.03308972225766,
+        "mean_rank": 2.8333333333333335,
+        "win_rate": 0.5,
+        "beat_baseline_rate": 0.6666666666666666,
+        "best_baseline": "Seasonal naive (weekly)",
+        "best_baseline_mean_rmse": 7.945107966953015
+      }
+    },
+    "Lucknow": {
+      "model": "Prophet",
+      "config": "Prophet (yearly + weekly, additive)",
+      "dir": "models/no2/lucknow",
+      "files": [
+        "model.json"
+      ],
+      "trained_at": "2026-09-25T19:08:36+00:00",
+      "train_start": "2015-01-01",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 12.315622390124568,
+        "std_rmse": 5.843660933198515,
+        "mean_mae": 9.785590961261095,
+        "mean_mape": 27.16661565922313,
+        "mean_rank": 4.166666666666667,
+        "win_rate": 0.16666666666666666,
+        "beat_baseline_rate": 0.5,
+        "best_baseline": "Seasonal naive (annual)",
+        "best_baseline_mean_rmse": 14.62255281251292
+      }
+    }
+  }
+}

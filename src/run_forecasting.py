@@ -10,10 +10,11 @@ The LSTM is run once per seed in ``LSTM_SEEDS`` and its metrics averaged.
 
 Usage::
 
-    python -m src.run_forecasting                      # all cities, all models
+    python -m src.run_forecasting                      # AQI: all cities, all models
+    python -m src.run_forecasting --target PM2.5       # same evaluation for a pollutant
     python -m src.run_forecasting --cities Delhi --models ARIMA XGBoost --windows 2
 
-Outputs (``reports/forecasting/``):
+Outputs (``reports/forecasting/`` for AQI, ``reports/forecasting/<pm25|no2>/`` for pollutants):
     stationarity.csv         ADF/KPSS + ACF/STL seasonal diagnostics per city
     metrics.csv              one row per (city, window, model): RMSE/MSE/MAE/MAPE, config
     multiwindow_summary.csv  one row per (city, model): mean metrics, win rate, mean rank
@@ -21,7 +22,8 @@ Outputs (``reports/forecasting/``):
     leaderboard.json         per-city final-hold-out and multi-window rankings
     forecasts.csv            per-day actuals and forecasts for every window
     summary.md               generated tables and issues log
-and one final-hold-out plot per city in ``reports/figures/``.
+and one final-hold-out plot per city in ``reports/figures/`` (``reports/figures/<slug>/``
+for pollutants).
 """
 from __future__ import annotations
 
@@ -42,7 +44,8 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from src.data_loader import AQI_EXCLUDED_POLLUTANTS, CITIES, PROJECT_ROOT, load_all_cities  # noqa: E402
+from src.data_loader import (AQI_EXCLUDED_POLLUTANTS, CITIES, PROJECT_ROOT, TARGETS,  # noqa: E402
+                             load_all_cities)
 from src.evaluation import forecast_metrics  # noqa: E402
 from src.models.baselines import BASELINES  # noqa: E402
 from src.preprocessing import (N_WINDOWS, TEST_DAYS, WINDOW_STEP,  # noqa: E402
@@ -51,6 +54,16 @@ from src.preprocessing import (N_WINDOWS, TEST_DAYS, WINDOW_STEP,  # noqa: E402
 
 OUT_DIR = PROJECT_ROOT / "reports" / "forecasting"
 FIG_DIR = PROJECT_ROOT / "reports" / "figures"
+UNITS = {"AQI": "AQI", "PM2.5": "PM2.5 (µg/m³)", "NO2": "NO2 (µg/m³)"}
+
+
+def out_dir(target: str = "AQI"):
+    """AQI keeps the original location; pollutants get a subfolder."""
+    return OUT_DIR if target == "AQI" else OUT_DIR / TARGETS[target]
+
+
+def fig_dir(target: str = "AQI"):
+    return FIG_DIR if target == "AQI" else FIG_DIR / TARGETS[target]
 METRIC_KEYS = ["rmse", "mse", "mae", "mape"]
 
 # name -> (module in src.models, function, seeds or None). Resolved lazily inside
@@ -80,8 +93,8 @@ def _to_aqi(yhat_log) -> np.ndarray:
 
 # --------------------------------------------------------------------------- diagnostics
 
-def diagnose(city: str, df: pd.DataFrame, train: pd.DataFrame) -> dict:
-    log_train = to_model_space(train["aqi"])
+def diagnose(city: str, df: pd.DataFrame, train: pd.DataFrame, target: str = "AQI") -> dict:
+    log_train = to_model_space(train["value"])
     row = {
         "city": city,
         "start": df.index.min().date().isoformat(),
@@ -89,11 +102,12 @@ def diagnose(city: str, df: pd.DataFrame, train: pd.DataFrame) -> dict:
         "n_days": len(df),
         "n_interpolated": int(df["is_interpolated"].sum()),
         "n_train": len(train),
-        "aqi_excludes": ",".join(AQI_EXCLUDED_POLLUTANTS.get(city, ())),
+        "target": target,
+        "aqi_excludes": ",".join(AQI_EXCLUDED_POLLUTANTS.get(city, ())) if target == "AQI" else "",
     }
-    row.update({f"raw_{k}": v for k, v in stationarity_report(train["aqi"]).items()})
+    row.update({f"raw_{k}": v for k, v in stationarity_report(train["value"]).items()})
     row.update({f"log_{k}": v for k, v in stationarity_report(log_train).items()})
-    row.update(dominant_seasonal_period(train["aqi"]))
+    row.update(dominant_seasonal_period(train["value"]))
     for m in (7, 365):
         row[f"stl_strength_{m}"] = seasonal_strength(log_train, m)
     return row
@@ -105,7 +119,7 @@ def evaluate_window(city: str, window: int, train: pd.DataFrame, test: pd.DataFr
                     model_names: list[str]):
     """Fit every baseline + model on ``train`` and score on ``test``. Runs in a worker."""
     horizon = len(test)
-    y_train = to_model_space(train["aqi"])
+    y_train = to_model_space(train["value"])
     observed = ~test["is_interpolated"].to_numpy()
     meta = {"city": city, "window": window,
             "test_start": test.index[0].date().isoformat(),
@@ -113,7 +127,7 @@ def evaluate_window(city: str, window: int, train: pd.DataFrame, test: pd.DataFr
 
     rows, seed_rows = [], []
     preds = {"date": test.index, "city": city, "window": window,
-             "actual": test["aqi"].to_numpy(), "observed": observed}
+             "actual": test["value"].to_numpy(), "observed": observed}
     candidates = [(n, "baseline") for n in BASELINES] + [(n, "model") for n in model_names]
     for name, kind in candidates:
         t0 = time.perf_counter()
@@ -127,14 +141,14 @@ def evaluate_window(city: str, window: int, train: pd.DataFrame, test: pd.DataFr
                 out = fn(y_train, horizon)
                 yhat_log, config = out if isinstance(out, tuple) else (out, name)
                 yhat = _to_aqi(yhat_log)
-                metrics = forecast_metrics(test["aqi"], yhat, mask=observed)
+                metrics = forecast_metrics(test["value"], yhat, mask=observed)
             else:
                 # Seeded model: one run per seed, metrics averaged across runs.
                 runs, forecasts = [], []
                 for seed in seeds:
                     yhat_log, config = fn(y_train, horizon, seed=seed)
                     yhat = _to_aqi(yhat_log)
-                    m = forecast_metrics(test["aqi"], yhat, mask=observed)
+                    m = forecast_metrics(test["value"], yhat, mask=observed)
                     runs.append(m)
                     forecasts.append(yhat)
                     seed_rows.append({**meta, "model": name, "seed": seed, **m, "config": config})
@@ -228,16 +242,19 @@ def _clean(v):
     return v
 
 
-def build_leaderboard(metrics: pd.DataFrame, summary: pd.DataFrame, test_days: int) -> dict:
+def build_leaderboard(metrics: pd.DataFrame, summary: pd.DataFrame, test_days: int,
+                      target: str = "AQI") -> dict:
     board = {
-        "task": "aqi_forecast",
+        "task": f"{TARGETS[target]}_forecast",
+        "target": target,
         "horizon_days": test_days,
         "selection_metric": "rmse",
         "multi_window_selection": "lowest mean RMSE across windows",
         "n_windows": int(metrics["window"].nunique()),
         "window_step_days": WINDOW_STEP,
         "lstm_seeds": list(_resolve("LSTM")[1]) if "LSTM" in set(metrics["model"]) else None,
-        "aqi_excluded_pollutants": {c: list(p) for c, p in AQI_EXCLUDED_POLLUTANTS.items()},
+        "aqi_excluded_pollutants": ({c: list(p) for c, p in AQI_EXCLUDED_POLLUTANTS.items()}
+                                    if target == "AQI" else {}),
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "cities": {},
     }
@@ -295,10 +312,11 @@ def leaderboard_nan_paths(obj, path="") -> list[str]:
 
 # --------------------------------------------------------------------------- reporting
 
-def plot_final_window(city: str, df: pd.DataFrame, preds: pd.DataFrame, metrics: pd.DataFrame):
+def plot_final_window(city: str, df: pd.DataFrame, preds: pd.DataFrame, metrics: pd.DataFrame,
+                      target: str = "AQI"):
     fig, ax = plt.subplots(figsize=(11, 4.5))
-    context = df["aqi"].iloc[-120:]
-    ax.plot(context.index, context.values, color="black", lw=1.4, label="Actual AQI")
+    context = df["value"].iloc[-120:]
+    ax.plot(context.index, context.values, color="black", lw=1.4, label=f"Actual {target}")
     ranked = metrics[(metrics["city"] == city) & (metrics["window"] == 0)
                      & metrics["error"].isna()].sort_values("rmse")
     best_base = ranked[ranked["kind"] == "baseline"].iloc[0]["model"]
@@ -307,12 +325,12 @@ def plot_final_window(city: str, df: pd.DataFrame, preds: pd.DataFrame, metrics:
         style = dict(ls="--", color="grey") if name == best_base else {}
         ax.plot(preds["date"], preds[name], lw=1.2, label=f"{name} (RMSE {rmse:.1f})", **style)
     ax.axvline(preds["date"].iloc[0], color="grey", lw=0.8, ls=":")
-    suffix = " (AQI recomputed without CO)" if city in AQI_EXCLUDED_POLLUTANTS else ""
-    ax.set_title(f"{city}: final 30-day hold-out forecasts{suffix}")
-    ax.set_ylabel("AQI")
+    suffix = " (AQI recomputed without CO)" if target == "AQI" and city in AQI_EXCLUDED_POLLUTANTS else ""
+    ax.set_title(f"{city}: final 30-day hold-out {target} forecasts{suffix}")
+    ax.set_ylabel(UNITS[target])
     ax.legend(fontsize=8, ncol=2, loc="upper left")
     fig.tight_layout()
-    fig.savefig(FIG_DIR / f"forecast_{city.lower()}.png", dpi=120)
+    fig.savefig(fig_dir(target) / f"forecast_{city.lower()}.png", dpi=120)
     plt.close(fig)
 
 
@@ -328,15 +346,15 @@ def _matrix(df: pd.DataFrame, value: str, fmt, order: list[str]) -> list[str]:
     return _md_table(["Model", *pivot.columns], rows)
 
 
-def write_summary(diag, metrics, summary, board, test_days, model_order):
+def write_summary(diag, metrics, summary, board, test_days, model_order, target: str = "AQI"):
     n_win = board["n_windows"]
-    L = ["# AQI forecasting: evaluation summary", "",
-         f"Generated {board['generated_at']}. Models fitted on log1p(AQI), scored on the AQI scale "
+    L = [f"# {target} forecasting: evaluation summary", "",
+         f"Generated {board['generated_at']}. Models fitted on log1p({target}), scored on the original scale "
          f"(observed days only). Horizon {test_days} days. "
          f"Multi-window: {n_win} non-overlapping {test_days}-day test windows per city, stepping back "
          f"{WINDOW_STEP} days from the end (expanding training window); window 0 is the final hold-out. "
-         f"LSTM metrics are the mean of seeds {board['lstm_seeds']}. "
-         "Ahmedabad AQI is recomputed without CO (see findings.md).", "",
+         f"LSTM metrics are the mean of seeds {board['lstm_seeds']}."
+         + (" Ahmedabad AQI is recomputed without CO (see findings.md)." if target == "AQI" else ""), "",
          "## Multi-window results (primary)", "",
          "Best model = lowest mean RMSE across windows. Win = lowest RMSE of all candidates "
          "(baselines included) in a window.", ""]
@@ -409,13 +427,14 @@ def write_summary(diag, metrics, summary, board, test_days, model_order):
         L.append(f"- {city}: never beat the baseline in any window: {', '.join(g['model'])}")
     if failed.empty and never.empty:
         L.append("- None.")
-    (OUT_DIR / "summary.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    (out_dir(target) / "summary.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 # --------------------------------------------------------------------------- main
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--target", default="AQI", choices=list(TARGETS))
     ap.add_argument("--cities", nargs="+", default=CITIES)
     ap.add_argument("--models", nargs="+", default=list(MODELS), choices=list(MODELS))
     ap.add_argument("--test-days", type=int, default=TEST_DAYS)
@@ -423,36 +442,40 @@ def main():
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 1) - 2))
     args = ap.parse_args()
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    target = args.target
+    out, figs = out_dir(target), fig_dir(target)
+    out.mkdir(parents=True, exist_ok=True)
+    figs.mkdir(parents=True, exist_ok=True)
 
-    data = load_all_cities(args.cities)
+    data = load_all_cities(args.cities, target=target)
+    print(f"Target: {target}")
     for city, df in data.items():
-        note = f"  [AQI without {', '.join(AQI_EXCLUDED_POLLUTANTS[city])}]" if city in AQI_EXCLUDED_POLLUTANTS else ""
+        note = (f"  [AQI without {', '.join(AQI_EXCLUDED_POLLUTANTS[city])}]"
+                if target == "AQI" and city in AQI_EXCLUDED_POLLUTANTS else "")
         print(f"{city:<10} {df.index.min().date()} -> {df.index.max().date()} ({len(df)} days){note}")
-    diag = pd.DataFrame([diagnose(c, df, df.iloc[:-args.test_days]) for c, df in data.items()])
+    diag = pd.DataFrame([diagnose(c, df, df.iloc[:-args.test_days], target) for c, df in data.items()])
 
     t0 = time.perf_counter()
     raw_metrics, seed_runs, preds = run_all(data, args.models, args.test_days, args.windows, args.jobs)
     metrics = add_window_rankings(raw_metrics)
     summary = summarise_windows(metrics)
-    board = build_leaderboard(metrics, summary, args.test_days)
+    board = build_leaderboard(metrics, summary, args.test_days, target)
 
-    diag.to_csv(OUT_DIR / "stationarity.csv", index=False)
-    metrics.to_csv(OUT_DIR / "metrics.csv", index=False)
-    summary.to_csv(OUT_DIR / "multiwindow_summary.csv", index=False)
-    seed_runs.to_csv(OUT_DIR / "lstm_seed_runs.csv", index=False)
-    preds.to_csv(OUT_DIR / "forecasts.csv", index=False)
-    (OUT_DIR / "leaderboard.json").write_text(json.dumps(board, indent=2, allow_nan=False), encoding="utf-8")
+    diag.to_csv(out / "stationarity.csv", index=False)
+    metrics.to_csv(out / "metrics.csv", index=False)
+    summary.to_csv(out / "multiwindow_summary.csv", index=False)
+    seed_runs.to_csv(out / "lstm_seed_runs.csv", index=False)
+    preds.to_csv(out / "forecasts.csv", index=False)
+    (out / "leaderboard.json").write_text(json.dumps(board, indent=2, allow_nan=False), encoding="utf-8")
     for city, df in data.items():
         final = preds[(preds["city"] == city) & (preds["window"] == 0)].reset_index(drop=True)
-        plot_final_window(city, df, final, metrics)
-    write_summary(diag, metrics, summary, board, args.test_days, args.models)
+        plot_final_window(city, df, final, metrics, target)
+    write_summary(diag, metrics, summary, board, args.test_days, args.models, target)
 
     bad = leaderboard_nan_paths(board)
     print(f"\nDone in {time.perf_counter() - t0:.0f}s. Failed fits: {int(metrics['error'].notna().sum())}. "
           f"NaN/null metric fields in leaderboard: {len(bad)}" + (f" -> {bad[:10]}" if bad else ""))
-    print(f"Wrote results to {OUT_DIR.relative_to(PROJECT_ROOT)} and plots to {FIG_DIR.relative_to(PROJECT_ROOT)}")
+    print(f"Wrote results to {out.relative_to(PROJECT_ROOT)} and plots to {figs.relative_to(PROJECT_ROOT)}")
 
 
 if __name__ == "__main__":

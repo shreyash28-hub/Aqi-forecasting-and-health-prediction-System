@@ -1,0 +1,43 @@
+{
+  "city": "Delhi",
+  "target": "NO2",
+  "output_column": "no2",
+  "model": "Prophet",
+  "config": "Prophet (yearly + weekly, additive)",
+  "files": [
+    "model.json"
+  ],
+  "transform": "log1p",
+  "trained_at": "2026-09-25T19:08:34+00:00",
+  "train_start": "2015-01-01",
+  "train_end": "2020-07-01",
+  "last_train_date": "2020-07-01",
+  "n_train": 2009,
+  "max_horizon": 30,
+  "aqi_excluded_pollutants": [],
+  "evaluation": {
+    "selection": "lowest mean RMSE over multi-window evaluation",
+    "n_windows": 6,
+    "horizon_days": 30,
+    "mean_rmse": 8.730571772479776,
+    "std_rmse": 3.3513881726666086,
+    "mean_mae": 7.286171483273471,
+    "mean_mape": 17.085997399668525,
+    "mean_rank": 2.1666666666666665,
+    "win_rate": 0.5,
+    "beat_baseline_rate": 0.8333333333333334,
+    "best_baseline": "Naive (last value)",
+    "best_baseline_mean_rmse": 13.200171317503012
+  },
+  "params": {},
+  "library_versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.1.3",
+    "statsmodels": "0.15.0",
+    "xgboost": "3.4.1",
+    "torch": "2.14.0+cpu",
+    "prophet": "1.4.0",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0"
+  }
+}

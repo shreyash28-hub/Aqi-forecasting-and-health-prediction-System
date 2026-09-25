@@ -1,0 +1,43 @@
+{
+  "city": "Lucknow",
+  "target": "PM2.5",
+  "output_column": "pm25",
+  "model": "Prophet",
+  "config": "Prophet (yearly + weekly, additive)",
+  "files": [
+    "model.json"
+  ],
+  "transform": "log1p",
+  "trained_at": "2026-09-25T19:07:37+00:00",
+  "train_start": "2015-03-20",
+  "train_end": "2020-07-01",
+  "last_train_date": "2020-07-01",
+  "n_train": 1931,
+  "max_horizon": 30,
+  "aqi_excluded_pollutants": [],
+  "evaluation": {
+    "selection": "lowest mean RMSE over multi-window evaluation",
+    "n_windows": 6,
+    "horizon_days": 30,
+    "mean_rmse": 36.04232026763941,
+    "std_rmse": 19.14617496730948,
+    "mean_mae": 26.76884608909151,
+    "mean_mape": 27.27826890677608,
+    "mean_rank": 2.3333333333333335,
+    "win_rate": 0.3333333333333333,
+    "beat_baseline_rate": 0.8333333333333334,
+    "best_baseline": "Naive (last value)",
+    "best_baseline_mean_rmse": 50.24870261364597
+  },
+  "params": {},
+  "library_versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.1.3",
+    "statsmodels": "0.15.0",
+    "xgboost": "3.4.1",
+    "torch": "2.14.0+cpu",
+    "prophet": "1.4.0",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0"
+  }
+}

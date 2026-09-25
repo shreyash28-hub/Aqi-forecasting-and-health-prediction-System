@@ -58,3 +58,55 @@ load_forecaster("Delhi").forecast(7)   # DataFrame of date, aqi. No retraining.
 Pickled statsmodels models are only guaranteed to load with the library versions in
 `metadata.json`, so the backend should pin the same versions (see `requirements.txt`).
 If a load fails after an upgrade, rerun `python -m src.train_final_models`.
+
+## Pollutant forecasts (PM2.5, NO2)
+
+The same evaluation and deployment pipeline runs for PM2.5 and NO2, which the health
+model uses alongside AQI (the only pollutants with usable history in all six cities):
+
+```bash
+python -m src.run_forecasting --target PM2.5      # -> reports/forecasting/pm25/
+python -m src.run_forecasting --target NO2        # -> reports/forecasting/no2/
+python -m src.train_final_models --target PM2.5   # -> models/pm25/
+python -m src.train_final_models --target NO2     # -> models/no2/
+```
+
+If no model beats the best naive baseline on mean RMSE for a city, the baseline itself is
+deployed (currently Hyderabad PM2.5 and Ahmedabad NO2). `forecast_air(city, horizon)`
+returns AQI, PM2.5 and NO2 forecasts together.
+
+## Health-risk models
+
+```bash
+python -m src.health.train      # train, evaluate, select and save (~3-10 min on CPU)
+python -m src.health.backtest   # health models fed real forecasts vs measured air
+```
+
+Random Forest, XGBoost and an MLP are trained for the risk level (classification,
+selected by weighted F1) and the risk score (regression, selected by RMSE). Selection
+uses 5-fold stratified CV on an 80% split; the 20% test split gives the reported
+metrics; each winner is then refitted on all rows and saved to `models/health/`
+(preprocessor via joblib, estimator via joblib or XGBoost `.ubj`).
+
+Two variants are deployed: **profile + AQI + PM2.5 + NO2** (primary) and **profile + AQI**
+(fallback when a pollutant forecast is missing). Results: `reports/health/summary.md`
+and `reports/health/forecast_backtest.md`.
+
+```python
+from src.model_store import forecast_air
+from src.health.store import load_health_predictor
+risk = load_health_predictor().predict(profile, forecast_air("Delhi", 7))
+```
+
+Per day it returns `risk_level` (classifier, the headline), `confidence` and
+`p_low..p_severe`, `risk_score`, and the boundary rule's outputs: `borderline` (the
+score implies a neighbouring level), `risk_range` (e.g. `Moderate-High`) and
+`alert_level` (the higher level, used for High/Severe actions such as the hospital map).
+
+| Path | Contents |
+|---|---|
+| `src/health/data.py` | Dataset loading, feature sets, excluded (leaky) columns, category lists |
+| `src/health/models.py` | Preprocessing + Random Forest / XGBoost / MLP builders |
+| `src/health/train.py` | CV selection, test evaluation, boundary-rule evaluation, final refit and save |
+| `src/health/store.py` | Save/load; `HealthRiskPredictor.predict(profile, air_forecast)` |
+| `src/health/backtest.py` | Health models on forecast inputs vs measured air |

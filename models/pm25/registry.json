@@ -1,0 +1,161 @@
+{
+  "task": "pm25_forecast",
+  "target": "PM2.5",
+  "updated_at": "2026-09-25T19:09:14+00:00",
+  "cities": {
+    "Ahmedabad": {
+      "model": "Holt-Winters",
+      "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+      "dir": "models/pm25/ahmedabad",
+      "files": [
+        "model.joblib"
+      ],
+      "trained_at": "2026-09-25T19:07:18+00:00",
+      "train_start": "2017-10-10",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 26.922059704598627,
+        "std_rmse": 9.045602004500228,
+        "mean_mae": 20.228746948013608,
+        "mean_mape": 32.65327858644333,
+        "mean_rank": 3.8333333333333335,
+        "win_rate": 0.0,
+        "beat_baseline_rate": 0.5,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 30.07654984630147
+      }
+    },
+    "Bengaluru": {
+      "model": "SARIMA",
+      "config": "SARIMA(2, 0, 1)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+      "dir": "models/pm25/bengaluru",
+      "files": [
+        "model.joblib"
+      ],
+      "trained_at": "2026-09-25T19:07:34+00:00",
+      "train_start": "2015-03-20",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 10.529438105653428,
+        "std_rmse": 4.452889180323578,
+        "mean_mae": 8.532920886216585,
+        "mean_mape": 30.744260334971898,
+        "mean_rank": 3.1666666666666665,
+        "win_rate": 0.16666666666666666,
+        "beat_baseline_rate": 0.5,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 11.447710456518415
+      }
+    },
+    "Chennai": {
+      "model": "Holt-Winters",
+      "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+      "dir": "models/pm25/chennai",
+      "files": [
+        "model.joblib"
+      ],
+      "trained_at": "2026-09-25T19:07:34+00:00",
+      "train_start": "2015-03-23",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 25.674006221080177,
+        "std_rmse": 13.894542143564413,
+        "mean_mae": 16.942639132694822,
+        "mean_mape": 38.21823326972212,
+        "mean_rank": 3.0,
+        "win_rate": 0.16666666666666666,
+        "beat_baseline_rate": 0.6666666666666666,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 26.906187717678332
+      }
+    },
+    "Delhi": {
+      "model": "Prophet",
+      "config": "Prophet (yearly + weekly, additive)",
+      "dir": "models/pm25/delhi",
+      "files": [
+        "model.json"
+      ],
+      "trained_at": "2026-09-25T19:07:35+00:00",
+      "train_start": "2015-01-01",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 44.038564596854805,
+        "std_rmse": 32.06171526668093,
+        "mean_mae": 31.404446665111266,
+        "mean_mape": 27.853223402061946,
+        "mean_rank": 2.0,
+        "win_rate": 0.3333333333333333,
+        "beat_baseline_rate": 0.8333333333333334,
+        "best_baseline": "Seasonal naive (annual)",
+        "best_baseline_mean_rmse": 67.5274402571916
+      }
+    },
+    "Hyderabad": {
+      "model": "Naive (last value)",
+      "config": "Naive (last value)",
+      "dir": "models/pm25/hyderabad",
+      "files": [],
+      "trained_at": "2026-09-25T19:09:14+00:00",
+      "train_start": "2015-03-31",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "naive baseline: best model (Holt-Winters) did not beat it on mean RMSE over the multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 12.14977020036421,
+        "std_rmse": 0.8942215762010605,
+        "mean_mae": 9.772055555555555,
+        "mean_mape": 39.87650946323081,
+        "mean_rank": 4.0,
+        "win_rate": 0.0,
+        "beat_baseline_rate": null,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 12.14977020036421
+      }
+    },
+    "Lucknow": {
+      "model": "Prophet",
+      "config": "Prophet (yearly + weekly, additive)",
+      "dir": "models/pm25/lucknow",
+      "files": [
+        "model.json"
+      ],
+      "trained_at": "2026-09-25T19:07:37+00:00",
+      "train_start": "2015-03-20",
+      "train_end": "2020-07-01",
+      "max_horizon": 30,
+      "evaluation": {
+        "selection": "lowest mean RMSE over multi-window evaluation",
+        "n_windows": 6,
+        "horizon_days": 30,
+        "mean_rmse": 36.04232026763941,
+        "std_rmse": 19.14617496730948,
+        "mean_mae": 26.76884608909151,
+        "mean_mape": 27.27826890677608,
+        "mean_rank": 2.3333333333333335,
+        "win_rate": 0.3333333333333333,
+        "beat_baseline_rate": 0.8333333333333334,
+        "best_baseline": "Naive (last value)",
+        "best_baseline_mean_rmse": 50.24870261364597
+      }
+    }
+  }
+}

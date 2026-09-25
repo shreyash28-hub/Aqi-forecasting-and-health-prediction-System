@@ -1,0 +1,47 @@
+{
+  "city": "Bengaluru",
+  "target": "PM2.5",
+  "output_column": "pm25",
+  "model": "SARIMA",
+  "config": "SARIMA(2, 0, 1)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+  "files": [
+    "model.joblib"
+  ],
+  "transform": "log1p",
+  "trained_at": "2026-09-25T19:07:34+00:00",
+  "train_start": "2015-03-20",
+  "train_end": "2020-07-01",
+  "last_train_date": "2020-07-01",
+  "n_train": 1931,
+  "max_horizon": 30,
+  "aqi_excluded_pollutants": [],
+  "evaluation": {
+    "selection": "lowest mean RMSE over multi-window evaluation",
+    "n_windows": 6,
+    "horizon_days": 30,
+    "mean_rmse": 10.529438105653428,
+    "std_rmse": 4.452889180323578,
+    "mean_mae": 8.532920886216585,
+    "mean_mape": 30.744260334971898,
+    "mean_rank": 3.1666666666666665,
+    "win_rate": 0.16666666666666666,
+    "beat_baseline_rate": 0.5,
+    "best_baseline": "Naive (last value)",
+    "best_baseline_mean_rmse": 11.447710456518415
+  },
+  "params": {
+    "fourier_k": 3,
+    "fourier_period": 365.25,
+    "fourier_origin": "2015-01-01"
+  },
+  "library_versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.1.3",
+    "statsmodels": "0.15.0",
+    "xgboost": "3.4.1",
+    "torch": "2.14.0+cpu",
+    "prophet": "1.4.0",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0"
+  }
+}
