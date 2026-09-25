@@ -1,0 +1,7 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Extracted from data/Aqi.zip by src/data_loader.py
+data/city_day.csv

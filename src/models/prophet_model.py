@@ -1,0 +1,23 @@
+"""Facebook Prophet with yearly + weekly seasonality."""
+from __future__ import annotations
+
+import logging
+
+import pandas as pd
+
+# Prophet logs an error at import when plotly (only used for its interactive plots) is absent.
+logging.getLogger("prophet.plot").disabled = True
+from prophet import Prophet  # noqa: E402
+
+
+
+def prophet_forecast(train: pd.Series, horizon: int):
+    # cmdstanpy attaches its INFO handler lazily, so quieten it at call time.
+    for name in ("cmdstanpy", "prophet"):
+        logging.getLogger(name).setLevel(logging.WARNING)
+    df = pd.DataFrame({"ds": train.index, "y": train.to_numpy()})
+    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False,
+                    seasonality_mode="additive", changepoint_prior_scale=0.05)
+    model.fit(df)
+    future = model.make_future_dataframe(periods=horizon, freq="D", include_history=False)
+    return model.predict(future)["yhat"].to_numpy(), "Prophet (yearly + weekly, additive)"

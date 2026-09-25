@@ -1,0 +1,650 @@
+{
+  "task": "aqi_forecast",
+  "horizon_days": 30,
+  "selection_metric": "rmse",
+  "generated_at": "2026-09-25T15:18:01+00:00",
+  "cities": {
+    "Ahmedabad": {
+      "best_model": "Prophet",
+      "best_model_beats_baseline": true,
+      "best_baseline": "Seasonal naive (weekly)",
+      "ranking": [
+        {
+          "model": "Prophet",
+          "kind": "model",
+          "rmse": 22.891310411515178,
+          "mse": 524.0120923563431,
+          "mae": 20.979182061391555,
+          "mape": 22.627862223375516,
+          "config": "Prophet (yearly + weekly, additive)",
+          "runtime_s": 0.38,
+          "rank": 1
+        },
+        {
+          "model": "Seasonal naive (weekly)",
+          "kind": "baseline",
+          "rmse": 28.317082174142573,
+          "mse": 801.857142857143,
+          "mae": 25.214285714285722,
+          "mape": 27.798786027233703,
+          "config": "Seasonal naive (weekly)",
+          "runtime_s": 0.0,
+          "rank": 2
+        },
+        {
+          "model": "Naive (last value)",
+          "kind": "baseline",
+          "rmse": 32.68300126103126,
+          "mse": 1068.1785714285709,
+          "mae": 30.749999999999993,
+          "mape": 33.75133960014461,
+          "config": "Naive (last value)",
+          "runtime_s": 0.0,
+          "rank": 3
+        },
+        {
+          "model": "Holt-Winters",
+          "kind": "model",
+          "rmse": 36.377866368229476,
+          "mse": 1323.3491615047612,
+          "mae": 33.78604384914079,
+          "mape": 36.82609600516319,
+          "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+          "runtime_s": 0.22,
+          "rank": 4
+        },
+        {
+          "model": "XGBoost",
+          "kind": "model",
+          "rmse": 36.57792546184713,
+          "mse": 1337.9446310924448,
+          "mae": 34.6399951368927,
+          "mape": 37.999859110772384,
+          "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar)",
+          "runtime_s": 1.5,
+          "rank": 5
+        },
+        {
+          "model": "ARIMA",
+          "kind": "model",
+          "rmse": 70.74483088079285,
+          "mse": 5004.831096351981,
+          "mae": 67.8364014445195,
+          "mape": 73.6608360503503,
+          "config": "ARIMA(2, 0, 2)",
+          "runtime_s": 4.39,
+          "rank": 6
+        },
+        {
+          "model": "SARIMA",
+          "kind": "model",
+          "rmse": 157.35675986795147,
+          "mse": 24761.14987614014,
+          "mae": 145.66763481702847,
+          "mape": 157.3852315412289,
+          "config": "SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+          "runtime_s": 7.23,
+          "rank": 7
+        },
+        {
+          "model": "LSTM",
+          "kind": "model",
+          "rmse": 195.02941849111087,
+          "mse": 38036.47407698086,
+          "mae": 189.97856421753292,
+          "mape": 203.63645151749142,
+          "config": "LSTM(1x64) lookback=60, direct 30-step, 23 epochs (early stop)",
+          "runtime_s": 4.0,
+          "rank": 8
+        },
+        {
+          "model": "Seasonal naive (annual)",
+          "kind": "baseline",
+          "rmse": 314.0000568698765,
+          "mse": 98596.0357142857,
+          "mae": 300.67857142857144,
+          "mape": 320.2099964066487,
+          "config": "Seasonal naive (annual)",
+          "runtime_s": 0.0,
+          "rank": 9
+        }
+      ],
+      "failed": []
+    },
+    "Bengaluru": {
+      "best_model": "Holt-Winters",
+      "best_model_beats_baseline": true,
+      "best_baseline": "Naive (last value)",
+      "ranking": [
+        {
+          "model": "Holt-Winters",
+          "kind": "model",
+          "rmse": 8.54726340124409,
+          "mse": 73.05571165024669,
+          "mae": 6.986396646359884,
+          "mape": 13.947949835348883,
+          "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+          "runtime_s": 0.35,
+          "rank": 1
+        },
+        {
+          "model": "Naive (last value)",
+          "kind": "baseline",
+          "rmse": 9.600347215943115,
+          "mse": 92.16666666666673,
+          "mae": 7.96666666666667,
+          "mape": 13.825629706085959,
+          "config": "Naive (last value)",
+          "runtime_s": 0.0,
+          "rank": 2
+        },
+        {
+          "model": "XGBoost",
+          "kind": "model",
+          "rmse": 10.097893629653154,
+          "mse": 101.96745575578976,
+          "mae": 8.044912607054203,
+          "mape": 16.193569782807096,
+          "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar)",
+          "runtime_s": 1.48,
+          "rank": 3
+        },
+        {
+          "model": "Prophet",
+          "kind": "model",
+          "rmse": 10.64838482980249,
+          "mse": 113.38809948356781,
+          "mae": 8.113482653546276,
+          "mape": 14.707821402153199,
+          "config": "Prophet (yearly + weekly, additive)",
+          "runtime_s": 0.5,
+          "rank": 4
+        },
+        {
+          "model": "SARIMA",
+          "kind": "model",
+          "rmse": 14.55471032024838,
+          "mse": 211.8395925063447,
+          "mae": 13.217030427729789,
+          "mape": 25.958789766349426,
+          "config": "SARIMA(2, 0, 1)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+          "runtime_s": 11.16,
+          "rank": 5
+        },
+        {
+          "model": "Seasonal naive (weekly)",
+          "kind": "baseline",
+          "rmse": 15.775508443998447,
+          "mse": 248.86666666666633,
+          "mae": 12.933333333333321,
+          "mape": 25.605454587991023,
+          "config": "Seasonal naive (weekly)",
+          "runtime_s": 0.0,
+          "rank": 6
+        },
+        {
+          "model": "ARIMA",
+          "kind": "model",
+          "rmse": 18.790317849857757,
+          "mse": 353.0760448986831,
+          "mae": 17.630892888041874,
+          "mape": 34.085675749226375,
+          "config": "ARIMA(2, 0, 1)",
+          "runtime_s": 6.46,
+          "rank": 7
+        },
+        {
+          "model": "Seasonal naive (annual)",
+          "kind": "baseline",
+          "rmse": 20.504471057145885,
+          "mse": 420.4333333333333,
+          "mae": 15.899999999999997,
+          "mape": 31.68790570097556,
+          "config": "Seasonal naive (annual)",
+          "runtime_s": 0.0,
+          "rank": 8
+        },
+        {
+          "model": "LSTM",
+          "kind": "model",
+          "rmse": 23.79667200630506,
+          "mse": 566.2815985756628,
+          "mae": 22.514843662587467,
+          "mape": 43.65499904498469,
+          "config": "LSTM(1x64) lookback=60, direct 30-step, 16 epochs (early stop)",
+          "runtime_s": 5.56,
+          "rank": 9
+        }
+      ],
+      "failed": []
+    },
+    "Chennai": {
+      "best_model": "SARIMA",
+      "best_model_beats_baseline": true,
+      "best_baseline": "Naive (last value)",
+      "ranking": [
+        {
+          "model": "SARIMA",
+          "kind": "model",
+          "rmse": 20.684548810850156,
+          "mse": 427.8505595084426,
+          "mae": 14.851805463779177,
+          "mape": 14.185144955105661,
+          "config": "SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+          "runtime_s": 13.66,
+          "rank": 1
+        },
+        {
+          "model": "Naive (last value)",
+          "kind": "baseline",
+          "rmse": 21.143162803453357,
+          "mse": 447.0333333333336,
+          "mae": 15.099999999999996,
+          "mape": 14.137270740305144,
+          "config": "Naive (last value)",
+          "runtime_s": 0.0,
+          "rank": 2
+        },
+        {
+          "model": "Holt-Winters",
+          "kind": "model",
+          "rmse": 21.42975779902495,
+          "mse": 459.2345193248708,
+          "mae": 15.351535226903353,
+          "mape": 14.253650894002151,
+          "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+          "runtime_s": 0.37,
+          "rank": 3
+        },
+        {
+          "model": "XGBoost",
+          "kind": "model",
+          "rmse": 23.02753781934951,
+          "mse": 530.2674980215721,
+          "mae": 15.509699936227571,
+          "mape": 13.636826477472678,
+          "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar)",
+          "runtime_s": 1.54,
+          "rank": 4
+        },
+        {
+          "model": "LSTM",
+          "kind": "model",
+          "rmse": 24.624447597655056,
+          "mse": 606.3634194896598,
+          "mae": 17.307002149410202,
+          "mape": 15.084520934772302,
+          "config": "LSTM(1x64) lookback=60, direct 30-step, 34 epochs (early stop)",
+          "runtime_s": 11.21,
+          "rank": 5
+        },
+        {
+          "model": "Seasonal naive (weekly)",
+          "kind": "baseline",
+          "rmse": 25.024654509769633,
+          "mse": 626.2333333333336,
+          "mae": 20.166666666666675,
+          "mape": 18.496255845314398,
+          "config": "Seasonal naive (weekly)",
+          "runtime_s": 0.0,
+          "rank": 6
+        },
+        {
+          "model": "ARIMA",
+          "kind": "model",
+          "rmse": 27.97668596851862,
+          "mse": 782.6949577811066,
+          "mae": 19.80089775114036,
+          "mape": 16.8443186511742,
+          "config": "ARIMA(2, 0, 2)",
+          "runtime_s": 9.28,
+          "rank": 7
+        },
+        {
+          "model": "Seasonal naive (annual)",
+          "kind": "baseline",
+          "rmse": 34.46931002113813,
+          "mse": 1188.1333333333334,
+          "mae": 27.066666666666666,
+          "mape": 26.762704254913384,
+          "config": "Seasonal naive (annual)",
+          "runtime_s": 0.0,
+          "rank": 8
+        },
+        {
+          "model": "Prophet",
+          "kind": "model",
+          "rmse": 46.76049143715638,
+          "mse": 2186.543559444375,
+          "mae": 41.171180342801996,
+          "mape": 37.80817736616903,
+          "config": "Prophet (yearly + weekly, additive)",
+          "runtime_s": 0.53,
+          "rank": 9
+        }
+      ],
+      "failed": []
+    },
+    "Delhi": {
+      "best_model": "LSTM",
+      "best_model_beats_baseline": true,
+      "best_baseline": "Naive (last value)",
+      "ranking": [
+        {
+          "model": "LSTM",
+          "kind": "model",
+          "rmse": 32.846486235482615,
+          "mse": 1078.891658017749,
+          "mae": 25.901215520834988,
+          "mape": 21.207672627255747,
+          "config": "LSTM(1x64) lookback=60, direct 30-step, 17 epochs (early stop)",
+          "runtime_s": 7.6,
+          "rank": 1
+        },
+        {
+          "model": "ARIMA",
+          "kind": "model",
+          "rmse": 35.722701783880076,
+          "mse": 1276.1114227400287,
+          "mae": 28.3685277902112,
+          "mape": 25.65748693911203,
+          "config": "ARIMA(2, 0, 2)",
+          "runtime_s": 8.72,
+          "rank": 2
+        },
+        {
+          "model": "XGBoost",
+          "kind": "model",
+          "rmse": 35.975736887210886,
+          "mse": 1294.2536445778258,
+          "mae": 24.55569850319106,
+          "mape": 20.755710584245275,
+          "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar)",
+          "runtime_s": 1.42,
+          "rank": 3
+        },
+        {
+          "model": "SARIMA",
+          "kind": "model",
+          "rmse": 38.51010428277249,
+          "mse": 1483.0281318700117,
+          "mae": 31.014166077908953,
+          "mape": 28.075421177533304,
+          "config": "SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+          "runtime_s": 13.3,
+          "rank": 4
+        },
+        {
+          "model": "Prophet",
+          "kind": "model",
+          "rmse": 39.550549035359104,
+          "mse": 1564.245928998345,
+          "mae": 25.411268265570243,
+          "mape": 17.95555122952286,
+          "config": "Prophet (yearly + weekly, additive)",
+          "runtime_s": 0.65,
+          "rank": 5
+        },
+        {
+          "model": "Naive (last value)",
+          "kind": "baseline",
+          "rmse": 41.05808893100926,
+          "mse": 1685.7666666666653,
+          "mae": 29.63333333333332,
+          "mape": 20.842739139560237,
+          "config": "Naive (last value)",
+          "runtime_s": 0.0,
+          "rank": 6
+        },
+        {
+          "model": "Holt-Winters",
+          "kind": "model",
+          "rmse": 41.61219117270356,
+          "mse": 1731.5744541936283,
+          "mae": 30.271915244109973,
+          "mape": 21.394541710193444,
+          "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+          "runtime_s": 0.39,
+          "rank": 7
+        },
+        {
+          "model": "Seasonal naive (weekly)",
+          "kind": "baseline",
+          "rmse": 52.77941517927862,
+          "mse": 2785.6666666666665,
+          "mae": 41.666666666666664,
+          "mape": 34.645562660613436,
+          "config": "Seasonal naive (weekly)",
+          "runtime_s": 0.0,
+          "rank": 8
+        },
+        {
+          "model": "Seasonal naive (annual)",
+          "kind": "baseline",
+          "rmse": 77.89373102717146,
+          "mse": 6067.4333333333325,
+          "mae": 67.83333333333333,
+          "mape": 58.05483173872108,
+          "config": "Seasonal naive (annual)",
+          "runtime_s": 0.0,
+          "rank": 9
+        }
+      ],
+      "failed": []
+    },
+    "Hyderabad": {
+      "best_model": "XGBoost",
+      "best_model_beats_baseline": false,
+      "best_baseline": "Naive (last value)",
+      "ranking": [
+        {
+          "model": "Naive (last value)",
+          "kind": "baseline",
+          "rmse": 14.079535977202289,
+          "mse": 198.23333333333363,
+          "mae": 11.300000000000008,
+          "mape": 29.387963401371337,
+          "config": "Naive (last value)",
+          "runtime_s": 0.0,
+          "rank": 1
+        },
+        {
+          "model": "XGBoost",
+          "kind": "model",
+          "rmse": 15.936932020603008,
+          "mse": 253.98580222932148,
+          "mae": 12.834885021962608,
+          "mape": 33.75904328108094,
+          "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar)",
+          "runtime_s": 1.53,
+          "rank": 2
+        },
+        {
+          "model": "Prophet",
+          "kind": "model",
+          "rmse": 16.238248079945738,
+          "mse": 263.6807007058614,
+          "mae": 12.149785587249717,
+          "mape": 32.43806974192128,
+          "config": "Prophet (yearly + weekly, additive)",
+          "runtime_s": 0.5,
+          "rank": 3
+        },
+        {
+          "model": "Holt-Winters",
+          "kind": "model",
+          "rmse": 16.578394294061304,
+          "mse": 274.8431573693644,
+          "mae": 13.705712691741072,
+          "mape": 35.785788203693265,
+          "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+          "runtime_s": 0.38,
+          "rank": 4
+        },
+        {
+          "model": "Seasonal naive (annual)",
+          "kind": "baseline",
+          "rmse": 23.8725784112232,
+          "mse": 569.9,
+          "mae": 18.7,
+          "mape": 46.29835225622288,
+          "config": "Seasonal naive (annual)",
+          "runtime_s": 0.0,
+          "rank": 5
+        },
+        {
+          "model": "LSTM",
+          "kind": "model",
+          "rmse": 27.8845788141976,
+          "mse": 777.5497356451976,
+          "mae": 25.992205152739913,
+          "mape": 64.57015307684479,
+          "config": "LSTM(1x64) lookback=60, direct 30-step, 19 epochs (early stop)",
+          "runtime_s": 6.41,
+          "rank": 6
+        },
+        {
+          "model": "SARIMA",
+          "kind": "model",
+          "rmse": 29.4751255523444,
+          "mse": 868.7830263264659,
+          "mae": 27.66524221300437,
+          "mape": 68.46031011550492,
+          "config": "SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+          "runtime_s": 12.9,
+          "rank": 7
+        },
+        {
+          "model": "Seasonal naive (weekly)",
+          "kind": "baseline",
+          "rmse": 35.252895862136874,
+          "mse": 1242.766666666667,
+          "mae": 30.43333333333334,
+          "mape": 76.58200436900884,
+          "config": "Seasonal naive (weekly)",
+          "runtime_s": 0.0,
+          "rank": 8
+        },
+        {
+          "model": "ARIMA",
+          "kind": "model",
+          "rmse": 35.84296097873768,
+          "mse": 1284.7178517233117,
+          "mae": 34.36844359929026,
+          "mape": 83.51097821808898,
+          "config": "ARIMA(3, 0, 1)",
+          "runtime_s": 8.08,
+          "rank": 9
+        }
+      ],
+      "failed": []
+    },
+    "Lucknow": {
+      "best_model": "Prophet",
+      "best_model_beats_baseline": true,
+      "best_baseline": "Naive (last value)",
+      "ranking": [
+        {
+          "model": "Prophet",
+          "kind": "model",
+          "rmse": 32.03100664670828,
+          "mse": 1025.98538680147,
+          "mae": 21.268118639850982,
+          "mape": 18.854426234395667,
+          "config": "Prophet (yearly + weekly, additive)",
+          "runtime_s": 0.47,
+          "rank": 1
+        },
+        {
+          "model": "Holt-Winters",
+          "kind": "model",
+          "rmse": 35.7521090233645,
+          "mse": 1278.2132996185412,
+          "mae": 24.3441369681068,
+          "mape": 21.715011518446005,
+          "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+          "runtime_s": 0.38,
+          "rank": 2
+        },
+        {
+          "model": "Naive (last value)",
+          "kind": "baseline",
+          "rmse": 36.881793159588476,
+          "mse": 1360.2666666666673,
+          "mae": 24.466666666666665,
+          "mape": 21.27684811453447,
+          "config": "Naive (last value)",
+          "runtime_s": 0.0,
+          "rank": 3
+        },
+        {
+          "model": "LSTM",
+          "kind": "model",
+          "rmse": 37.90644968015206,
+          "mse": 1436.8989273539,
+          "mae": 31.559315946809118,
+          "mape": 33.32697443518138,
+          "config": "LSTM(1x64) lookback=60, direct 30-step, 17 epochs (early stop)",
+          "runtime_s": 5.96,
+          "rank": 4
+        },
+        {
+          "model": "ARIMA",
+          "kind": "model",
+          "rmse": 45.54426901418801,
+          "mse": 2074.280440036726,
+          "mae": 41.31286002226265,
+          "mape": 49.011953471528805,
+          "config": "ARIMA(2, 0, 2)",
+          "runtime_s": 7.8,
+          "rank": 5
+        },
+        {
+          "model": "SARIMA",
+          "kind": "model",
+          "rmse": 49.363610613427404,
+          "mse": 2436.7660527940825,
+          "mae": 45.548047788453935,
+          "mape": 55.958686850172825,
+          "config": "SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",
+          "runtime_s": 13.3,
+          "rank": 6
+        },
+        {
+          "model": "XGBoost",
+          "kind": "model",
+          "rmse": 51.04256451853509,
+          "mse": 2605.343392628817,
+          "mae": 44.92776800834579,
+          "mape": 54.838626363905675,
+          "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar)",
+          "runtime_s": 1.6,
+          "rank": 7
+        },
+        {
+          "model": "Seasonal naive (weekly)",
+          "kind": "baseline",
+          "rmse": 55.63751731820295,
+          "mse": 3095.5333333333333,
+          "mae": 39.2,
+          "mape": 45.4650460501517,
+          "config": "Seasonal naive (weekly)",
+          "runtime_s": 0.0,
+          "rank": 8
+        },
+        {
+          "model": "Seasonal naive (annual)",
+          "kind": "baseline",
+          "rmse": 84.53559408123104,
+          "mse": 7146.2666666666655,
+          "mae": 74.13333333333334,
+          "mape": 90.36692234237943,
+          "config": "Seasonal naive (annual)",
+          "runtime_s": 0.0,
+          "rank": 9
+        }
+      ],
+      "failed": []
+    }
+  }
+}

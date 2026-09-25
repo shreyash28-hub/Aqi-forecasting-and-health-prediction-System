@@ -1,0 +1,16 @@
+# Core data stack
+pandas>=2.2
+numpy>=1.26,<2.2
+matplotlib>=3.8
+
+# Classical time series
+statsmodels>=0.14.2
+prophet>=1.1.5
+
+# ML
+scikit-learn>=1.4
+xgboost>=2.0
+
+# Deep learning (LSTM). CPU build is enough; install with:
+#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.3
