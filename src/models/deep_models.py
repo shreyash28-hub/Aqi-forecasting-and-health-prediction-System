@@ -55,12 +55,13 @@ def _windows(feats: np.ndarray, target: np.ndarray, horizon: int):
     return np.stack(X), np.stack(Y).astype(np.float32)
 
 
-def lstm_forecast(train: pd.Series, horizon: int, seed: int = SEED):
+def fit_lstm(train: pd.Series, horizon: int, seed: int = SEED):
+    """Train one seeded LSTM. Returns ``(model, scaler, config)``; ``scaler`` = {"mu", "sigma"}."""
     torch.set_num_threads(1)  # float reductions (and so results) depend on thread count
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    mu, sigma = train.mean(), train.std()
+    mu, sigma = float(train.mean()), float(train.std())
     y = ((train - mu) / sigma).to_numpy(dtype=np.float32)
     feats = _inputs(y, train.index)
     X, Y = _windows(feats, y, horizon)
@@ -93,9 +94,23 @@ def lstm_forecast(train: pd.Series, horizon: int, seed: int = SEED):
             if bad >= PATIENCE:
                 break
     model.load_state_dict(best_state)
+    model.eval()
+    config = (f"LSTM(1x{HIDDEN}) lookback={LOOKBACK}, direct {horizon}-step, "
+              f"{epochs_run} epochs (early stop), seed={seed}")
+    return model, {"mu": mu, "sigma": sigma}, config
 
+
+def predict_lstm(model: LSTMForecaster, scaler: dict, history: pd.Series) -> np.ndarray:
+    """Forecast the model's full horizon from the last ``LOOKBACK`` days of ``history``."""
+    history = history.iloc[-LOOKBACK:]
+    y = ((history - scaler["mu"]) / scaler["sigma"]).to_numpy(dtype=np.float32)
+    feats = _inputs(y, history.index)
     model.eval()
     with torch.no_grad():
-        pred = model(torch.from_numpy(feats[-LOOKBACK:][None])).numpy()[0]
-    return pred * sigma + mu, (f"LSTM(1x{HIDDEN}) lookback={LOOKBACK}, direct {horizon}-step, "
-                               f"{epochs_run} epochs (early stop), seed={seed}")
+        pred = model(torch.from_numpy(feats[None])).numpy()[0]
+    return pred * scaler["sigma"] + scaler["mu"]
+
+
+def lstm_forecast(train: pd.Series, horizon: int, seed: int = SEED):
+    model, scaler, config = fit_lstm(train, horizon, seed)
+    return predict_lstm(model, scaler, train), config

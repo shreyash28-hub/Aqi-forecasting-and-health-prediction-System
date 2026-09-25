@@ -6,3 +6,6 @@ __pycache__/
 # Extracted from data/Aqi.zip by src/data_loader.py
 data/city_day.csv
 data/city_hour.csv
+
+# Raw Kaggle download (~76 MB, publicly available): see data/README.md
+data/Aqi.zip

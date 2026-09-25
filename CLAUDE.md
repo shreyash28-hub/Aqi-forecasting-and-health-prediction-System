@@ -127,6 +127,7 @@ This schema is a sketch — refine exact column types/indexes/RLS policy syntax 
 - **2026-09-25: synthetic health dataset briefly paused, then resumed the same day after the user's teacher approved proceeding with it. In active use per the disclosure rule above.**
 - 2026-09-25: Ahmedabad AQI is recomputed from `city_hour.csv` **without CO** (faulty CO sensor: median 16 mg/m³ vs ~1 elsewhere, drove AQI to 2,049). Other cities use published AQI. Evidence in `reports/forecasting/findings.md`; switch is `AQI_EXCLUDED_POLLUTANTS` in `src/data_loader.py`.
 - 2026-09-25: AQI model selection uses 6 rolling-origin 30-day windows per city (lowest mean RMSE), not just the final June 2020 hold-out. LSTM metrics are averaged over seeds 42/43/44.
+- 2026-09-25: Deployed AQI models live in `models/aqi/<city>/` (winner retrained on full history, native save formats, `registry.json` index). Backend should load them with `src.model_store.load_forecaster(city).forecast(horizon)`, not retrain. Regenerate with `python -m src.train_final_models` after re-running the evaluation.
 
 ## Working conventions for this repo
 

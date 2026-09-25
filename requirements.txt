@@ -9,6 +9,7 @@ prophet>=1.1.5
 
 # ML
 scikit-learn>=1.4
+joblib>=1.3
 xgboost>=2.0
 
 # Deep learning (LSTM). CPU build is enough; install with:

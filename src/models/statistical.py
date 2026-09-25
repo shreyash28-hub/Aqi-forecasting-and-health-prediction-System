@@ -1,7 +1,9 @@
 """Classical forecasters: ARIMA, SARIMA and Holt-Winters (statsmodels).
 
-Each returns ``(forecast, description)`` where ``forecast`` is a length-``horizon``
-array in the same space as ``train`` and ``description`` records the chosen config.
+Each model has a ``fit_*`` function returning ``(fitted_results, config)`` (what gets
+saved for deployment) and a ``*_forecast(train, horizon)`` wrapper returning
+``(forecast, config)`` for evaluation. ``forecast`` is a length-``horizon`` array in
+the same space as ``train``.
 
 Why SARIMA uses weekly seasonality + Fourier terms
 --------------------------------------------------
@@ -63,11 +65,17 @@ def select_arima_order(train: pd.Series, d: int, max_p: int = 3, max_q: int = 3)
 
 
 @_silenced
-def arima_forecast(train: pd.Series, horizon: int):
+def fit_arima(train: pd.Series):
+    """Fit ARIMA with d from the ADF test and (p, q) by AIC. Returns ``(results, config)``."""
     d = stationarity_report(train)["recommended_d"]
     order = select_arima_order(train, d)
     res = ARIMA(train.to_numpy(), order=order, trend=_trend_for(d)).fit()
-    return res.forecast(horizon), f"ARIMA{order}"
+    return res, f"ARIMA{order}"
+
+
+def arima_forecast(train: pd.Series, horizon: int):
+    res, config = fit_arima(train)
+    return res.forecast(horizon), config
 
 
 def fourier_terms(index: pd.DatetimeIndex, k: int = FOURIER_K, period: float = ANNUAL) -> pd.DataFrame:
@@ -79,12 +87,16 @@ def fourier_terms(index: pd.DatetimeIndex, k: int = FOURIER_K, period: float = A
     return pd.DataFrame(cols, index=index)
 
 
+def future_index(last_date: pd.Timestamp, horizon: int) -> pd.DatetimeIndex:
+    return pd.date_range(last_date + pd.Timedelta(days=1), periods=horizon, freq="D")
+
+
 @_silenced
-def sarima_forecast(train: pd.Series, horizon: int):
+def fit_sarima(train: pd.Series):
+    """SARIMA(p,d,q)(P,0,Q)_7 with annual Fourier regressors. Returns ``(results, config)``."""
     d = stationarity_report(train)["recommended_d"]
     order = select_arima_order(train, d, max_p=2, max_q=2)
-    future_idx = pd.date_range(train.index[-1] + pd.Timedelta(days=1), periods=horizon, freq="D")
-    x_train, x_future = fourier_terms(train.index), fourier_terms(future_idx)
+    x_train = fourier_terms(train.index)
 
     best = (np.inf, None, None)
     for P, Q in [(1, 1), (1, 0), (0, 1)]:
@@ -99,12 +111,22 @@ def sarima_forecast(train: pd.Series, horizon: int):
     if best[2] is None:
         raise RuntimeError("No SARIMA configuration could be fitted")
     _, seasonal, res = best
-    fc = res.forecast(horizon, exog=x_future.to_numpy())
-    return fc, f"SARIMA{order}x{seasonal} + {FOURIER_K} annual Fourier pairs"
+    return res, f"SARIMA{order}x{seasonal} + {FOURIER_K} annual Fourier pairs"
+
+
+def predict_sarima(res, last_train_date: pd.Timestamp, horizon: int) -> np.ndarray:
+    """Forecast from a fitted SARIMA; the Fourier regressors are rebuilt for the future dates."""
+    x_future = fourier_terms(future_index(last_train_date, horizon))
+    return res.forecast(horizon, exog=x_future.to_numpy())
+
+
+def sarima_forecast(train: pd.Series, horizon: int):
+    res, config = fit_sarima(train)
+    return predict_sarima(res, train.index[-1], horizon), config
 
 
 @_silenced
-def holt_winters_forecast(train: pd.Series, horizon: int):
+def fit_holt_winters(train: pd.Series):
     """Additive damped-trend Holt-Winters; seasonal period 365 vs 7 chosen by AIC."""
     y = train.to_numpy()
     best = (np.inf, None, None)
@@ -122,4 +144,9 @@ def holt_winters_forecast(train: pd.Series, horizon: int):
     if best[2] is None:
         raise RuntimeError("Holt-Winters failed for every seasonal period")
     _, m, res = best
-    return res.forecast(horizon), f"Holt-Winters (add. damped trend, add. seasonal m={m})"
+    return res, f"Holt-Winters (add. damped trend, add. seasonal m={m})"
+
+
+def holt_winters_forecast(train: pd.Series, horizon: int):
+    res, config = fit_holt_winters(train)
+    return res.forecast(horizon), config

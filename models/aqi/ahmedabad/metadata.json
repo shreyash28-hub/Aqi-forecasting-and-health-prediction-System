@@ -1,0 +1,43 @@
+{
+  "city": "Ahmedabad",
+  "model": "Holt-Winters",
+  "config": "Holt-Winters (add. damped trend, add. seasonal m=7)",
+  "files": [
+    "model.joblib"
+  ],
+  "transform": "log1p",
+  "trained_at": "2026-09-25T18:14:24+00:00",
+  "train_start": "2017-10-11",
+  "train_end": "2020-07-01",
+  "last_train_date": "2020-07-01",
+  "n_train": 995,
+  "max_horizon": 30,
+  "aqi_excluded_pollutants": [
+    "CO"
+  ],
+  "evaluation": {
+    "selection": "lowest mean RMSE over multi-window evaluation",
+    "n_windows": 6,
+    "horizon_days": 30,
+    "mean_rmse": 57.4425762827773,
+    "std_rmse": 22.81145917532646,
+    "mean_mae": 48.166906020920386,
+    "mean_mape": 32.19542031925138,
+    "mean_rank": 3.6666666666666665,
+    "win_rate": 0.16666666666666666,
+    "beat_baseline_rate": 0.6666666666666666,
+    "best_baseline": "Naive (last value)",
+    "best_baseline_mean_rmse": 60.74957475807407
+  },
+  "params": {},
+  "library_versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.1.3",
+    "statsmodels": "0.15.0",
+    "xgboost": "3.4.1",
+    "torch": "2.14.0+cpu",
+    "prophet": "1.4.0",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0"
+  }
+}

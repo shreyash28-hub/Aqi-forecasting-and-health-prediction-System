@@ -11,7 +11,8 @@ from prophet import Prophet  # noqa: E402
 
 
 
-def prophet_forecast(train: pd.Series, horizon: int):
+def fit_prophet(train: pd.Series):
+    """Returns ``(model, config)``."""
     # cmdstanpy (re)configures its INFO handler lazily on first use, so a level set at
     # import time doesn't stick; disabling the logger does.
     logging.getLogger("cmdstanpy").disabled = True
@@ -20,5 +21,14 @@ def prophet_forecast(train: pd.Series, horizon: int):
     model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False,
                     seasonality_mode="additive", changepoint_prior_scale=0.05)
     model.fit(df)
+    return model, "Prophet (yearly + weekly, additive)"
+
+
+def predict_prophet(model: Prophet, horizon: int):
     future = model.make_future_dataframe(periods=horizon, freq="D", include_history=False)
-    return model.predict(future)["yhat"].to_numpy(), "Prophet (yearly + weekly, additive)"
+    return model.predict(future)["yhat"].to_numpy()
+
+
+def prophet_forecast(train: pd.Series, horizon: int):
+    model, config = fit_prophet(train)
+    return predict_prophet(model, horizon), config
