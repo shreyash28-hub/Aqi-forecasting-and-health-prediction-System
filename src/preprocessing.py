@@ -76,6 +76,31 @@ def train_test_split(df: pd.DataFrame, test_days: int = TEST_DAYS):
     return df.iloc[:-test_days], df.iloc[-test_days:]
 
 
+N_WINDOWS = 6
+WINDOW_STEP = 120  # days between successive test-window ends
+
+
+def rolling_origin_splits(df: pd.DataFrame, test_days: int = TEST_DAYS,
+                          n_windows: int = N_WINDOWS, step: int = WINDOW_STEP,
+                          min_train: int = 365):
+    """Non-overlapping 30-day test windows stepping back ``step`` days from the end.
+
+    Window 0 is the final hold-out. Each window trains on everything before it
+    (expanding window), and windows that would leave fewer than ``min_train``
+    training days are skipped. A 120-day step moves each window ~4 months, so the
+    windows cover different seasons instead of repeating the same month.
+    Yields ``(window_id, train, test)``.
+    """
+    if step < test_days:
+        raise ValueError("step must be >= test_days for non-overlapping windows")
+    for w in range(n_windows):
+        end = len(df) - w * step
+        start = end - test_days
+        if start < min_train:
+            break
+        yield w, df.iloc[:start], df.iloc[start:end]
+
+
 # AQI is strictly positive and right-skewed; models are fitted on log1p(AQI).
 def to_model_space(s: pd.Series) -> pd.Series:
     return np.log1p(s)

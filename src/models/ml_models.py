@@ -32,7 +32,8 @@ def xgboost_forecast(train: pd.Series, horizon: int):
     X = make_features(train)
     ok = X.notna().all(axis=1)
     model = XGBRegressor(n_estimators=400, learning_rate=0.03, max_depth=4, subsample=0.8,
-                         colsample_bytree=0.8, min_child_weight=5, random_state=SEED, n_jobs=-1)
+                         colsample_bytree=0.8, min_child_weight=5, random_state=SEED,
+                         n_jobs=1)  # single thread: results depend on thread count otherwise
     model.fit(X[ok], train[ok])
 
     # Recursive multi-step: append each prediction and rebuild features for the next day.

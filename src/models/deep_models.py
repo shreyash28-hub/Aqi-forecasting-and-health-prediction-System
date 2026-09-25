@@ -2,6 +2,11 @@
 
 Takes the last ``LOOKBACK`` days and predicts all ``horizon`` days in one shot,
 which avoids the error compounding of recursive forecasting.
+
+Reproducibility: every run is fully seeded (torch + numpy), so a given seed always
+gives the same forecast. The evaluation runs the LSTM once per seed in
+``LSTM_SEEDS`` and averages the metrics, so a single lucky/unlucky initialisation
+can't decide the ranking.
 """
 from __future__ import annotations
 
@@ -20,6 +25,7 @@ BATCH = 64
 LR = 1e-3
 VAL_FRACTION = 0.1
 SEED = 42
+LSTM_SEEDS = (42, 43, 44)
 
 
 class LSTMForecaster(nn.Module):
@@ -49,9 +55,10 @@ def _windows(feats: np.ndarray, target: np.ndarray, horizon: int):
     return np.stack(X), np.stack(Y).astype(np.float32)
 
 
-def lstm_forecast(train: pd.Series, horizon: int):
-    torch.manual_seed(SEED)
-    np.random.seed(SEED)
+def lstm_forecast(train: pd.Series, horizon: int, seed: int = SEED):
+    torch.set_num_threads(1)  # float reductions (and so results) depend on thread count
+    torch.manual_seed(seed)
+    np.random.seed(seed)
 
     mu, sigma = train.mean(), train.std()
     y = ((train - mu) / sigma).to_numpy(dtype=np.float32)
@@ -91,4 +98,4 @@ def lstm_forecast(train: pd.Series, horizon: int):
     with torch.no_grad():
         pred = model(torch.from_numpy(feats[-LOOKBACK:][None])).numpy()[0]
     return pred * sigma + mu, (f"LSTM(1x{HIDDEN}) lookback={LOOKBACK}, direct {horizon}-step, "
-                               f"{epochs_run} epochs (early stop)")
+                               f"{epochs_run} epochs (early stop), seed={seed}")

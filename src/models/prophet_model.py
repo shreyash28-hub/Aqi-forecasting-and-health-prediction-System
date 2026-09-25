@@ -12,9 +12,10 @@ from prophet import Prophet  # noqa: E402
 
 
 def prophet_forecast(train: pd.Series, horizon: int):
-    # cmdstanpy attaches its INFO handler lazily, so quieten it at call time.
-    for name in ("cmdstanpy", "prophet"):
-        logging.getLogger(name).setLevel(logging.WARNING)
+    # cmdstanpy (re)configures its INFO handler lazily on first use, so a level set at
+    # import time doesn't stick; disabling the logger does.
+    logging.getLogger("cmdstanpy").disabled = True
+    logging.getLogger("prophet").setLevel(logging.WARNING)
     df = pd.DataFrame({"ds": train.index, "y": train.to_numpy()})
     model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False,
                     seasonality_mode="additive", changepoint_prior_scale=0.05)

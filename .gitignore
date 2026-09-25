@@ -5,3 +5,4 @@ __pycache__/
 
 # Extracted from data/Aqi.zip by src/data_loader.py
 data/city_day.csv
+data/city_hour.csv

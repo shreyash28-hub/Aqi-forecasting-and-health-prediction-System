@@ -11,6 +11,15 @@ Gap handling
   segment is kept (a long outage can't be interpolated honestly). In practice
   this only affects Ahmedabad, which has 232- and 340-day outages in 2015-2017.
 * An ``is_interpolated`` flag is kept so evaluation can score observed days only.
+
+Ahmedabad: AQI recomputed without CO
+------------------------------------
+Ahmedabad's CO readings are implausible: its median daily CO is 16 mg/m3 against
+0.6-1.4 in the other five cities, and CO is the dominant sub-index in 82% of hours,
+pushing the published AQI up to 2,049 (CPCB scale tops out at 500). For
+Ahmedabad only, AQI is recomputed from ``city_hour.csv`` with the same method the
+dataset used (see ``src/aqi.py``), leaving CO out. In the other cities CO moves the
+median AQI by only 7-15 points, so their published AQI is used as-is.
 """
 from __future__ import annotations
 
@@ -19,30 +28,54 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.aqi import daily_aqi_from_hourly
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
 ZIP_PATH = DATA_DIR / "Aqi.zip"
 CSV_PATH = DATA_DIR / "city_day.csv"
+HOURLY_CSV_PATH = DATA_DIR / "city_hour.csv"
 
 CITIES = ["Delhi", "Bengaluru", "Chennai", "Hyderabad", "Lucknow", "Ahmedabad"]
 POLLUTANTS = ["PM2.5", "PM10", "NO2", "SO2", "O3", "CO"]
 DEFAULT_MAX_GAP = 21  # days
+# Pollutants left out when recomputing a city's AQI (see module docstring).
+AQI_EXCLUDED_POLLUTANTS = {"Ahmedabad": ("CO",)}
+
+
+def _ensure_extracted(path: Path) -> Path:
+    """Extract ``path`` from ``Aqi.zip`` if it isn't already on disk."""
+    if not path.exists():
+        if not ZIP_PATH.exists():
+            raise FileNotFoundError(f"Neither {path} nor {ZIP_PATH} exists.")
+        with zipfile.ZipFile(ZIP_PATH) as zf:
+            zf.extract(path.name, DATA_DIR)
+    return path
 
 
 def ensure_city_day_csv() -> Path:
-    """Extract ``city_day.csv`` from ``Aqi.zip`` if it isn't already on disk."""
-    if not CSV_PATH.exists():
-        if not ZIP_PATH.exists():
-            raise FileNotFoundError(f"Neither {CSV_PATH} nor {ZIP_PATH} exists.")
-        with zipfile.ZipFile(ZIP_PATH) as zf:
-            zf.extract("city_day.csv", DATA_DIR)
-    return CSV_PATH
+    return _ensure_extracted(CSV_PATH)
 
 
 def load_raw(cities: list[str] | None = None) -> pd.DataFrame:
     """Raw ``city_day.csv`` rows for the selected cities (default: the six)."""
     df = pd.read_csv(ensure_city_day_csv(), parse_dates=["Date"])
     return df[df["City"].isin(cities or CITIES)].reset_index(drop=True)
+
+
+def load_hourly(cities: list[str]) -> pd.DataFrame:
+    """``city_hour.csv`` rows for the given cities."""
+    df = pd.read_csv(_ensure_extracted(HOURLY_CSV_PATH), parse_dates=["Datetime"])
+    return df[df["City"].isin(cities)].reset_index(drop=True)
+
+
+def daily_aqi(city: str, raw: pd.DataFrame, hourly: pd.DataFrame | None = None) -> pd.Series:
+    """Daily AQI: published values, or recomputed from hourly data for excluded-pollutant cities."""
+    exclude = AQI_EXCLUDED_POLLUTANTS.get(city)
+    if not exclude:
+        return raw[raw["City"] == city].set_index("Date")["AQI"]
+    hourly = load_hourly([city]) if hourly is None else hourly
+    return daily_aqi_from_hourly(hourly[hourly["City"] == city], exclude=exclude)
 
 
 def _gap_lengths(mask: pd.Series) -> pd.Series:
@@ -67,13 +100,13 @@ def clean_series(s: pd.Series, max_gap: int = DEFAULT_MAX_GAP) -> pd.DataFrame:
     return pd.DataFrame({"aqi": filled, "is_interpolated": missing})
 
 
-def load_city_series(city: str, max_gap: int = DEFAULT_MAX_GAP,
-                     raw: pd.DataFrame | None = None) -> pd.DataFrame:
+def load_city_series(city: str, max_gap: int = DEFAULT_MAX_GAP, raw: pd.DataFrame | None = None,
+                     hourly: pd.DataFrame | None = None) -> pd.DataFrame:
     """Daily AQI for one city: DataFrame indexed by date with ``aqi`` and ``is_interpolated``."""
     raw = load_raw([city]) if raw is None else raw[raw["City"] == city]
     if raw.empty:
         raise ValueError(f"No rows for city {city!r}")
-    out = clean_series(raw.set_index("Date")["AQI"], max_gap=max_gap)
+    out = clean_series(daily_aqi(city, raw, hourly), max_gap=max_gap)
     out.index.name = "date"
     return out
 
@@ -83,7 +116,9 @@ def load_all_cities(cities: list[str] | None = None,
     """``{city: load_city_series(city)}`` for every selected city, reading the CSV once."""
     cities = cities or CITIES
     raw = load_raw(cities)
-    return {c: load_city_series(c, max_gap=max_gap, raw=raw) for c in cities}
+    recomputed = [c for c in cities if c in AQI_EXCLUDED_POLLUTANTS]
+    hourly = load_hourly(recomputed) if recomputed else None
+    return {c: load_city_series(c, max_gap=max_gap, raw=raw, hourly=hourly) for c in cities}
 
 
 def load_city_pollutants(city: str, max_gap: int = DEFAULT_MAX_GAP) -> pd.DataFrame:
