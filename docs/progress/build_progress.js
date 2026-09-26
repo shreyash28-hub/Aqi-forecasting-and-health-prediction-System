@@ -11,7 +11,7 @@ const {
 // =========================================================================== CONTENT
 
 const LAST_UPDATED = "26 September 2026";
-const LATEST_COMMIT = "Supabase accounts: profile, prediction history (26 Sep 2026)";
+const LATEST_COMMIT = "836d8f7 Supabase accounts; design docs pending commit";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -22,8 +22,9 @@ const AT_A_GLANCE = [
   ["FastAPI backend: public endpoints", "Done", "7 endpoints"],
   ["Supabase: database and sign-in", "Done", "Project created, tables and row-level security live and verified"],
   ["Backend: sign-in, saved profile, history", "Done", "5 signed-in endpoints; 41 tests pass in total"],
-  ["Live check with a real test user", "Waiting on you", "Run scripts/check_accounts_live.py (about 2 minutes)"],
-  ["Next.js frontend", "Not started", ""],
+  ["Live check with a real test user", "Done", "All 8 checks passed against the real Supabase project"],
+  ["Frontend design (Airware)", "Done", "Landing page and dashboard designs approved; spec in docs/frontend_design.md"],
+  ["Next.js frontend", "Not started", "Waiting for your go-ahead to start coding"],
   ["Hospital map", "Not started", "Leaflet + OpenStreetMap (Overpass)"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Not started", "Vercel (frontend), Render or Railway (backend)"],
@@ -82,12 +83,26 @@ const DONE = [
       "Signed-in endpoints: GET/PUT /api/me/profile, POST /api/me/risk (runs a prediction with the saved profile and saves it to history), GET /api/me/history, GET/DELETE /api/me/history/{id}.",
       "Each database call is made with the user's own sign-in token, so row-level security keeps every user's profile and history private, even inside the backend.",
       "12 new tests using an in-memory stand-in for Supabase that enforces the same per-user rules (41 tests pass in total); the real sign-in service correctly rejects invalid tokens.",
+      "Live end-to-end check with a real test user passed all 8 steps: save and read profile, run a prediction, list and read history, hidden without sign-in, delete, confirm deletion.",
       "SQL script supabase/migrations/0001_init.sql: profiles, saved_forecasts, risk_predictions, aqi_forecasts_cache, model_leaderboard.",
       "Row-level security: users only see and change their own profile and history; history can't be edited; public tables are read-only except for the backend.",
       "Step-by-step setup guide (supabase/README.md) and .env.example; real keys stay in a git-ignored .env.",
     ],
   },
 ];
+
+DONE.push({
+  title: "Frontend design (Airware)",
+  items: [
+    "Site named Airware. Stack confirmed: Next.js, React + TypeScript, Tailwind CSS, shadcn/ui, Motion, ECharts, Lucide React, Leaflet + OpenStreetMap, Overpass API.",
+    "Design direction: a data-first dashboard (like IQAir or Windy) using the full screen width, with IBM Plex fonts, neutral colours, one deep-teal brand colour, and the official CPCB colours reserved for air-quality data.",
+    "Approved overview page: city tabs, tomorrow's AQI with the CPCB scale and health advice, interactive forecast chart, pollutants, day-by-day health risk, precautions, and an all-cities comparison table.",
+    "Approved landing page: hero with a live dashboard preview, city AQI strip, a two-person example showing why personal risk matters, how it works, features, model results, data and AQI scale, privacy, FAQ and footer.",
+    "Site structure: landing page at /, dashboard at /dashboard, plus sign-in, profile wizard, my risk, history and models pages.",
+    "Light and dark themes with a toggle; layout checked at 1280, 1536 and 1920 px wide (the user's laptop at 150%, 125% and 100% scaling).",
+    "Spec saved in docs/frontend_design.md with the approved preview in docs/design/.",
+  ],
+});
 
 const AQI_RESULTS = [
   // [city, deployed AQI model, mean RMSE, best baseline mean RMSE, improvement]
@@ -117,19 +132,18 @@ const HEALTH_RESULTS = [
 
 const REMAINING = [
   // [task, needs, notes]
-  ["Live accounts check with a real test user", "You", "Create a test user in the dashboard (Auto Confirm) and run scripts/check_accounts_live.py"],
   ["Next.js frontend", "Backend", "City forecast charts, one-time profile form, day-by-day risk view, history, leaderboard, disclaimer"],
   ["Hospital map", "Frontend", "Shown when the alert level is High/Severe; contact details only, no booking"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
+  ["Live 2026 data", "After the frontend", "Show today's AQI and forecast from today using recent station data; needs a free OpenAQ API key"],
   ["Deployment", "All of the above", "Vercel + Render/Railway; handle the ~20 s model-loading startup"],
   ["Mid-sem report/presentation (19-30 Oct)", "You + me", "Classical models: ARIMA, SARIMA, Holt-Winters, decomposition"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
 ];
 
 const ACTIONS_FOR_YOU = [
-  "Run git push to upload the latest commits to GitHub.",
-  "In Supabase: Authentication > Users > Add user > Create new user (tick Auto Confirm User) to make a test account.",
-  "With the project venv active, run: python scripts/check_accounts_live.py, then type the test user's email and password when asked.",
+  "Tell me when to start coding the frontend (design is approved).",
+  "Optional: confirm the small frontend choices (frontend/ folder in this repo, npm, react-leaflet for the map).",
 ];
 
 const IMPROVEMENTS = [
@@ -140,6 +154,9 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["26 Sep 2026", "Landing page design approved and saved; site structure set; live 2026 data scheduled after the frontend."],
+  ["26 Sep 2026", "Frontend design approved: Airware data-first dashboard, light and dark themes; spec and preview saved."],
+  ["26 Sep 2026", "Live accounts check passed (8/8) with a real test user; all commits pushed to GitHub."],
   ["26 Sep 2026", "Supabase connected: signed-in endpoints for profile, prediction runs and history; 41 tests."],
   ["26 Sep 2026", "Supabase schema, row-level security and setup guide; this progress report created."],
   ["26 Sep 2026", "FastAPI backend public endpoints with 29 tests; exposure fields made required."],
