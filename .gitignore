@@ -9,3 +9,11 @@ data/city_hour.csv
 
 # Raw Kaggle download (~76 MB, publicly available): see data/README.md
 data/Aqi.zip
+
+# Local secrets (see .env.example)
+.env
+.env.*
+!.env.example
+
+# Progress doc generator dependencies
+docs/progress/node_modules/

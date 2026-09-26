@@ -1,0 +1,8 @@
+{
+  "name": "project-progress-doc",
+  "private": true,
+  "description": "Generates docs/Project_Progress.docx (run: node build_progress.js)",
+  "dependencies": {
+    "docx": "^9.5.0"
+  }
+}

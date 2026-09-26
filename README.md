@@ -138,3 +138,18 @@ Profile fields (snake_case, matching the planned `profiles` table): `age`, `gend
 required. The exposure fields are required because filling them with typical values badly
 understated risk. `bmi`, `exercise_hours` and `family_history` are optional and filled with
 typical values when missing (listed in the response's `imputed_fields`).
+
+## Database (Supabase)
+
+Setup steps are in `supabase/README.md`; the schema (tables + row-level security) is
+`supabase/migrations/0001_init.sql`, run once in the Supabase SQL editor. Keys go in a
+local `.env` (template: `.env.example`, git-ignored).
+
+## Progress report
+
+`docs/Project_Progress.docx` summarises work done, key results and work remaining. It's
+generated from `docs/progress/build_progress.js` (edit the CONTENT section, then run):
+
+```bash
+cd docs/progress && npm install && node build_progress.js
+```
