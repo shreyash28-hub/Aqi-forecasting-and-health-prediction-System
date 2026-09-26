@@ -11,7 +11,7 @@ const {
 // =========================================================================== CONTENT
 
 const LAST_UPDATED = "26 September 2026";
-const LATEST_COMMIT = "Supabase schema and progress report (26 Sep 2026)";
+const LATEST_COMMIT = "Supabase accounts: profile, prediction history (26 Sep 2026)";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -19,10 +19,10 @@ const AT_A_GLANCE = [
   ["PM2.5 and NO2 forecasting", "Done", "Same pipeline; naive forecast deployed where no model beats it"],
   ["Saved forecasting models", "Done", "18 city forecasters, loadable without retraining"],
   ["Health-risk models", "Done", "Level (F1 0.873) and score (RMSE 0.198); primary + fallback variants"],
-  ["FastAPI backend: public endpoints", "Done", "7 endpoints, 29 passing tests"],
-  ["Supabase: database design", "Done", "Tables, row-level security, setup guide ready to run"],
-  ["Supabase: project creation", "Waiting on you", "Create the project and run the SQL script"],
-  ["Backend: sign-in, saved profile, history", "Not started", "Needs the Supabase project"],
+  ["FastAPI backend: public endpoints", "Done", "7 endpoints"],
+  ["Supabase: database and sign-in", "Done", "Project created, tables and row-level security live and verified"],
+  ["Backend: sign-in, saved profile, history", "Done", "5 signed-in endpoints; 41 tests pass in total"],
+  ["Live check with a real test user", "Waiting on you", "Run scripts/check_accounts_live.py (about 2 minutes)"],
   ["Next.js frontend", "Not started", ""],
   ["Hospital map", "Not started", "Leaflet + OpenStreetMap (Overpass)"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
@@ -76,8 +76,12 @@ const DONE = [
     ],
   },
   {
-    title: "Supabase (database design)",
+    title: "Supabase and user accounts",
     items: [
+      "Supabase project created (Mumbai region); database script run; checks confirmed public tables are readable, private tables are blocked without sign-in, and the public key can't write.",
+      "Signed-in endpoints: GET/PUT /api/me/profile, POST /api/me/risk (runs a prediction with the saved profile and saves it to history), GET /api/me/history, GET/DELETE /api/me/history/{id}.",
+      "Each database call is made with the user's own sign-in token, so row-level security keeps every user's profile and history private, even inside the backend.",
+      "12 new tests using an in-memory stand-in for Supabase that enforces the same per-user rules (41 tests pass in total); the real sign-in service correctly rejects invalid tokens.",
       "SQL script supabase/migrations/0001_init.sql: profiles, saved_forecasts, risk_predictions, aqi_forecasts_cache, model_leaderboard.",
       "Row-level security: users only see and change their own profile and history; history can't be edited; public tables are read-only except for the backend.",
       "Step-by-step setup guide (supabase/README.md) and .env.example; real keys stay in a git-ignored .env.",
@@ -113,8 +117,7 @@ const HEALTH_RESULTS = [
 
 const REMAINING = [
   // [task, needs, notes]
-  ["Create the Supabase project and run the SQL script", "You", "Follow supabase/README.md; share the project URL and anon key (never the service role key)"],
-  ["Backend: sign-in checks, saved profile, prediction history", "Supabase project", "Private endpoints; saves each run to the user's history"],
+  ["Live accounts check with a real test user", "You", "Create a test user in the dashboard (Auto Confirm) and run scripts/check_accounts_live.py"],
   ["Next.js frontend", "Backend", "City forecast charts, one-time profile form, day-by-day risk view, history, leaderboard, disclaimer"],
   ["Hospital map", "Frontend", "Shown when the alert level is High/Severe; contact details only, no booking"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
@@ -125,8 +128,8 @@ const REMAINING = [
 
 const ACTIONS_FOR_YOU = [
   "Run git push to upload the latest commits to GitHub.",
-  "Create the Supabase project and run supabase/migrations/0001_init.sql (steps in supabase/README.md).",
-  "Share the Supabase project URL and anon key so the backend can be connected. Keep the service role key in your local .env only.",
+  "In Supabase: Authentication > Users > Add user > Create new user (tick Auto Confirm User) to make a test account.",
+  "With the project venv active, run: python scripts/check_accounts_live.py, then type the test user's email and password when asked.",
 ];
 
 const IMPROVEMENTS = [
@@ -137,6 +140,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["26 Sep 2026", "Supabase connected: signed-in endpoints for profile, prediction runs and history; 41 tests."],
   ["26 Sep 2026", "Supabase schema, row-level security and setup guide; this progress report created."],
   ["26 Sep 2026", "FastAPI backend public endpoints with 29 tests; exposure fields made required."],
   ["26 Sep 2026", "PM2.5/NO2 forecasting, two-variant health models, boundary rule, forecast backtest."],

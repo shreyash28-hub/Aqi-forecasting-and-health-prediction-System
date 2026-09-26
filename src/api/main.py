@@ -4,11 +4,13 @@ Run locally::
 
     uvicorn src.api.main:app --reload            # http://localhost:8000/docs
 
-Environment:
-    ALLOWED_ORIGINS   comma-separated CORS origins (default: http://localhost:3000)
+Environment (or ``.env``):
+    ALLOWED_ORIGINS     comma-separated CORS origins (default: http://localhost:3000)
+    SUPABASE_URL        enables the signed-in endpoints under /api/me
+    SUPABASE_ANON_KEY
 
-Everything here is public (no login). Saving profiles and prediction history comes
-with the Supabase integration.
+Endpoints under /api are public. Endpoints under /api/me need a Supabase access token
+(``Authorization: Bearer ...``) and store the user's profile and prediction history.
 """
 from __future__ import annotations
 
@@ -19,14 +21,20 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.api import me
 from src.api.schemas import CityInfo, ForecastResponse, HealthStatus, RiskRequest, RiskResponse, Target
 from src.api.services import MAX_HORIZON, ModelService, UnknownCity, forecast_leaderboard, health_leaderboard
+from src.api.supabase_client import SupabaseClient
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.models = ModelService.load()
+    if not hasattr(app.state, "supabase"):  # tests may inject a client
+        app.state.supabase = SupabaseClient.from_env()
     yield
+    if app.state.supabase is not None:
+        app.state.supabase.close()
 
 
 app = FastAPI(
@@ -39,9 +47,10 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",") if o.strip()],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
+app.include_router(me.router)
 
 
 def _svc(request: Request) -> ModelService:
@@ -57,7 +66,8 @@ def health(request: Request):
     svc = _svc(request)
     return {"status": "ok", "cities": len(svc.forecasts), "forecasters": len(svc.forecasters),
             "health_models": sorted(f"{t}/{fs}" for t, fs in svc.health.models),
-            "startup_seconds": svc.startup_seconds}
+            "startup_seconds": svc.startup_seconds,
+            "accounts_enabled": request.app.state.supabase is not None}
 
 
 @app.get("/api/cities", response_model=list[CityInfo], tags=["forecast"])

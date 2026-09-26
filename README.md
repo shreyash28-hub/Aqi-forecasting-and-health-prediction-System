@@ -119,9 +119,11 @@ python -m pytest tests -q             # API tests
 ```
 
 All saved models load once at startup (~20 s) and each city's 30-day forecast is cached,
-so requests are fast. CORS origins come from `ALLOWED_ORIGINS` (comma-separated; default
-`http://localhost:3000`). All endpoints below are public; saved profiles and prediction
-history arrive with the Supabase integration.
+so requests are fast. Configuration comes from the environment or `.env` (see
+`.env.example`): `ALLOWED_ORIGINS` for CORS, `SUPABASE_URL` + `SUPABASE_ANON_KEY` to enable
+accounts.
+
+Public endpoints (no sign-in):
 
 | Method | Path | Returns |
 |---|---|---|
@@ -132,6 +134,21 @@ history arrive with the Supabase integration.
 | GET | `/api/profile/schema` | Profile fields, allowed values, training ranges, defaults |
 | GET | `/api/leaderboard/forecast?target=AQI` | Multi-window ranking and deployed model per city (AQI, PM2.5, NO2) |
 | GET | `/api/leaderboard/health` | Health model rankings (CV + test), selected models, boundary-rule stats |
+
+Signed-in endpoints (`Authorization: Bearer <Supabase access token>`, obtained by the
+frontend via supabase-js). Database calls are made with the user's own token, so Row
+Level Security keeps each user's data private:
+
+| Method | Path | Does |
+|---|---|---|
+| GET / PUT | `/api/me/profile` | Read / save the user's profile (plus last city) |
+| POST | `/api/me/risk` | Predict with the saved profile (`city`, `horizon`) and save the run to history |
+| GET | `/api/me/history?limit=20` | Past runs with summaries |
+| GET / DELETE | `/api/me/history/{id}` | One run day by day / delete it |
+
+`python scripts/check_accounts_live.py` runs this flow against the real Supabase project
+with a test user (you type its email and password; create it in the dashboard with
+"Auto Confirm User").
 
 Profile fields (snake_case, matching the planned `profiles` table): `age`, `gender`,
 `condition`, `smoker`, `occupation`, `area_type`, `mask_usage` and `outdoor_hours` are

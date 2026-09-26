@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 import pandas as pd
 
 from src.data_loader import PROJECT_ROOT, TARGETS
-from src.health.data import CATEGORIES, PERSON_NUMERIC, load_health_dataset
+from src.health.data import CATEGORIES, PERSON_NUMERIC, load_health_dataset, score_to_level
 from src.health.store import HealthRiskPredictor, load_health_predictor
 from src.model_store import Forecaster, load_forecaster, saved_cities
 from src.preprocessing import TEST_DAYS
@@ -48,6 +48,22 @@ def aqi_category(aqi: float) -> str:
 
 class UnknownCity(KeyError):
     pass
+
+
+LEVEL_ORDER = ["Low", "Moderate", "High", "Severe"]
+
+
+def score_level_of(score: float) -> str:
+    """Level implied by a risk score (the dataset's 1.0 / 1.8 / 2.8 cuts)."""
+    return str(score_to_level([float(score)]).iloc[0])
+
+
+def summarize(days: list[dict]) -> dict:
+    """Run summary from per-day risk (works for fresh predictions and stored history)."""
+    highest = max((d["alert_level"] for d in days), key=LEVEL_ORDER.index)
+    return {"highest_alert_level": highest, "show_hospitals": highest in ELEVATED,
+            "borderline_days": sum(bool(d["borderline"]) for d in days),
+            "days_by_level": {lvl: sum(d["risk_level"] == lvl for d in days) for lvl in LEVEL_ORDER}}
 
 
 @dataclass
@@ -169,16 +185,12 @@ class ModelService:
                          "risk_score": round(float(r.risk_score), 3), "score_level": r.score_level,
                          "borderline": bool(r.borderline), "risk_range": r.risk_range,
                          "alert_level": r.alert_level})
-        order = ["Low", "Moderate", "High", "Severe"]
-        highest = max((d["alert_level"] for d in days), key=order.index)
         return {
             "city": city, "horizon": horizon, "origin_date": self.origin_date(city), "feature_set": fs,
             "health_models": {task: self.health.models[(task, fs)].meta["model"]
                               for task in ("classification", "regression")},
             "imputed_fields": imputed, "warnings": warnings,
-            "summary": {"highest_alert_level": highest, "show_hospitals": highest in ELEVATED,
-                        "borderline_days": sum(d["borderline"] for d in days),
-                        "days_by_level": {lvl: sum(d["risk_level"] == lvl for d in days) for lvl in order}},
+            "summary": summarize(days),
             "days": days,
         }
 

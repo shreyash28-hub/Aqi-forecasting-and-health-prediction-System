@@ -6,7 +6,7 @@ Supabase ``profiles`` table) and are mapped to the health model's feature names 
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -120,3 +120,45 @@ class HealthStatus(BaseModel):
     forecasters: int
     health_models: list[str]
     startup_seconds: float
+    accounts_enabled: bool
+
+
+# ---------------------------------------------------------------------------- signed-in user
+
+class SavedProfile(Profile):
+    """Profile as stored in Supabase; ``city`` remembers the user's last selected city."""
+    city: str | None = None
+
+
+class ProfileRecord(SavedProfile):
+    """A stored profile as returned to its owner (database-only columns are dropped)."""
+    model_config = ConfigDict(extra="ignore")
+
+    updated_at: datetime | None = None
+
+
+class MyRiskRequest(BaseModel):
+    """Run a prediction with the saved profile. ``city`` defaults to the profile's city."""
+    model_config = ConfigDict(extra="forbid")
+
+    city: str | None = None
+    horizon: int = Field(default=7, ge=1, le=30)
+
+
+class SavedRiskResponse(RiskResponse):
+    forecast_id: str = Field(description="History id of this run")
+    predicted_at: datetime
+
+
+class HistoryItem(BaseModel):
+    forecast_id: str
+    city: str
+    horizon: int
+    origin_date: date
+    predicted_at: datetime
+    summary: RiskSummary
+
+
+class HistoryDetail(HistoryItem):
+    models: dict
+    days: list[RiskDay]
