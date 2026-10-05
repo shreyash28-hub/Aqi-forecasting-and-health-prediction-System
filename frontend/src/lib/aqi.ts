@@ -48,3 +48,17 @@ export function chipStyle(color: string): CSSProperties {
     color: `color-mix(in srgb, ${color} 72%, var(--foreground))`,
   };
 }
+
+// The model's raw risk score is unbounded (about 0-18). For display it is mapped to a
+// 0-100 scale in which each risk level fills a quarter: Low 0-25, Moderate 25-50,
+// High 50-75, Severe 75-100 (raw 1.0 / 1.8 / 2.8 are the level cut-offs; 6+ shows as 100).
+const SCORE_KNOTS: Array<[number, number]> = [[0, 0], [1.0, 25], [1.8, 50], [2.8, 75], [6.0, 100]];
+
+export function scoreToPoints(raw: number): number {
+  const v = Math.max(raw, 0);
+  for (let i = 1; i < SCORE_KNOTS.length; i++) {
+    const [x0, y0] = SCORE_KNOTS[i - 1], [x1, y1] = SCORE_KNOTS[i];
+    if (v <= x1) return Math.round(y0 + ((v - x0) / (x1 - x0)) * (y1 - y0));
+  }
+  return 100;
+}

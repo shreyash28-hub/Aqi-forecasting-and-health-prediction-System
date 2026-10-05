@@ -7,7 +7,7 @@ import { ForecastChart } from "@/components/charts/forecast-chart";
 import { Sparkline } from "@/components/charts/sparkline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChartColors } from "@/components/theme/theme-provider";
-import { AQI_CATEGORIES, RISK_COLOR, aqiCategory } from "@/lib/aqi";
+import { AQI_CATEGORIES, RISK_COLOR, aqiCategory, scoreToPoints } from "@/lib/aqi";
 import { fmtDate, fmtDay, fmtDayMonth, fmtWeekday, round } from "@/lib/format";
 import { DISCLAIMER, EXAMPLE_PROFILES, PRECAUTIONS, type Precaution } from "@/lib/content";
 import type { ForecastDay, ForecastResponse, RiskResponse } from "@/lib/api";
@@ -175,7 +175,7 @@ export function RiskCard({ risk, loading }: { risk?: RiskResponse; loading: bool
             <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
               <i className="block h-full" style={{ width: `${Math.round(d.confidence * 100)}%`, background: RISK_COLOR[d.risk_level] }} />
             </div>
-            <div className="mt-1.5 text-[11.5px] text-faint"><span className="num">{Math.round(d.confidence * 100)}%</span> conf · <span className="num">{d.risk_score.toFixed(2)}</span></div>
+            <div className="mt-1.5 text-[11.5px] text-faint"><span className="num">{Math.round(d.confidence * 100)}%</span> conf · <span className="num">{scoreToPoints(d.risk_score)}</span></div>
           </div>
         ))}
       </div>

@@ -6,7 +6,7 @@ import { ColorChip, Disclaimer, Panel, PanelTitle } from "@/components/common";
 import { ForecastChart } from "@/components/charts/forecast-chart";
 import { RiskScoreChart } from "@/components/charts/risk-score-chart";
 import { PRECAUTION_ICON } from "@/components/dashboard/sections";
-import { AQI_CATEGORIES, RISK_COLOR, RISK_LEVELS, aqiCategory } from "@/lib/aqi";
+import { AQI_CATEGORIES, RISK_COLOR, RISK_LEVELS, aqiCategory, scoreToPoints } from "@/lib/aqi";
 import { fmtDay, fmtDayMonth, fmtWeekday } from "@/lib/format";
 import { DISCLAIMER, PRECAUTIONS } from "@/lib/content";
 import type { HistoryDetail, RiskDay, RiskLevel, SavedRiskResponse } from "@/lib/api";
@@ -68,7 +68,7 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
   const { summary, days } = data;
   const level = summary.highest_alert_level;
   const firstAlert = days.find((d) => d.alert_level === level);
-  const scores = days.map((d) => d.risk_score);
+  const scores = days.map((d) => scoreToPoints(d.risk_score));
 
   return (
     <div className={cn("grid grid-cols-12 gap-4 transition-opacity", busy && "pointer-events-none opacity-60")} aria-busy={busy}>
@@ -97,8 +97,8 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
         )}
         <LevelMix counts={summary.days_by_level} total={days.length} className="mt-5" />
         <dl className="mt-5 grid grid-cols-[1fr_auto] gap-x-3 gap-y-2 border-t pt-4 text-sm">
-          <dt className="text-muted-foreground">Risk score range</dt>
-          <dd className="num text-right font-medium">{Math.min(...scores).toFixed(2)}–{Math.max(...scores).toFixed(2)}</dd>
+          <dt className="text-muted-foreground">Risk score range (of 100)</dt>
+          <dd className="num text-right font-medium">{Math.min(...scores)}–{Math.max(...scores)} <span className="text-faint">/ 100</span></dd>
           <dt className="text-muted-foreground">Borderline days</dt>
           <dd className="num text-right font-medium">{summary.borderline_days}</dd>
           <dt className="text-muted-foreground">City</dt>
@@ -180,7 +180,7 @@ function DayCard({ day: d, compact }: { day: RiskDay; compact: boolean }) {
   const cat = aqiCategory(d.aqi);
   return (
     <div className={cn("flex flex-col rounded-[8px] border", compact ? "p-2" : "p-3")}
-      title={`${fmtDay(d.date)} · AQI ${Math.round(d.aqi)} (${cat.name}) · score ${d.risk_score.toFixed(2)}${d.borderline ? " · borderline" : ""}`}>
+      title={`${fmtDay(d.date)} · AQI ${Math.round(d.aqi)} (${cat.name}) · score ${scoreToPoints(d.risk_score)}/100${d.borderline ? " · borderline" : ""}`}>
       <div className="flex items-baseline justify-between gap-1">
         <span className="text-xs text-muted-foreground">{fmtWeekday(d.date)}</span>
         <span className="text-[11.5px] text-faint">{fmtDayMonth(d.date)}</span>
@@ -203,7 +203,7 @@ function DayCard({ day: d, compact }: { day: RiskDay; compact: boolean }) {
             </div>
             <div className="text-right">
               <div className="text-[11px] text-faint">Score</div>
-              <div className="num text-[13px] font-medium">{d.risk_score.toFixed(2)}</div>
+              <div className="num text-[13px] font-medium">{scoreToPoints(d.risk_score)}<span className="text-faint">/100</span></div>
             </div>
           </div>
         </>

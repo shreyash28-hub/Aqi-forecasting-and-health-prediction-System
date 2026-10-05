@@ -188,6 +188,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["6 Oct 2026", "Risk score now shown out of 100 (each risk level fills a quarter of the scale)."],
   ["6 Oct 2026", "Sign-in, profile form, My risk, History and Models pages built."],
   ["5 Oct 2026", "Frontend started: landing page and dashboard built on the live API, light and dark themes."],
   ["5 Oct 2026", "Project report written (15 pages, 11 figures, 9 tables); cleaned dataset exported to CSV."],
