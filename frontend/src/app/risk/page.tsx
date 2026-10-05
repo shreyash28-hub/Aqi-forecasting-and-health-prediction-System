@@ -1,8 +1,18 @@
-import type { Metadata } from "next";
-import { ComingSoon } from "@/components/layout/coming-soon";
+"use client";
 
-export const metadata: Metadata = { title: "My risk" };
+import { AppHeader } from "@/components/layout/app-header";
+import { AppFooter } from "@/components/layout/footer";
+import { RequireAuth } from "@/components/auth/require-auth";
+import { RiskView } from "@/components/risk/risk-view";
 
-export default function Page() {
-  return <ComingSoon title="My risk" text="Your personal day-by-day risk, based on your saved profile, is being built. The dashboard shows an example profile in the meantime." />;
+export default function RiskPage() {
+  return (
+    <div className="flex min-h-screen flex-col bg-page">
+      <AppHeader />
+      <main className="shell flex-1 pb-4">
+        <RequireAuth>{(session) => <RiskView session={session} />}</RequireAuth>
+      </main>
+      <AppFooter />
+    </div>
+  );
 }

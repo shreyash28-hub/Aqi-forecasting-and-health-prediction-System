@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Brand } from "./brand";
 import { ThemeToggle } from "./theme-toggle";
+import { UserMenu } from "./user-menu";
 
 const LINKS = [
   { href: "#how", label: "How it works" },
@@ -24,9 +25,7 @@ export function LandingHeader() {
         </nav>
         <div className="ml-auto flex items-center gap-2.5">
           <ThemeToggle />
-          <Link href="/sign-in" className="flex h-9 items-center rounded-[7px] border border-border-strong bg-card px-4 text-sm font-medium hover:bg-muted">
-            Sign in
-          </Link>
+          <UserMenu />
           <Link href="/dashboard" className="flex h-9 items-center rounded-[7px] bg-brand px-4 text-sm font-medium text-on-brand hover:brightness-110">
             Open dashboard
           </Link>

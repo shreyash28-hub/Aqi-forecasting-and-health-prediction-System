@@ -1,8 +1,13 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/layout/coming-soon";
+import { SignInView } from "@/components/auth/sign-in-view";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-export default function Page() {
-  return <ComingSoon title="Sign in" text="Email sign-in with your Airware account is being connected." />;
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-page" />}>
+      <SignInView />
+    </Suspense>
+  );
 }

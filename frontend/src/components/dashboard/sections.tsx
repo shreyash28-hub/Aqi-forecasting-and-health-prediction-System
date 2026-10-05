@@ -186,7 +186,7 @@ export function RiskCard({ risk, loading }: { risk?: RiskResponse; loading: bool
 
 // ------------------------------------------------------------------ precautions
 
-const PRECAUTION_ICON: Record<Precaution["icon"], React.ComponentType<{ className?: string }>> = {
+export const PRECAUTION_ICON: Record<Precaution["icon"], React.ComponentType<{ className?: string }>> = {
   activity: Activity, mask: Shield, window: Wind, pulse: HeartPulse, home: Home, phone: Phone,
 };
 

@@ -10,8 +10,8 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "5 October 2026";
-const LATEST_COMMIT = "836d8f7 Supabase accounts; design docs pending commit";
+const LAST_UPDATED = "6 October 2026";
+const LATEST_COMMIT = "75af4ea Landing page and dashboard; signed-in pages pending commit";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -25,7 +25,7 @@ const AT_A_GLANCE = [
   ["Live check with a real test user", "Done", "All 8 checks passed against the real Supabase project"],
   ["Frontend design (Airware)", "Done", "Landing page and dashboard designs approved; spec in docs/frontend_design.md"],
   ["Next.js frontend: landing + dashboard", "Done", "Built and connected to the live API; checked at 1280, 1536 and 1920 px"],
-  ["Frontend: sign-in, profile, my risk, history, models", "Not started", "Placeholder pages in place; next build step"],
+  ["Frontend: sign-in, profile, my risk, history, models", "Done", "Built on the live API; sign-in flow to be tested by you with a real account"],
   ["Hospital map", "Not started", "Leaflet + OpenStreetMap (Overpass)"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Not started", "Vercel (frontend), Render or Railway (backend)"],
@@ -116,6 +116,18 @@ DONE.push({
 });
 
 DONE.push({
+  title: "Frontend: sign-in, profile, my risk, history and models",
+  items: [
+    "Sign in and create account (email and password through Supabase); new accounts confirm by email and go straight to the profile form.",
+    "Health profile: a 3-step form (about you, daily exposure, optional health details) saved once and reused; it can be edited at any time.",
+    "My risk: the user's own day-by-day risk for 7 or 30 days in any of the six cities, with confidence, borderline ranges, a risk-score chart, the AQI forecast, precautions and a High/Severe callout.",
+    "Each new estimate is saved to History, where past runs can be opened in full or deleted; the page reuses the latest run unless the profile changed, so visits don't create duplicates.",
+    "Models page: leaderboards for AQI, PM2.5 and NO2 forecasting per city (gain over the naive forecast, all metrics, test windows) and for the health models (classification, regression, recall by risk level, borderline-day statistics).",
+    "Type check, lint and production build pass; layouts checked at 1280, 1536 and 1920 px in light and dark.",
+  ],
+});
+
+DONE.push({
   title: "Frontend: landing page and dashboard",
   items: [
     "Next.js app in frontend/ with React + TypeScript, Tailwind CSS, shadcn/ui, Motion, ECharts and Lucide icons, following the approved Airware design.",
@@ -153,7 +165,7 @@ const HEALTH_RESULTS = [
 
 const REMAINING = [
   // [task, needs, notes]
-  ["Frontend: remaining pages", "Backend", "Sign-in, one-time profile wizard, my risk (day by day), history, models leaderboard, forecast detail"],
+  ["Frontend: forecast detail page", "Frontend", "City forecast page (/forecast); the other pages are built"],
   ["Hospital map", "Frontend", "Shown when the alert level is High/Severe; contact details only, no booking"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
   ["Live 2026 data", "After the frontend", "Show today's AQI and forecast from today using recent station data; needs a free OpenAQ API key"],
@@ -163,6 +175,7 @@ const REMAINING = [
 ];
 
 const ACTIONS_FOR_YOU = [
+  "Test the signed-in pages with a real account: create an account, confirm the email, fill in the profile, check My risk, then History (open and delete a run).",
   "Try the site locally: start the API, then run npm run dev in frontend/ and open http://localhost:3000.",
   "Fill in the title-page details in docs/Project_Report.docx before submitting it.",
 ];
@@ -175,6 +188,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["6 Oct 2026", "Sign-in, profile form, My risk, History and Models pages built."],
   ["5 Oct 2026", "Frontend started: landing page and dashboard built on the live API, light and dark themes."],
   ["5 Oct 2026", "Project report written (15 pages, 11 figures, 9 tables); cleaned dataset exported to CSV."],
   ["26 Sep 2026", "Landing page design approved and saved; site structure set; live 2026 data scheduled after the frontend."],

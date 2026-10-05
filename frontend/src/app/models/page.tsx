@@ -1,8 +1,19 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/layout/coming-soon";
+import { AppHeader } from "@/components/layout/app-header";
+import { AppFooter } from "@/components/layout/footer";
+import { ModelsView } from "@/components/models/models-view";
 
 export const metadata: Metadata = { title: "Models" };
 
-export default function Page() {
-  return <ComingSoon title="Models" text="The full model leaderboard for forecasting and health-risk models is being built." />;
+export default function ModelsPage() {
+  return (
+    <div className="flex min-h-screen flex-col bg-page">
+      <AppHeader />
+      <main className="shell flex-1 pb-4">
+        <Suspense><ModelsView /></Suspense>
+      </main>
+      <AppFooter />
+    </div>
+  );
 }

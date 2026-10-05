@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Brand } from "./brand";
 import { ThemeToggle } from "./theme-toggle";
 import { CitySelect } from "./city-select";
+import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -24,7 +25,7 @@ export function AppHeader({ city, onCityChange }: { city?: string; onCityChange?
         <Brand href="/" />
         <nav aria-label="Main" className="flex h-full gap-1">
           {NAV.map((n) => {
-            const active = path === n.href;
+            const active = path === n.href || path.startsWith(`${n.href}/`);
             return (
               <Link
                 key={n.href}
@@ -43,9 +44,7 @@ export function AppHeader({ city, onCityChange }: { city?: string; onCityChange?
         <div className="ml-auto flex items-center gap-2.5">
           {city && onCityChange && <CitySelect city={city} onChange={onCityChange} />}
           <ThemeToggle />
-          <Link href="/sign-in" className="flex h-9 items-center rounded-[7px] border border-border-strong bg-card px-3.5 text-sm font-medium hover:bg-muted">
-            Sign in
-          </Link>
+          <UserMenu />
         </div>
       </div>
     </header>

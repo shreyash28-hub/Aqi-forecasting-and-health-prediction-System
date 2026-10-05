@@ -33,13 +33,13 @@ folder in this repo; npm; a small in-house ECharts React wrapper; `react-leaflet
 
 | Page | Route | Status |
 |---|---|---|
-| Landing page | `/` | Mockup approved |
-| Dashboard (Overview) | `/dashboard` | Mockup approved |
-| Sign in | `/sign-in` | Planned |
-| Profile setup wizard | `/profile` | Planned |
-| My risk | `/risk` | Planned |
-| History | `/history` | Planned |
-| Models leaderboard | `/models` | Planned |
+| Landing page | `/` | Built |
+| Dashboard (Overview) | `/dashboard` | Built |
+| Sign in | `/sign-in` | Built (sign in + create account) |
+| Profile setup wizard | `/profile` | Built |
+| My risk | `/risk` | Built |
+| History | `/history`, `/history/[id]` | Built |
+| Models leaderboard | `/models?tab=AQI` (also PM2.5, NO2, health) | Built |
 | Hospitals map | inside My risk, when `alert_level` is High or Severe | Planned, later |
 
 ## Visual direction
@@ -186,15 +186,28 @@ for now so it reads as a product.
    PM2.5, NO2, forecast model; rows are clickable.
 9. **Footer:** data source and the disclaimer.
 
-## Other pages (planned, same design language)
+## Other pages (same design language)
 
-- **Sign in:** centred card, email sign-in via Supabase.
-- **Profile setup:** a one-time 3-step wizard with a progress indicator. The 8 required
-  fields match the API; BMI, exercise and family history are optional.
-- **My risk:** the day-by-day view following the forecast curve, with confidence and
-  borderline ranges.
-- **History:** past runs, with a click-through to details.
-- **Models:** the leaderboard, from `/api/leaderboard/*`.
+- **Sign in:** centred card with Sign in / Create account tabs (email + password via
+  Supabase). New accounts confirm by email and land on `/profile`; `?next=` returns users
+  to the page they came from (same-site paths only).
+- **Profile setup:** a 3-step wizard (About you, Daily exposure, Health details) with a
+  progress indicator. The 8 required fields plus the home city; BMI, exercise and family
+  history are optional. Values outside the model's training range get a gentle note.
+  Saving goes to `/risk`; the same page edits an existing profile.
+- **My risk:** profile tags with an Edit link, city / 7-30 day / Recalculate controls,
+  then: High/Severe callout, summary (highest level, days by level, score range,
+  borderline days), day-by-day cards (range, confidence, AQI, score), a risk-score chart
+  with level bands and a separate AQI chart (no dual axis), precautions, and "About this
+  estimate" (models, inputs, typical values used). On load it shows the latest saved run
+  and only calculates a new one (saved to history) when there is none or the profile
+  changed since.
+- **History:** table of runs (when, city, days, highest level, days by level, borderline),
+  click-through to `/history/[id]` with the same result view; delete with inline confirm.
+- **Models:** tabs for AQI, PM2.5, NO2 and health risk. Forecast tabs: city chips, 4
+  summary tiles (deployed model, mean RMSE, gain over naive, MAPE), ranking table and
+  RMSE bars, test windows. Health tab: primary/fallback switch, classification and
+  regression tables, recall by level, boundary-rule stats.
 - **Hospitals (later):** Leaflet map and contact cards when `alert_level` is High or Severe.
   Enquiry only, no booking.
 
