@@ -1,0 +1,149 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Dark mode is a class on <html> (set before paint by the script in layout.tsx). */
+@custom-variant dark (&:is(.dark *));
+
+/* Wide layout (1700px): risk + pollutants + precautions in one row. In rem so it sorts after lg (64rem). */
+@theme {
+  --breakpoint-wide: 106.25rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+  --font-heading: var(--font-plex-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Airware design tokens (docs/frontend_design.md) */
+  --color-page: var(--page);
+  --color-surface: var(--card);
+  --color-surface-2: var(--muted);
+  --color-faint: var(--faint);
+  --color-border-strong: var(--border-strong);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+
+  /* CPCB AQI categories: reserved for air-quality data, identical in both themes */
+  --color-aqi-good: #2e9e5b;
+  --color-aqi-satisfactory: #8cc152;
+  --color-aqi-moderate: #e8b923;
+  --color-aqi-poor: #ea8a2e;
+  --color-aqi-very-poor: #d9453f;
+  --color-aqi-severe: #8e2436;
+
+
+
+
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+}
+
+:root {
+  --radius: 10px;
+  --page: #f5f6f8;          /* app pages */
+  --background: #ffffff;    /* landing page */
+  --foreground: #0e1116;
+  --card: #ffffff;
+  --card-foreground: #0e1116;
+  --popover: #ffffff;
+  --popover-foreground: #0e1116;
+  --primary: #0b6e74;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f2f5;
+  --secondary-foreground: #0e1116;
+  --muted: #f0f2f5;
+  --muted-foreground: #5a6270;
+  --accent: #f0f2f5;
+  --accent-foreground: #0e1116;
+  --destructive: #c0392b;
+  --border: #e3e6eb;
+  --border-strong: #cfd4dc;
+  --input: #cfd4dc;
+  --ring: #0b6e74;
+  --faint: #8a919e;
+  --brand: #0b6e74;
+  --brand-ink: #0b6e74;
+  --brand-soft: #e3f1f1;
+  --on-brand: #ffffff;
+}
+
+.dark {
+  --page: #0c0e12;
+  --background: #0c0e12;
+  --foreground: #e9ebef;
+  --card: #13161c;
+  --card-foreground: #e9ebef;
+  --popover: #1a1e25;
+  --popover-foreground: #e9ebef;
+  --primary: #3fb5b8;
+  --primary-foreground: #04282a;
+  --secondary: #1a1e25;
+  --secondary-foreground: #e9ebef;
+  --muted: #1a1e25;
+  --muted-foreground: #a0a7b4;
+  --accent: #1a1e25;
+  --accent-foreground: #e9ebef;
+  --destructive: #e5675d;
+  --border: #242932;
+  --border-strong: #323843;
+  --input: #323843;
+  --ring: #3fb5b8;
+  --faint: #737b89;
+  --brand: #3fb5b8;
+  --brand-ink: #7fd3d5;
+  --brand-soft: #0f2a2c;
+  --on-brand: #04282a;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Numbers: IBM Plex Mono with tabular figures */
+  .num {
+    font-family: var(--font-plex-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Full-width fluid shell, up to 1840px */
+  .shell {
+    width: 100%;
+    max-width: 1840px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 2.5vw, 32px);
+  }
+}

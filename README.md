@@ -156,6 +156,17 @@ required. The exposure fields are required because filling them with typical val
 understated risk. `bmi`, `exercise_hours` and `family_history` are optional and filled with
 typical values when missing (listed in the response's `imputed_fields`).
 
+## Frontend (Next.js)
+
+The Airware web app lives in `frontend/` (setup and structure in `frontend/README.md`).
+With the API running on port 8000:
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:3000  (landing page; dashboard at /dashboard)
+```
+
 ## Database (Supabase)
 
 Setup steps are in `supabase/README.md`; the schema (tables + row-level security) is

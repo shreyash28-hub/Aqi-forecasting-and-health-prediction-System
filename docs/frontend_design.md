@@ -95,8 +95,12 @@ Everything is disabled under `prefers-reduced-motion`.
 
 | Width | Row 1 | Row 2 | Row 3 | Row 4 |
 |---|---|---|---|---|
-| >= 1500 px | Tomorrow (3) + chart (9) | Risk (5) + pollutants (4) + precautions (3) | All cities (12) | |
-| 1024-1499 px | Tomorrow (4) + chart (8) | Risk (12) | Pollutants (6) + precautions (6) | All cities (12) |
+| >= 1700 px (`wide`) | Tomorrow (3) + chart (9) | Risk (5) + pollutants (4) + precautions (3) | All cities (12) | |
+| 1024-1699 px (`lg`) | Tomorrow (4) + chart (8) | Risk (12) | Pollutants (6) + precautions (6) | All cities (12) |
+
+The wide breakpoint was moved from 1500 px to 1700 px during the build: at 1536 px the
+seven risk day cards were too narrow ("Low-Moderate" wrapped badly), so 1536 uses the
+laptop layout.
 | < 1024 px | everything stacked | | | |
 
 ## Headers

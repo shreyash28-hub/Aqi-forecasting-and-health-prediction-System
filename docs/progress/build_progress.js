@@ -10,7 +10,7 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "26 September 2026";
+const LAST_UPDATED = "5 October 2026";
 const LATEST_COMMIT = "836d8f7 Supabase accounts; design docs pending commit";
 
 const AT_A_GLANCE = [
@@ -24,12 +24,14 @@ const AT_A_GLANCE = [
   ["Backend: sign-in, saved profile, history", "Done", "5 signed-in endpoints; 41 tests pass in total"],
   ["Live check with a real test user", "Done", "All 8 checks passed against the real Supabase project"],
   ["Frontend design (Airware)", "Done", "Landing page and dashboard designs approved; spec in docs/frontend_design.md"],
-  ["Next.js frontend", "Not started", "Waiting for your go-ahead to start coding"],
+  ["Next.js frontend: landing + dashboard", "Done", "Built and connected to the live API; checked at 1280, 1536 and 1920 px"],
+  ["Frontend: sign-in, profile, my risk, history, models", "Not started", "Placeholder pages in place; next build step"],
   ["Hospital map", "Not started", "Leaflet + OpenStreetMap (Overpass)"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Not started", "Vercel (frontend), Render or Railway (backend)"],
-  ["Course mid-sem submission (19-30 Oct)", "Results ready", "Report/presentation still to prepare"],
-  ["Course final submission (16-27 Nov)", "Results ready", "Report/presentation still to prepare"],
+  ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
+  ["Course mid-sem submission (19-30 Oct)", "Results ready", "Presentation still to prepare (report content can be reused)"],
+  ["Course final submission (16-27 Nov)", "Results ready", "Presentation still to prepare (report content can be reused)"],
 ];
 
 const DONE = [
@@ -104,6 +106,25 @@ DONE.push({
   ],
 });
 
+DONE.push({
+  title: "Project report",
+  items: [
+    "15-page Word report (docs/Project_Report.docx) structured around the four evaluation criteria: review of existing systems and feasibility, objectives and methodology, relevance of algorithms, and synchronisation of design and implementation.",
+    "Includes 11 figures (architecture, methodology, data overview, Ahmedabad sensor fix, STL decomposition, evaluation windows, model comparison, forecasts, health results, dashboard design) and 9 tables, all from the project's actual results, plus 15 references.",
+    "A cleaned dataset export (data/processed/city_day_clean.csv) was also produced on request.",
+  ],
+});
+
+DONE.push({
+  title: "Frontend: landing page and dashboard",
+  items: [
+    "Next.js app in frontend/ with React + TypeScript, Tailwind CSS, shadcn/ui, Motion, ECharts and Lucide icons, following the approved Airware design.",
+    "Landing page: hero with a live dashboard preview, city AQI strip, two-person risk comparison computed live by the models, how it works, features, model results from the leaderboard, AQI scale, privacy and FAQ.",
+    "Dashboard: city tabs, tomorrow's AQI on the CPCB scale with health advice, 7/30-day forecast chart, pollutant trends, 7-day risk for an example profile, precautions and an all-cities table; city and horizon are kept in the page address.",
+    "Light and dark themes with a toggle; layouts checked at 1280, 1536 and 1920 px; type check, lint and production build all pass.",
+  ],
+});
+
 const AQI_RESULTS = [
   // [city, deployed AQI model, mean RMSE, best baseline mean RMSE, improvement]
   ["Delhi", "SARIMA", "69.21", "98.91", "-30%"],
@@ -132,7 +153,7 @@ const HEALTH_RESULTS = [
 
 const REMAINING = [
   // [task, needs, notes]
-  ["Next.js frontend", "Backend", "City forecast charts, one-time profile form, day-by-day risk view, history, leaderboard, disclaimer"],
+  ["Frontend: remaining pages", "Backend", "Sign-in, one-time profile wizard, my risk (day by day), history, models leaderboard, forecast detail"],
   ["Hospital map", "Frontend", "Shown when the alert level is High/Severe; contact details only, no booking"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
   ["Live 2026 data", "After the frontend", "Show today's AQI and forecast from today using recent station data; needs a free OpenAQ API key"],
@@ -142,8 +163,8 @@ const REMAINING = [
 ];
 
 const ACTIONS_FOR_YOU = [
-  "Tell me when to start coding the frontend (design is approved).",
-  "Optional: confirm the small frontend choices (frontend/ folder in this repo, npm, react-leaflet for the map).",
+  "Try the site locally: start the API, then run npm run dev in frontend/ and open http://localhost:3000.",
+  "Fill in the title-page details in docs/Project_Report.docx before submitting it.",
 ];
 
 const IMPROVEMENTS = [
@@ -154,6 +175,8 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["5 Oct 2026", "Frontend started: landing page and dashboard built on the live API, light and dark themes."],
+  ["5 Oct 2026", "Project report written (15 pages, 11 figures, 9 tables); cleaned dataset exported to CSV."],
   ["26 Sep 2026", "Landing page design approved and saved; site structure set; live 2026 data scheduled after the frontend."],
   ["26 Sep 2026", "Frontend design approved: Airware data-first dashboard, light and dark themes; spec and preview saved."],
   ["26 Sep 2026", "Live accounts check passed (8/8) with a real test user; all commits pushed to GitHub."],
