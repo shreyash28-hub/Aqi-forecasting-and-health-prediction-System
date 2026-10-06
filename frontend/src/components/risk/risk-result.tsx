@@ -1,14 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Hospital, UserRound } from "lucide-react";
 import { ColorChip, Disclaimer, Panel, PanelTitle } from "@/components/common";
 import { ForecastChart } from "@/components/charts/forecast-chart";
 import { RiskScoreChart } from "@/components/charts/risk-score-chart";
-import { PRECAUTION_ICON } from "@/components/dashboard/sections";
+import { PrecautionList, pickDay } from "@/components/dashboard/sections";
 import { AQI_CATEGORIES, RISK_COLOR, RISK_LEVELS, aqiCategory, scoreToPoints } from "@/lib/aqi";
 import { fmtDay, fmtDayMonth, fmtWeekday } from "@/lib/format";
-import { DISCLAIMER, PRECAUTIONS } from "@/lib/content";
+import { DISCLAIMER } from "@/lib/content";
 import type { HistoryDetail, RiskDay, RiskLevel, SavedRiskResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -69,6 +70,8 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
   const level = summary.highest_alert_level;
   const firstAlert = days.find((d) => d.alert_level === level);
   const scores = days.map((d) => scoreToPoints(d.risk_score));
+  const [picked, setPicked] = useState<string>();
+  const day = pickDay(days, picked);
 
   return (
     <div className={cn("grid grid-cols-12 gap-4 transition-opacity", busy && "pointer-events-none opacity-60")} aria-busy={busy}>
@@ -110,7 +113,7 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
       <Panel delay={0.05} className="col-span-12 flex flex-col lg:col-span-8 wide:col-span-9">
         <PanelTitle sub={`${fmtDayMonth(days[0].date)} – ${fmtDayMonth(days[days.length - 1].date)}`}>Day by day</PanelTitle>
         <div className={cn("mt-4 grid gap-2", days.length <= 7 ? "flex-1 grid-cols-7" : "grid-cols-6 wide:grid-cols-10")}>
-          {days.map((d) => <DayCard key={d.date} day={d} compact={days.length > 7} />)}
+          {days.map((d) => <DayCard key={d.date} day={d} compact={days.length > 7} selected={d.date === day.date} onSelect={() => setPicked(d.date)} />)}
         </div>
         {summary.borderline_days > 0 && (
           <p className="mt-3 text-[12.5px] text-faint">* Borderline day: the estimate sits between two levels, so a range is shown. Precautions follow the higher level.</p>
@@ -136,18 +139,9 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
 
       {/* precautions + about */}
       <Panel delay={0.15} className="col-span-12 lg:col-span-6">
-        <PanelTitle sub={`for ${level.toLowerCase()} risk`}>Precautions</PanelTitle>
-        <ul className="mt-1.5">
-          {PRECAUTIONS[level].map((p) => {
-            const Icon = PRECAUTION_ICON[p.icon];
-            return (
-              <li key={p.title} className="flex gap-3 border-b py-3 last:border-b-0">
-                <span className="grid size-[30px] shrink-0 place-items-center rounded-[7px] bg-brand-soft text-brand-ink"><Icon className="size-4" aria-hidden /></span>
-                <div className="leading-snug"><b className="block text-sm font-medium">{p.title}</b><span className="text-[13px] text-muted-foreground">{p.detail}</span></div>
-              </li>
-            );
-          })}
-        </ul>
+        <PanelTitle sub={`${fmtDay(day.date)} · ${day.alert_level.toLowerCase()} risk`}>Precautions</PanelTitle>
+        <p className="mt-1 text-[12.5px] text-faint">Select a day above to see its precautions.</p>
+        <PrecautionList days={days} selected={day.date} onSelect={setPicked} />
       </Panel>
       <Panel delay={0.18} className="col-span-12 flex flex-col lg:col-span-6">
         <PanelTitle>About this estimate</PanelTitle>
@@ -175,11 +169,13 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
   );
 }
 
-function DayCard({ day: d, compact }: { day: RiskDay; compact: boolean }) {
+function DayCard({ day: d, compact, selected, onSelect }: { day: RiskDay; compact: boolean; selected: boolean; onSelect: () => void }) {
   const pct = Math.round(d.confidence * 100);
   const cat = aqiCategory(d.aqi);
   return (
-    <div className={cn("flex flex-col rounded-[8px] border", compact ? "p-2" : "p-3")}
+    <button type="button" onClick={onSelect} aria-pressed={selected}
+      className={cn("flex flex-col rounded-[8px] border text-left transition-colors hover:bg-muted", compact ? "p-2" : "p-3",
+        selected && "border-brand shadow-[inset_0_0_0_1px_var(--brand)]")}
       title={`${fmtDay(d.date)} · AQI ${Math.round(d.aqi)} (${cat.name}) · score ${scoreToPoints(d.risk_score)}/100${d.borderline ? " · borderline" : ""}`}>
       <div className="flex items-baseline justify-between gap-1">
         <span className="text-xs text-muted-foreground">{fmtWeekday(d.date)}</span>
@@ -208,6 +204,6 @@ function DayCard({ day: d, compact }: { day: RiskDay; compact: boolean }) {
           </div>
         </>
       )}
-    </div>
+    </button>
   );
 }

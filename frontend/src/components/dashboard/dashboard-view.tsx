@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppFooter } from "@/components/layout/footer";
@@ -26,6 +26,8 @@ export function DashboardView() {
   const forecasts = useCityForecasts();
   const risk = useExampleRisk(city);
   const selected = forecasts.data?.byCity[city];
+  // Day whose precautions are shown; ignored once the city's days no longer include it.
+  const [riskDay, setRiskDay] = useState<string>();
 
   return (
     <div className="min-h-screen bg-page">
@@ -44,9 +46,9 @@ export function DashboardView() {
                 <ErrorState className="col-span-12" message={risk.error.message} onRetry={risk.retry} />
               ) : (
                 <>
-                  <RiskCard risk={risk.data} loading={risk.loading} />
+                  <RiskCard risk={risk.data} loading={risk.loading} selected={riskDay} onSelect={setRiskDay} />
                   <PollutantsCard days={selected?.days} horizon={horizon} />
-                  <PrecautionsCard risk={risk.data} />
+                  <PrecautionsCard risk={risk.data} selected={riskDay} onSelect={setRiskDay} />
                 </>
               )}
               <CitiesTable byCity={forecasts.data?.byCity} onSelect={(c) => { setParams({ city: c }); window.scrollTo({ top: 0, behavior: "smooth" }); }} />

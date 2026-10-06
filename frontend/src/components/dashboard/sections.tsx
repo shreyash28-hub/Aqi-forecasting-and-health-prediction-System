@@ -7,10 +7,10 @@ import { ForecastChart } from "@/components/charts/forecast-chart";
 import { Sparkline } from "@/components/charts/sparkline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChartColors } from "@/components/theme/theme-provider";
-import { AQI_CATEGORIES, RISK_COLOR, aqiCategory, scoreToPoints } from "@/lib/aqi";
+import { AQI_CATEGORIES, RISK_COLOR, RISK_LEVELS, aqiCategory, scoreToPoints } from "@/lib/aqi";
 import { fmtDate, fmtDay, fmtDayMonth, fmtWeekday, round } from "@/lib/format";
 import { DISCLAIMER, EXAMPLE_PROFILES, PRECAUTIONS, type Precaution } from "@/lib/content";
-import type { ForecastDay, ForecastResponse, RiskResponse } from "@/lib/api";
+import type { ForecastDay, ForecastResponse, RiskDay, RiskResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 // ------------------------------------------------------------------ page head
@@ -152,7 +152,9 @@ export function PollutantsCard({ days, horizon }: { days?: ForecastDay[]; horizo
 
 // ------------------------------------------------------------------ risk
 
-export function RiskCard({ risk, loading }: { risk?: RiskResponse; loading: boolean }) {
+export function RiskCard({ risk, loading, selected, onSelect }: {
+  risk?: RiskResponse; loading: boolean; selected?: string; onSelect: (date: string) => void;
+}) {
   const ex = EXAMPLE_PROFILES.ramesh;
   return (
     <Panel delay={0.1} className="col-span-12 wide:col-span-5">
@@ -167,8 +169,11 @@ export function RiskCard({ risk, loading }: { risk?: RiskResponse; loading: bool
       </div>
       <div className={cn("mt-4 grid grid-cols-7 gap-2", loading && "opacity-60")}>
         {!risk && Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-[104px]" />)}
-        {risk?.days.slice(0, 7).map((d) => (
-          <div key={d.date} className="rounded-[8px] border p-2.5" title={d.borderline ? "Borderline day: the estimate sits between two levels" : undefined}>
+        {risk?.days.slice(0, 7).map((d, i) => (
+          <button key={d.date} type="button" onClick={() => onSelect(d.date)} aria-pressed={(selected ?? risk.days[0].date) === d.date}
+            className={cn("rounded-[8px] border p-2.5 text-left transition-colors hover:bg-muted",
+              (selected ? selected === d.date : i === 0) && "border-brand shadow-[inset_0_0_0_1px_var(--brand)]")}
+            title={d.borderline ? "Borderline day: the estimate sits between two levels" : "Show precautions for this day"}>
             <div className="text-xs text-muted-foreground">{fmtWeekday(d.date)}</div>
             <div className="text-[11.5px] text-faint">{fmtDayMonth(d.date)}</div>
             <div className="mt-2.5 text-[13px] leading-tight font-semibold">{d.risk_range.replace("-", "–​")}{d.borderline && <span className="text-faint">*</span>}</div>
@@ -176,7 +181,7 @@ export function RiskCard({ risk, loading }: { risk?: RiskResponse; loading: bool
               <i className="block h-full" style={{ width: `${Math.round(d.confidence * 100)}%`, background: RISK_COLOR[d.risk_level] }} />
             </div>
             <div className="mt-1.5 text-[11.5px] text-faint"><span className="num">{Math.round(d.confidence * 100)}%</span> conf · <span className="num">{scoreToPoints(d.risk_score)}</span></div>
-          </div>
+          </button>
         ))}
       </div>
       <Disclaimer className="mt-4">{DISCLAIMER}</Disclaimer>
@@ -190,24 +195,49 @@ export const PRECAUTION_ICON: Record<Precaution["icon"], React.ComponentType<{ c
   activity: Activity, mask: Shield, window: Wind, pulse: HeartPulse, home: Home, phone: Phone,
 };
 
-export function PrecautionsCard({ risk }: { risk?: RiskResponse }) {
-  const level = risk?.summary.highest_alert_level;
+/** The selected day (defaults to the first forecast day). */
+export function pickDay<T extends { date: string }>(days: T[], selected?: string): T {
+  return days.find((d) => d.date === selected) ?? days[0];
+}
+
+/**
+ * Precautions for one day's risk. Borderline days use their alert level (the higher
+ * of the two), and a note points to the next day when risk goes up later in the week.
+ */
+export function PrecautionList({ days, selected, onSelect }: { days: RiskDay[]; selected?: string; onSelect?: (date: string) => void }) {
+  const day = pickDay(days, selected);
+  const level = day.alert_level;
+  const rank = RISK_LEVELS.indexOf(level);
+  const higher = days.find((d) => d.date > day.date && RISK_LEVELS.indexOf(d.alert_level) > rank);
+  return (
+    <>
+      <ul className="mt-1.5">
+        {PRECAUTIONS[level].map((p) => {
+          const Icon = PRECAUTION_ICON[p.icon];
+          return (
+            <li key={p.title} className="flex gap-3 border-b py-3 last:border-b-0">
+              <span className="grid size-[30px] shrink-0 place-items-center rounded-[7px] bg-brand-soft text-brand-ink"><Icon className="size-4" aria-hidden /></span>
+              <div className="leading-snug"><b className="block text-sm font-medium">{p.title}</b><span className="text-[13px] text-muted-foreground">{p.detail}</span></div>
+            </li>
+          );
+        })}
+      </ul>
+      {higher && (
+        <p className="mt-2 rounded-[8px] bg-muted px-3 py-2 text-[12.5px] text-muted-foreground">
+          Risk rises to <b className="font-medium text-foreground">{higher.alert_level}</b> on {fmtDay(higher.date)}.{" "}
+          {onSelect && <button type="button" onClick={() => onSelect(higher.date)} className="font-medium text-brand-ink hover:underline">See that day</button>}
+        </p>
+      )}
+    </>
+  );
+}
+
+export function PrecautionsCard({ risk, selected, onSelect }: { risk?: RiskResponse; selected?: string; onSelect: (date: string) => void }) {
+  const day = risk ? pickDay(risk.days, selected) : undefined;
   return (
     <Panel delay={0.2} className="col-span-12 lg:col-span-6 wide:col-span-3">
-      <PanelTitle sub={level ? `for ${level.toLowerCase()} risk` : undefined}>Precautions</PanelTitle>
-      {!level ? <Skeleton className="mt-4 h-48" /> : (
-        <ul className="mt-1.5">
-          {PRECAUTIONS[level].map((p) => {
-            const Icon = PRECAUTION_ICON[p.icon];
-            return (
-              <li key={p.title} className="flex gap-3 border-b py-3 last:border-b-0">
-                <span className="grid size-[30px] shrink-0 place-items-center rounded-[7px] bg-brand-soft text-brand-ink"><Icon className="size-4" aria-hidden /></span>
-                <div className="leading-snug"><b className="block text-sm font-medium">{p.title}</b><span className="text-[13px] text-muted-foreground">{p.detail}</span></div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <PanelTitle sub={day ? `${fmtDay(day.date)} · ${day.alert_level.toLowerCase()} risk` : undefined}>Precautions</PanelTitle>
+      {!risk ? <Skeleton className="mt-4 h-48" /> : <PrecautionList days={risk.days.slice(0, 7)} selected={selected} onSelect={onSelect} />}
     </Panel>
   );
 }
