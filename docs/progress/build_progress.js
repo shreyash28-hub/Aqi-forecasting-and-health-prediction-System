@@ -10,7 +10,7 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "7 October 2026";
+const LAST_UPDATED = "8 October 2026";
 const LATEST_COMMIT = "75af4ea Landing page and dashboard; signed-in pages pending commit";
 
 const AT_A_GLANCE = [
@@ -188,6 +188,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["8 Oct 2026", "Project working guide written (22 pages, theory and technical): docs/Project_Working_Guide.docx."],
   ["7 Oct 2026", "Precautions now follow the selected day's risk (tomorrow by default) instead of the week's highest level; day cards are clickable."],
   ["6 Oct 2026", "Risk score now shown out of 100 (each risk level fills a quarter of the scale)."],
   ["6 Oct 2026", "Sign-in, profile form, My risk, History and Models pages built."],
