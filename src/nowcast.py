@@ -23,13 +23,13 @@ only if the signal's day is one of the forecast days.
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from src.data_loader import CITIES, DATA_DIR
-from src.live_data import city_hourly_aqi
+from src.live_data import RAW_DIR, RECENT_DIR, city_hourly_aqi
 
 NOWCAST_PATH = DATA_DIR / "processed" / "live_nowcast.json"
 MIN_HOURS = 6            # fewer hours of today than this: no adjustment
@@ -65,11 +65,15 @@ def adjust_values(forecast: np.ndarray, k0: int, signal: float, hours: float, *,
     return np.clip(out, 0, None)
 
 
-def current_signals(cities: list[str] | None = None, now: datetime | None = None) -> dict:
-    """Today's-so-far AQI, PM2.5 and NO2 per city, from the latest hourly readings."""
+def current_signals(cities: list[str] | None = None, raw: Path | None = None) -> dict:
+    """Today's-so-far AQI, PM2.5 and NO2 per city, from the latest hourly readings.
+
+    ``raw`` is the folder of station files; by default the recent download if there is
+    one (it is the fresher), else the full one."""
+    raw = raw or (RECENT_DIR if RECENT_DIR.exists() else RAW_DIR)
     out = {}
     for city in cities or CITIES:
-        aqi_h, conc, _ = city_hourly_aqi(city)
+        aqi_h, conc, _ = city_hourly_aqi(city, raw)
         last = aqi_h.dropna().index.max() if aqi_h.notna().any() else None
         if last is None:
             continue
@@ -113,8 +117,18 @@ def apply_signals(city: str, air: pd.DataFrame, signals: dict) -> tuple[pd.DataF
     return out, (sig["date"] if used else None)
 
 
+def refresh_signals(days: int = 6, progress=None) -> dict:
+    """Download the latest readings, work out today's signals and save them."""
+    from src.openaq import fetch_recent
+    fetch_recent(days=days, progress=progress)
+    signals = current_signals(raw=RECENT_DIR)
+    save_signals(signals)
+    return signals
+
+
 def main() -> None:
-    signals = current_signals()
+    import sys
+    signals = refresh_signals(progress=print) if "--fetch" in sys.argv else current_signals()
     save_signals(signals)
     for city, s in signals.items():
         print(f"{city:<10} {s['date']} as of {s['as_of']}: " + ", ".join(

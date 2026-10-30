@@ -1,0 +1,43 @@
+# Daily refresh of the live forecasts: fetch the latest station readings, retrain the live
+# models, and publish them as one bundle in Supabase Storage. A deployed API downloads the
+# bundle by itself (LIVE_BUNDLE_URL), so nothing is committed and no redeploy is needed.
+# One-time setup: docs/live_refresh.md
+name: Refresh live forecasts
+
+on:
+  schedule:
+    - cron: "30 0 * * *"    # 00:30 UTC = 06:00 IST
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-live
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      LIVE_BUNDLE_URL: ${{ vars.LIVE_BUNDLE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.lock.txt
+
+      - name: Install the pinned libraries (CPU-only torch)
+        run: pip install -r requirements.lock.txt --extra-index-url https://download.pytorch.org/whl/cpu
+
+      # The previous bundle holds the daily data up to yesterday; the refresh only adds the
+      # last few days to it. The first run has no bundle yet and starts from the repository.
+      - name: Download the previous bundle
+        run: python -m src.live_bundle sync || echo "No previous bundle, starting from the repository files"
+
+      - name: Refresh data, retrain the live models, upload the bundle
+        run: python -m src.refresh_live --upload

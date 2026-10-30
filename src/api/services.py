@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 from dataclasses import dataclass, field
 
@@ -20,8 +21,8 @@ import pandas as pd
 from src.data_loader import PROJECT_ROOT, TARGETS
 from src.health.data import CATEGORIES, PERSON_NUMERIC, load_health_dataset, score_to_level
 from src.health.store import HealthRiskPredictor, load_health_predictor
-from src.model_store import Forecaster, load_forecaster, saved_cities
-from src.nowcast import apply_signals, load_signals
+from src.model_store import Forecaster, load_forecaster, registry_path, saved_cities
+from src.nowcast import NOWCAST_PATH, apply_signals, load_signals
 from src.preprocessing import TEST_DAYS
 
 MAX_HORIZON = TEST_DAYS
@@ -30,6 +31,38 @@ FORECAST_LEADERBOARDS = {"AQI": REPORTS / "forecasting" / "leaderboard.json",
                          "PM2.5": REPORTS / "forecasting" / "pm25" / "leaderboard.json",
                          "NO2": REPORTS / "forecasting" / "no2" / "leaderboard.json"}
 LIVE_LEADERBOARDS = {t: REPORTS / "forecasting" / "live" / slug / "leaderboard.json" for t, slug in TARGETS.items()}
+
+
+RELOAD_CHECK_SECONDS = 10
+
+
+def air_fingerprint(source: str) -> tuple:
+    """Modification times of the files the air forecasts are built from: the model registries
+    and, for live models, today's readings. A change means the forecasts are out of date."""
+    paths = [registry_path(t, source) for t in TARGETS] + ([NOWCAST_PATH] if source == "live" else [])
+    return tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in paths)
+
+
+def load_air(source: str) -> tuple[dict, dict, dict]:
+    """Load the saved forecasters and each city's 30-day air forecast (adjusted with today's
+    readings for live models). Returns ``(forecasters, forecasts, readings_as_of)``."""
+    forecasters, forecasts, readings_as_of = {}, {}, {}
+    for target in TARGETS:
+        for city in saved_cities(target, source):
+            forecasters[(target, city)] = load_forecaster(city, target, source)
+    signals = load_signals() if source == "live" else {}
+    for city in saved_cities("AQI", source):
+        df = forecasters[("AQI", city)].forecast(MAX_HORIZON)
+        for target in ("PM2.5", "NO2"):
+            fc = forecasters.get((target, city))
+            if fc is not None:
+                df[TARGETS[target]] = fc.forecast(MAX_HORIZON)[TARGETS[target]].to_numpy()
+        if source == "live":   # start today from today's readings so far
+            df, used = apply_signals(city, df, signals)
+            if used:
+                readings_as_of[city] = signals[city]["as_of"]
+        forecasts[city] = df
+    return forecasters, forecasts, readings_as_of
 
 
 def default_source() -> str:
@@ -90,26 +123,17 @@ class ModelService:
     startup_seconds: float = 0.0
     source: str = "history"
     readings_as_of: dict[str, str] = field(default_factory=dict)       # city -> latest reading used
+    fingerprint: tuple = ()
+    last_check: float = 0.0
+    reload_error: str | None = None
+    _reloading: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     @classmethod
     def load(cls, source: str | None = None) -> "ModelService":
         t0 = time.perf_counter()
         svc = cls(source=source or default_source())
-        for target in TARGETS:
-            for city in saved_cities(target, svc.source):
-                svc.forecasters[(target, city)] = load_forecaster(city, target, svc.source)
-        for city in saved_cities("AQI", svc.source):
-            df = svc.forecasters[("AQI", city)].forecast(MAX_HORIZON)
-            for target in ("PM2.5", "NO2"):
-                fc = svc.forecasters.get((target, city))
-                if fc is not None:
-                    df[TARGETS[target]] = fc.forecast(MAX_HORIZON)[TARGETS[target]].to_numpy()
-            if svc.source == "live":   # start today from today's readings so far
-                signals = load_signals()
-                df, used = apply_signals(city, df, signals)
-                if used:
-                    svc.readings_as_of[city] = signals[city]["as_of"]
-            svc.forecasts[city] = df
+        svc.fingerprint = air_fingerprint(svc.source)
+        svc.forecasters, svc.forecasts, svc.readings_as_of = load_air(svc.source)
         svc.health = load_health_predictor()
 
         # Typical values for optional profile fields, and the ranges the model was trained on.
@@ -121,6 +145,39 @@ class ModelService:
             svc.defaults[feat] = data[feat].mode().iloc[0]
         svc.startup_seconds = round(time.perf_counter() - t0, 2)
         return svc
+
+    # ------------------------------------------------------------------ reloading
+
+    def reload_air(self) -> bool:
+        """Rebuild the air forecasts if the model or readings files changed since they were
+        loaded. The new tables are built aside and swapped in, so requests never see a
+        half-loaded state. Returns True if anything was reloaded."""
+        if not self._reloading.acquire(blocking=False):
+            return False                       # another reload is already running
+        try:
+            fingerprint = air_fingerprint(self.source)
+            if fingerprint == self.fingerprint:
+                return False
+            try:
+                forecasters, forecasts, readings_as_of = load_air(self.source)
+            except Exception as exc:           # half-written files: keep serving the old ones, retry later
+                self.reload_error = f"{type(exc).__name__}: {exc}"
+                return False
+            self.forecasters, self.forecasts, self.readings_as_of = forecasters, forecasts, readings_as_of
+            self.fingerprint, self.reload_error = fingerprint, None
+            return True
+        finally:
+            self._reloading.release()
+
+    def maybe_reload(self) -> None:
+        """Called on requests: at most every few seconds, check the files and, if they changed,
+        reload in the background so the request itself is not delayed."""
+        now = time.monotonic()
+        if now - self.last_check < RELOAD_CHECK_SECONDS:
+            return
+        self.last_check = now
+        if air_fingerprint(self.source) != self.fingerprint:
+            threading.Thread(target=self.reload_air, daemon=True, name="air-reload").start()
 
     # ------------------------------------------------------------------ lookups
 

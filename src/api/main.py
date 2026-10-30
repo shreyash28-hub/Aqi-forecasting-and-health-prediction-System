@@ -22,6 +22,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import hospitals, me
+from src.api import refresher
 from src.api.schemas import CityInfo, ForecastResponse, HealthStatus, RiskRequest, RiskResponse, Target
 from src.api.services import MAX_HORIZON, ModelService, UnknownCity, forecast_leaderboard, health_leaderboard
 from src.api.supabase_client import SupabaseClient
@@ -29,10 +30,14 @@ from src.api.supabase_client import SupabaseClient
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    refresher.prepare()
     app.state.models = ModelService.load()
+    stop_refresh = refresher.start(app.state.models)
     if not hasattr(app.state, "supabase"):  # tests may inject a client
         app.state.supabase = SupabaseClient.from_env()
     yield
+    if stop_refresh is not None:
+        stop_refresh.set()
     if app.state.supabase is not None:
         app.state.supabase.close()
 
@@ -55,7 +60,9 @@ app.include_router(hospitals.router)
 
 
 def _svc(request: Request) -> ModelService:
-    return request.app.state.models
+    svc = request.app.state.models
+    svc.maybe_reload()   # picks up a new daily refresh or hourly readings without a restart
+    return svc
 
 
 def _unknown_city(city: str, svc: ModelService) -> HTTPException:

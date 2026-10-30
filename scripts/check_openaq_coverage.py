@@ -18,58 +18,14 @@ Writes ``reports/openaq_coverage.json`` (raw findings) and ``reports/openaq_cove
 from __future__ import annotations
 
 import json
-import os
 import sys
-import time
 from pathlib import Path
 
-import httpx
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from src.openaq import CITIES, ROOT, Client, OpenAQError, load_key  # noqa: E402,F401  (shared with the daily refresh)
 
-ROOT = Path(__file__).resolve().parents[1]
-BASE = "https://api.openaq.org/v3"
-CITIES = {  # city centre (lat, lon)
-    "Delhi": (28.6139, 77.2090), "Bengaluru": (12.9716, 77.5946), "Chennai": (13.0827, 80.2707),
-    "Hyderabad": (17.3850, 78.4867), "Lucknow": (26.8467, 80.9462), "Ahmedabad": (23.0225, 72.5714),
-}
 PARAMS = ["pm25", "pm10", "no2", "so2", "co", "o3"]
 YEARS = list(range(2015, 2027))
-
-
-def load_key() -> str:
-    key = os.getenv("OPENAQ_API_KEY")
-    env = ROOT / ".env"
-    if not key and env.exists():
-        for line in env.read_text(encoding="utf-8").splitlines():
-            if line.startswith("OPENAQ_API_KEY="):
-                key = line.split("=", 1)[1].strip().strip('"').strip("'")
-    if not key:
-        sys.exit("No OPENAQ_API_KEY found. Add it to .env (see the docstring).")
-    return key
-
-
-class Client:
-    def __init__(self, key: str):
-        self.http = httpx.Client(headers={"X-API-Key": key}, timeout=30)
-
-    def get(self, path: str, **params):
-        for attempt in range(8):
-            try:
-                r = self.http.get(f"{BASE}{path}", params=params)
-            except (httpx.ConnectError, httpx.ReadTimeout):   # brief network hiccup: retry
-                time.sleep(3 * (attempt + 1))
-                continue
-            if r.status_code == 429:           # rate limited: wait and retry
-                time.sleep(float(r.headers.get("x-ratelimit-reset", 5)) + 1)
-                continue
-            if r.status_code >= 500 or r.status_code == 408:   # OpenAQ hiccup: wait and retry
-                time.sleep(5 * (attempt + 1))
-                continue
-            if r.status_code in (401, 403):
-                sys.exit(f"OpenAQ rejected the API key ({r.status_code}). Check OPENAQ_API_KEY.")
-            r.raise_for_status()
-            time.sleep(0.25)
-            return r.json()
-        raise RuntimeError(f"Rate limit not clearing for {path}")
 
 
 def year_of(item: dict) -> int | None:

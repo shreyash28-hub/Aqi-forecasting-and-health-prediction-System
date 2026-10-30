@@ -29,9 +29,16 @@ How the daily values are built
 * CO is included for every city, Ahmedabad too: its live CO sensors read normally
   (median 0.5-0.7 mg/m3), unlike the faulty 2015-2020 one.
 
+Daily refresh: ``python -m src.live_data --recent`` rebuilds only the last few days from
+``data/openaq/recent/`` (``src.openaq.fetch_recent``) and merges them into the saved file,
+so a server without the full download can keep it current. The first day of the recent
+window has no 24-hour history behind it and today is incomplete, so only the days in
+between are merged; a day with no new reading keeps its saved value.
+
 Usage::
 
-    python -m src.live_data        # rebuild data/processed/live_city_day.csv and print a summary
+    python -m src.live_data           # rebuild data/processed/live_city_day.csv from the full download
+    python -m src.live_data --recent  # merge the last few days from data/openaq/recent/
 """
 from __future__ import annotations
 
@@ -44,6 +51,7 @@ from src.aqi import hourly_aqi
 from src.data_loader import CITIES, DATA_DIR, clean_series
 
 RAW_DIR = DATA_DIR / "openaq" / "raw"
+RECENT_DIR = DATA_DIR / "openaq" / "recent"
 OUT_PATH = DATA_DIR / "processed" / "live_city_day.csv"
 
 # OpenAQ parameter -> city_day.csv column
@@ -71,7 +79,7 @@ def load_station_hourly(folder: Path) -> pd.Series:
     frames = [pd.read_csv(f, usecols=["datetime_utc", "value"]) for f in sorted(folder.glob("*.csv"))]
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["datetime_utc", "value"])
     if df.empty:
-        return pd.Series(dtype=float, name=col)
+        return pd.Series(dtype=float, index=pd.DatetimeIndex([]), name=col)
     stamp = (pd.to_datetime(df["datetime_utc"], utc=True).dt.tz_localize(None) + IST).dt.floor("h")
     s = pd.Series(df["value"].to_numpy(dtype=float), index=stamp).groupby(level=0).mean()
     s = s.asfreq("h")
@@ -79,10 +87,10 @@ def load_station_hourly(folder: Path) -> pd.Series:
     return _drop_stuck(s).rename(col)
 
 
-def load_station(city: str, station: str) -> pd.DataFrame:
+def load_station(city: str, station: str, raw: Path | None = None) -> pd.DataFrame:
     """One station's cleaned hourly pollutants. Hours with PM2.5 above PM10 are dropped
     for both: PM2.5 is part of PM10, so one of the two sensors is wrong."""
-    cols = [load_station_hourly(f) for f in sorted((RAW_DIR / city).glob(f"{station}_*"))
+    cols = [load_station_hourly(f) for f in sorted(((raw or RAW_DIR) / city).glob(f"{station}_*"))
             if f.name.split("_", 1)[1] in COLUMNS]
     df = pd.concat(cols, axis=1)
     if {"PM2.5", "PM10"} <= set(df):
@@ -104,10 +112,11 @@ def _drop_outlier_days(stations: dict[str, pd.Series], col: str) -> dict[str, pd
     return out
 
 
-def city_hourly(city: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+def city_hourly(city: str, raw: Path | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     """City hourly concentrations (station mean) and the number of stations per hour and pollutant."""
-    ids = sorted({f.name.split("_", 1)[0] for f in (RAW_DIR / city).iterdir() if f.is_dir()})
-    stations = {sid: load_station(city, sid) for sid in ids}
+    raw = raw or RAW_DIR
+    ids = sorted({f.name.split("_", 1)[0] for f in (raw / city).iterdir() if f.is_dir()})
+    stations = {sid: load_station(city, sid, raw) for sid in ids}
     means, counts = {}, {}
     for col in COLUMNS.values():
         per_station = {sid: df[col] for sid, df in stations.items() if col in df}
@@ -118,18 +127,18 @@ def city_hourly(city: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     return pd.DataFrame(means).asfreq("h"), pd.DataFrame(counts).asfreq("h").fillna(0).astype(int)
 
 
-def city_hourly_aqi(city: str) -> tuple[pd.Series, pd.DataFrame, pd.DataFrame]:
+def city_hourly_aqi(city: str, raw: Path | None = None) -> tuple[pd.Series, pd.DataFrame, pd.DataFrame]:
     """Hourly AQI, hourly concentrations and station counts for one city (IST hours)."""
-    conc, counts = city_hourly(city)
+    conc, counts = city_hourly(city, raw)
     frame = conc.reindex(columns=list(COLUMNS.values()))   # a missing pollutant becomes NaN
     frame["NOx"] = frame["NO2"]   # the AQI's NO2 sub-index reads the NOx column (see docstring)
     frame["NH3"] = np.nan
     return hourly_aqi(frame.rename_axis("Datetime").reset_index()), conc, counts
 
 
-def city_daily(city: str) -> pd.DataFrame:
+def city_daily(city: str, raw: Path | None = None) -> pd.DataFrame:
     """Daily AQI and 24-hour mean pollutants for one city."""
-    aqi_h, conc, counts = city_hourly_aqi(city)
+    aqi_h, conc, counts = city_hourly_aqi(city, raw)
 
     daily = pd.DataFrame(index=aqi_h.resample("D").mean().index)
     daily["AQI"] = aqi_h.resample("D").mean().round().where(aqi_h.resample("D").count() >= MIN_HOURS)
@@ -142,11 +151,34 @@ def city_daily(city: str) -> pd.DataFrame:
     return daily.rename_axis("Date").reset_index()
 
 
+def _today_ist() -> pd.Timestamp:
+    return (pd.Timestamp.now(tz="UTC").tz_localize(None) + IST).normalize()
+
+
 def build(cities: list[str] | None = None) -> pd.DataFrame:
     out = pd.concat([city_daily(c) for c in cities or CITIES], ignore_index=True)
     # The current day is still in progress: keep only complete days.
-    today = (pd.Timestamp.now(tz="UTC").tz_localize(None) + IST).normalize()
-    return out[out["Date"] < today]
+    return out[out["Date"] < _today_ist()]
+
+
+def merge_recent(raw: Path | None = None, cities: list[str] | None = None, path: Path | None = None) -> pd.DataFrame:
+    """Merge the complete days of the recent download into the saved daily file.
+
+    The window's first day is dropped (its rolling 24-hour values lack history) and so is
+    today (incomplete). Cells with a new value replace the saved ones; cells the new data
+    lacks keep what was saved."""
+    path = path or OUT_PATH
+    key = ["City", "Date"]
+    parts = []
+    for city in cities or CITIES:
+        d = city_daily(city, raw or RECENT_DIR)
+        first = d["Date"].min()
+        parts.append(d[(d["Date"] > first) & (d["Date"] < _today_ist())])
+    new = pd.concat(parts, ignore_index=True).set_index(key)
+    old = pd.read_csv(path, parse_dates=["Date"]).set_index(key) if path.exists() else new.iloc[:0]
+    merged = new.combine_first(old).reset_index().sort_values(key)
+    merged.to_csv(path, index=False)
+    return merged
 
 
 def load_live(city: str) -> pd.DataFrame:
@@ -169,6 +201,12 @@ def load_live_cities(cities: list[str] | None = None, target: str = "AQI") -> di
 
 
 def main() -> None:
+    import sys
+    if "--recent" in sys.argv:
+        df = merge_recent()
+        last = df.groupby("City")["Date"].max().dt.date.astype(str).to_dict()
+        print(f"Merged the recent readings into {OUT_PATH}; latest day per city: {last}")
+        return
     df = build()
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT_PATH, index=False)

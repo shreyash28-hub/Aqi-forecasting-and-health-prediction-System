@@ -51,7 +51,9 @@ def _db(call, *args, **kwargs):
 
 
 def _svc(request: Request) -> ModelService:
-    return request.app.state.models
+    svc = request.app.state.models
+    svc.maybe_reload()
+    return svc
 
 
 def _load_profile(sb: SupabaseClient, user: AuthUser) -> dict | None:

@@ -96,10 +96,24 @@ def load_data(cities: list[str], target: str, source: str) -> dict[str, pd.DataF
     return load_all_cities(cities, target=target)
 
 
+PROFILE_CACHE = PROJECT_ROOT / "models" / "live" / "seasonal_profiles.json"
+
+
 def load_profiles(cities: list[str], target: str) -> dict[str, np.ndarray]:
-    """Each city's average annual shape (log space) from the 2015-2020 data."""
-    return {c: historic_profile(to_model_space(df["value"]))
-            for c, df in load_all_cities(cities, target=target).items()}
+    """Each city's average annual shape (log space) from the 2015-2020 data.
+
+    Worked out once from ``city_day.csv`` and cached in ``models/live/seasonal_profiles.json``
+    (it never changes, and the daily refresh runs where the Kaggle file is not available).
+    Delete the cache to recompute it."""
+    cache = json.loads(PROFILE_CACHE.read_text(encoding="utf-8")) if PROFILE_CACHE.exists() else {}
+    have = cache.setdefault(target, {})
+    missing = [c for c in cities if c not in have]
+    if missing:
+        for c, df in load_all_cities(missing, target=target).items():
+            have[c] = [round(float(v), 6) for v in historic_profile(to_model_space(df["value"]))]
+        PROFILE_CACHE.parent.mkdir(parents=True, exist_ok=True)
+        PROFILE_CACHE.write_text(json.dumps(cache), encoding="utf-8")
+    return {c: np.array(have[c]) for c in cities}
 METRIC_KEYS = ["rmse", "mse", "mae", "mape"]
 
 # name -> (module in src.models, function, seeds or None). Resolved lazily inside

@@ -20,5 +20,7 @@ docs/progress/node_modules/
 
 # Hospital lookups cached by src/api/hospitals.py
 data/cache/
-# Live station data downloaded by scripts/download_openaq.py
-data/openaq/
+# Live station data downloaded by scripts/download_openaq.py and src/openaq.py
+# (data/openaq/stations.json is tracked: the daily refresh needs the station list)
+data/openaq/raw/
+data/openaq/recent/
