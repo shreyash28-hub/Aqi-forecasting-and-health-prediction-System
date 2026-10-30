@@ -7,6 +7,7 @@ import { ColorChip, Disclaimer, Panel, PanelTitle } from "@/components/common";
 import { ForecastChart } from "@/components/charts/forecast-chart";
 import { RiskScoreChart } from "@/components/charts/risk-score-chart";
 import { PrecautionList, pickDay } from "@/components/dashboard/sections";
+import { HospitalsPanel } from "@/components/hospitals/hospitals-panel";
 import { AQI_CATEGORIES, RISK_COLOR, RISK_LEVELS, aqiCategory, scoreToPoints } from "@/lib/aqi";
 import { fmtDay, fmtDayMonth, fmtWeekday } from "@/lib/format";
 import { DISCLAIMER } from "@/lib/content";
@@ -80,7 +81,7 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
           <Hospital className="mt-0.5 size-5 shrink-0" style={{ color: RISK_COLOR[level] }} aria-hidden />
           <div className="text-sm">
             <b className="font-semibold">Your estimated risk reaches {level} {firstAlert ? `on ${fmtDay(firstAlert.date)}` : ""}.</b>{" "}
-            <span className="text-muted-foreground">Follow the precautions below and keep the phone number of your nearest hospital handy. A map of nearby hospitals with contact details is coming soon.</span>
+            <span className="text-muted-foreground">Follow the precautions below and keep the phone number of your nearest hospital handy.{" "}<a href="#hospitals" className="font-medium text-brand-ink hover:underline">See nearby hospitals</a></span>
           </div>
         </div>
       )}
@@ -165,6 +166,9 @@ export function RiskResult({ data, busy = false }: { data: RiskResultData; busy?
         )}
         <Disclaimer className="mt-auto pt-4">{DISCLAIMER}</Disclaimer>
       </Panel>
+
+      {/* hospitals, only when risk reaches High or Severe */}
+      {summary.show_hospitals && <HospitalsPanel id="hospitals" city={data.city} className="col-span-12" />}
     </div>
   );
 }

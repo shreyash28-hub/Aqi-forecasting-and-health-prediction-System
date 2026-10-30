@@ -33,6 +33,7 @@ npm run dev        # http://localhost:3000
 | `/risk` | Personal day-by-day risk; each new estimate is saved to history (signed in) |
 | `/history`, `/history/[id]` | Saved estimates, detail view, delete (signed in) |
 | `/models?tab=AQI` | Model leaderboards: AQI, PM2.5, NO2, health risk |
+| `/hospitals?city=Delhi` | Nearby hospitals on a Leaflet map with contact details (also on My risk at High/Severe) |
 | `/forecast` | Placeholder, built later |
 
 Sign-in needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in

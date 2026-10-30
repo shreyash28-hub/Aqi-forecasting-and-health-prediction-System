@@ -9,7 +9,7 @@ import { ErrorState } from "@/components/common";
 import { PrimaryButton } from "@/components/forms";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAsync } from "@/hooks/use-async";
-import { meApi, type SavedProfile } from "@/lib/api";
+import { api, meApi, type SavedProfile } from "@/lib/api";
 import { CITIES } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { RiskResult, fromHistory, fromRun, type RiskResultData } from "./risk-result";
@@ -18,14 +18,17 @@ const CONDITION_LABEL: Record<string, string> = { "No Condition": "No condition"
 
 /**
  * Loads the saved profile and the latest estimate. A new estimate (saved to history)
- * is only calculated when there is none yet or the profile changed since the last one.
+ * is only calculated when there is none yet, the profile changed since the last one,
+ * or the forecasts have moved on (new data) since it was made.
  */
 async function loadInitial(token: string, signal: AbortSignal): Promise<{ profile: SavedProfile | null; result?: RiskResultData }> {
   const me = meApi(token);
   const profile = await me.profile(signal);
   if (!profile) return { profile };
-  const [latest] = await me.history(1, signal);
-  const stale = !latest || (profile.updated_at && Date.parse(profile.updated_at) > Date.parse(latest.predicted_at));
+  const [[latest], cities] = await Promise.all([me.history(1, signal), api.cities(signal)]);
+  const current = latest && cities.find((c) => c.city === latest.city)?.origin_date;
+  const stale = !latest || (profile.updated_at && Date.parse(profile.updated_at) > Date.parse(latest.predicted_at))
+    || (current !== undefined && current !== latest.origin_date);
   if (!stale) return { profile, result: fromHistory(await me.historyRun(latest.forecast_id, signal)) };
   return { profile, result: fromRun(await me.runRisk({ horizon: 7 }, signal)) };
 }

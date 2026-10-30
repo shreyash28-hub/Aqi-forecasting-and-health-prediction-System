@@ -21,7 +21,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api import me
+from src.api import hospitals, me
 from src.api.schemas import CityInfo, ForecastResponse, HealthStatus, RiskRequest, RiskResponse, Target
 from src.api.services import MAX_HORIZON, ModelService, UnknownCity, forecast_leaderboard, health_leaderboard
 from src.api.supabase_client import SupabaseClient
@@ -51,6 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(me.router)
+app.include_router(hospitals.router)
 
 
 def _svc(request: Request) -> ModelService:
@@ -102,8 +103,11 @@ def profile_schema(request: Request):
 
 
 @app.get("/api/leaderboard/forecast", tags=["leaderboard"])
-def leaderboard_forecast(target: Target = "AQI"):
-    return forecast_leaderboard(target)
+def leaderboard_forecast(request: Request, target: Target = "AQI",
+                         source: Literal["history", "live"] | None = None):
+    """Forecasting results. ``source`` defaults to the set the site serves; ``history``
+    is the 2015-2020 evaluation, ``live`` the recent station data."""
+    return forecast_leaderboard(target, source or _svc(request).source)
 
 
 @app.get("/api/leaderboard/health", tags=["leaderboard"])

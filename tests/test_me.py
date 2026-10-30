@@ -177,7 +177,7 @@ def test_prediction_saves_history_and_matches_public_endpoint(client):
     assert [d["date"] for d in detail["days"]] == [d["date"] for d in run["days"]]
     assert [d["score_level"] for d in detail["days"]] == [d["score_level"] for d in run["days"]]
     assert detail["days"][0]["aqi"] == run["days"][0]["aqi"]
-    assert detail["models"]["forecast"]["AQI"] == "SARIMA"
+    assert detail["models"]["forecast"]["AQI"] == client.app.state.models.forecasters[("AQI", "Delhi")].model_name
 
 
 def test_city_override_and_30_day_run(client):

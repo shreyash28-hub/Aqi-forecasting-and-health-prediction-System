@@ -1,6 +1,6 @@
 """Health-risk dataset loading and feature definitions.
 
-Dataset note: ``data/synthetic_person_health.csv`` is a constructed dataset. Its
+Dataset note: ``data/person_health.csv`` is a constructed dataset. Its
 air-quality columns (AQI, PM2_5, PM10, NO2, SO2, O3) are real values sampled from
 ``city_day.csv`` by city and date. The person profiles and the risk targets are
 synthetic, generated with a documented formula (vulnerability x effective exposure
@@ -20,7 +20,7 @@ import pandas as pd
 
 from src.data_loader import DATA_DIR
 
-HEALTH_CSV = DATA_DIR / "synthetic_person_health.csv"
+HEALTH_CSV = DATA_DIR / "person_health.csv"
 
 RISK_LEVELS = ["Low", "Moderate", "High", "Severe"]  # ordered; class index = position
 # Boundaries of HealthRiskScore between consecutive levels, as observed in the data

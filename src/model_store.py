@@ -14,6 +14,16 @@ Layout (``<slug>`` = ``aqi``, ``pm25`` or ``no2``)::
 A naive baseline is deployed when no model beats it on mean RMSE in the
 multi-window evaluation (the project rule is that forecasts must beat the baseline).
 
+Two sets of models (``source``):
+
+* ``history``: ``models/<slug>/``, trained on 2015-2020 (``city_day.csv``). The
+  coursework results; forecasts start on 2 July 2020.
+* ``live``: ``models/live/<slug>/``, trained on the recent CPCB station data
+  (``src/live_data.py``); forecasts start the day after the latest data. These models
+  carry a seasonal prior (``params.seasonal_prior``, 366 values in log space): it was
+  subtracted before fitting and is added back to every forecast. Naive baselines
+  never use it.
+
 All models work in log1p space; ``Forecaster.forecast`` returns the original scale
 (AQI, or µg/m³ for pollutants).
 ``metadata.json`` records the training span, the forecast origin (last training
@@ -42,27 +52,30 @@ import pandas as pd
 
 from src.data_loader import AQI_EXCLUDED_POLLUTANTS, PROJECT_ROOT, TARGETS
 from src.models.baselines import BASELINES
-from src.preprocessing import TEST_DAYS, from_model_space, to_model_space
+from src.preprocessing import TEST_DAYS, from_model_space, profile_at, to_model_space
 
 MODELS_ROOT = PROJECT_ROOT / "models"
 MODELS_DIR = MODELS_ROOT / "aqi"
 REGISTRY_PATH = MODELS_DIR / "registry.json"
+SOURCES = ("history", "live")
 STATSMODELS_TYPES = ("ARIMA", "SARIMA", "Holt-Winters")
 SUPPORTED = (*STATSMODELS_TYPES, "XGBoost", "LSTM", "Prophet", *BASELINES)
 BASELINE_HISTORY = 365  # days kept for naive baselines (the annual one needs a full year)
 LIBRARIES = ("pandas", "numpy", "statsmodels", "xgboost", "torch", "prophet", "scikit-learn", "joblib")
 
 
-def models_dir(target: str = "AQI") -> Path:
+def models_dir(target: str = "AQI", source: str = "history") -> Path:
+    if source == "live":
+        return MODELS_ROOT / "live" / TARGETS[target]
     return MODELS_DIR if target == "AQI" else MODELS_ROOT / TARGETS[target]
 
 
-def registry_path(target: str = "AQI") -> Path:
-    return models_dir(target) / "registry.json"
+def registry_path(target: str = "AQI", source: str = "history") -> Path:
+    return models_dir(target, source) / "registry.json"
 
 
-def _city_dir(city: str, target: str = "AQI") -> Path:
-    return models_dir(target) / city.lower()
+def _city_dir(city: str, target: str = "AQI", source: str = "history") -> Path:
+    return models_dir(target, source) / city.lower()
 
 
 def _series_payload(s: pd.Series) -> dict:
@@ -86,18 +99,25 @@ def _versions() -> dict:
 # --------------------------------------------------------------------------- fit + save
 
 def fit_and_save(city: str, model_name: str, series: pd.DataFrame, eval_info: dict | None = None,
-                 max_horizon: int = TEST_DAYS, target: str = "AQI"):
+                 max_horizon: int = TEST_DAYS, target: str = "AQI", source: str = "history",
+                 profile: np.ndarray | None = None):
     """Fit ``model_name`` on the city's full history and save it.
 
     Returns ``(metadata, in_memory_forecaster)``; the latter lets callers check that
     the saved files reproduce the freshly trained model exactly.
 
-    ``series`` is the cleaned frame from ``load_city_series(city, target=target)``.
+    ``series`` is the cleaned frame from ``load_city_series(city, target=target)``
+    (or ``load_live_cities`` for ``source="live"``). ``profile`` is the seasonal prior;
+    it is ignored for naive baselines.
     """
     if model_name not in SUPPORTED:
         raise ValueError(f"Unsupported model {model_name!r}; expected one of {SUPPORTED}")
+    if model_name in BASELINES:
+        profile = None
     y = to_model_space(series["value"])
-    out_dir = _city_dir(city, target)
+    if profile is not None:
+        y = y - profile_at(profile, y.index)
+    out_dir = _city_dir(city, target, source)
     out_dir.mkdir(parents=True, exist_ok=True)
     for old in out_dir.iterdir():  # never leave a previous winner's files behind
         old.unlink()
@@ -155,9 +175,13 @@ def fit_and_save(city: str, model_name: str, series: pd.DataFrame, eval_info: di
         (out_dir / "model.json").write_text(model_to_json(model), encoding="utf-8")
         files = ["model.json"]
 
+    if profile is not None:
+        params["seasonal_prior"] = [round(float(v), 6) for v in profile]
+        config += " + 2015-2020 seasonal prior"
     meta = {
         "city": city,
         "target": target,
+        "source": source,
         "output_column": TARGETS[target],
         "model": model_name,
         "config": config,
@@ -169,7 +193,8 @@ def fit_and_save(city: str, model_name: str, series: pd.DataFrame, eval_info: di
         "last_train_date": series.index[-1].date().isoformat(),
         "n_train": len(series),
         "max_horizon": max_horizon,
-        "aqi_excluded_pollutants": list(AQI_EXCLUDED_POLLUTANTS.get(city, ())) if target == "AQI" else [],
+        "aqi_excluded_pollutants": (list(AQI_EXCLUDED_POLLUTANTS.get(city, ()))
+                                    if target == "AQI" and source == "history" else []),
         "evaluation": eval_info or {},
         "params": params,
         "library_versions": _versions(),
@@ -178,16 +203,16 @@ def fit_and_save(city: str, model_name: str, series: pd.DataFrame, eval_info: di
     return meta, Forecaster(city, model_name, meta, fitted)
 
 
-def write_registry(metas: list[dict], target: str = "AQI"):
-    path = registry_path(target)
-    registry = {"task": f"{TARGETS[target]}_forecast", "target": target,
+def write_registry(metas: list[dict], target: str = "AQI", source: str = "history"):
+    path = registry_path(target, source)
+    registry = {"task": f"{TARGETS[target]}_forecast", "target": target, "source": source,
                 "updated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "cities": {}}
     if path.exists():  # keep cities not retrained in this run
         registry["cities"] = json.loads(path.read_text(encoding="utf-8")).get("cities", {})
     for m in metas:
         registry["cities"][m["city"]] = {
             "model": m["model"], "config": m["config"],
-            "dir": _city_dir(m["city"], target).relative_to(PROJECT_ROOT).as_posix(),
+            "dir": _city_dir(m["city"], target, source).relative_to(PROJECT_ROOT).as_posix(),
             "files": m["files"], "trained_at": m["trained_at"],
             "train_start": m["train_start"], "train_end": m["train_end"],
             "max_horizon": m["max_horizon"], "evaluation": m["evaluation"],
@@ -236,20 +261,23 @@ class Forecaster:
             from src.models.prophet_model import predict_prophet
             yhat = predict_prophet(self.model, horizon)
         dates = pd.date_range(self.last_train_date + pd.Timedelta(days=1), periods=horizon, freq="D")
-        values = np.clip(from_model_space(np.asarray(yhat, dtype=float)), 0, None)
+        yhat = np.asarray(yhat, dtype=float)
+        if "seasonal_prior" in p:
+            yhat = yhat + profile_at(p["seasonal_prior"], dates)
+        values = np.clip(from_model_space(yhat), 0, None)
         return pd.DataFrame({"date": dates, TARGETS[self.target]: values})
 
 
 AQIForecaster = Forecaster  # backwards-compatible name
 
 
-def load_forecaster(city: str, target: str = "AQI") -> Forecaster:
+def load_forecaster(city: str, target: str = "AQI", source: str = "history") -> Forecaster:
     """Load a saved city model; no retraining."""
-    d = _city_dir(city, target)
+    d = _city_dir(city, target, source)
     meta_path = d / "metadata.json"
     if not meta_path.exists():
         raise FileNotFoundError(f"No saved model for {city!r} (expected {meta_path}). "
-                                f"Run: python -m src.train_final_models --target {target}")
+                                f"Run: python -m src.train_final_models --target {target} --source {source}")
     meta = json.loads(meta_path.read_text(encoding="utf-8"))
     name = meta["model"]
     if name in BASELINES:
@@ -279,23 +307,23 @@ def load_forecaster(city: str, target: str = "AQI") -> Forecaster:
     return Forecaster(city, name, meta, model)
 
 
-def saved_cities(target: str = "AQI") -> list[str]:
-    path = registry_path(target)
+def saved_cities(target: str = "AQI", source: str = "history") -> list[str]:
+    path = registry_path(target, source)
     if not path.exists():
         return []
     return list(json.loads(path.read_text(encoding="utf-8"))["cities"])
 
 
-def forecast_air(city: str, horizon: int = 7) -> pd.DataFrame:
+def forecast_air(city: str, horizon: int = 7, source: str = "history") -> pd.DataFrame:
     """AQI plus, where saved, PM2.5 and NO2 forecasts for a city: date, aqi, pm25, no2.
 
     Pollutant columns are omitted when no model is saved for that city; the health
     predictor then falls back to its AQI-only model.
     """
-    out = load_forecaster(city, "AQI").forecast(horizon)
+    out = load_forecaster(city, "AQI", source).forecast(horizon)
     for target in ("PM2.5", "NO2"):
-        if city in saved_cities(target):
-            fc = load_forecaster(city, target).forecast(horizon)
+        if city in saved_cities(target, source):
+            fc = load_forecaster(city, target, source).forecast(horizon)
             if not fc["date"].equals(out["date"]):
                 raise ValueError(f"{city}: {target} forecast dates don't line up with AQI's")
             out[TARGETS[target]] = fc[TARGETS[target]].to_numpy()

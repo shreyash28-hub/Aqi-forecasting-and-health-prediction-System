@@ -64,12 +64,17 @@ def compute_aqi(df: pd.DataFrame, exclude: tuple[str, ...] = ()) -> pd.Series:
     return si.max(axis=1).where(valid).rename("AQI")
 
 
-def daily_aqi_from_hourly(hourly: pd.DataFrame, exclude: tuple[str, ...] = ()) -> pd.Series:
-    """Daily AQI for one city from its ``city_hour.csv`` rows (``Datetime`` + pollutant columns)."""
+def hourly_aqi(hourly: pd.DataFrame, exclude: tuple[str, ...] = ()) -> pd.Series:
+    """Hourly AQI from hourly concentrations (``Datetime`` + pollutant columns)."""
     h = hourly.set_index("Datetime").sort_index().asfreq("h")
     agg = pd.DataFrame(index=h.index)
     for col in ROLLING_MEAN_24H:
         agg[col] = h[col].rolling(24, min_periods=16).mean()
     for col in ROLLING_MAX_8H:
         agg[col] = h[col].rolling(8, min_periods=1).max()
-    return compute_aqi(agg, exclude).resample("D").mean().round()
+    return compute_aqi(agg, exclude)
+
+
+def daily_aqi_from_hourly(hourly: pd.DataFrame, exclude: tuple[str, ...] = ()) -> pd.Series:
+    """Daily AQI for one city from its ``city_hour.csv`` rows (``Datetime`` + pollutant columns)."""
+    return hourly_aqi(hourly, exclude).resample("D").mean().round()

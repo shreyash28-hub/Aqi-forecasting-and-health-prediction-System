@@ -13,7 +13,7 @@ import { useAsync } from "@/hooks/use-async";
 import { api, type ForecastLeaderboard, type RiskResponse } from "@/lib/api";
 import { AQI_CATEGORIES, RISK_COLOR, aqiCategory } from "@/lib/aqi";
 import { CITIES, EXAMPLE_PROFILES } from "@/lib/content";
-import { fmtWeekday } from "@/lib/format";
+import { fmtWeekday, relDay } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const Eyebrow = ({ children }: { children: React.ReactNode }) => <span className="text-[13px] font-semibold tracking-wide text-brand-ink">{children}</span>;
@@ -120,7 +120,7 @@ function Hero({ forecasts, f1 }: { forecasts?: Record<string, import("@/lib/api"
         </div>
         <div className="grid grid-cols-[190px_minmax(0,1fr)]">
           <div className="border-r p-4">
-            <div className="text-[13px] text-muted-foreground">Tomorrow</div>
+            <div className="text-[13px] text-muted-foreground">{week ? relDay(week[0].date) : " "}</div>
             {week ? <>
               <div className="num my-2 text-[52px] leading-none font-medium tracking-tighter">{Math.round(week[0].aqi)}</div>
               <CategoryChip aqi={week[0].aqi} />
@@ -150,6 +150,7 @@ function Hero({ forecasts, f1 }: { forecasts?: Record<string, import("@/lib/api"
 // ------------------------------------------------------------------ city strip
 
 function CityStrip({ byCity }: { byCity?: Record<string, import("@/lib/api").ForecastResponse> }) {
+  const firstDay = byCity ? Object.values(byCity)[0]?.days[0]?.date : undefined;
   return (
     <section className="shell">
       <Reveal className="grid grid-cols-3 overflow-hidden rounded-[12px] border bg-card xl:grid-cols-6">
@@ -162,7 +163,7 @@ function CityStrip({ byCity }: { byCity?: Record<string, import("@/lib/api").For
         ) : <div key={i} className="border-r px-5 py-4"><Skeleton className="h-[78px]" /></div>)}
       </Reveal>
       <div className="mt-3 flex justify-between px-0.5 text-[13px] text-faint">
-        <span>Tomorrow&apos;s forecast AQI · CPCB scale</span>
+        <span>{firstDay ? `${relDay(firstDay)}'s forecast AQI` : "Forecast AQI"} · CPCB scale</span>
         <Link href="/dashboard" className="hover:text-foreground">See all cities in the dashboard →</Link>
       </div>
     </section>

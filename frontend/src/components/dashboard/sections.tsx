@@ -8,7 +8,7 @@ import { Sparkline } from "@/components/charts/sparkline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChartColors } from "@/components/theme/theme-provider";
 import { AQI_CATEGORIES, RISK_COLOR, RISK_LEVELS, aqiCategory, scoreToPoints } from "@/lib/aqi";
-import { fmtDate, fmtDay, fmtDayMonth, fmtWeekday, round } from "@/lib/format";
+import { fmtDate, fmtDay, fmtDayMonth, fmtWeekday, relDay, round } from "@/lib/format";
 import { DISCLAIMER, EXAMPLE_PROFILES, PRECAUTIONS, type Precaution } from "@/lib/content";
 import type { ForecastDay, ForecastResponse, RiskDay, RiskResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -82,7 +82,7 @@ export function TomorrowCard({ days, horizon }: { days?: ForecastDay[]; horizon:
   const peak = win[values.indexOf(Math.max(...values))];
   return (
     <Panel className="col-span-12 lg:col-span-4 wide:col-span-3">
-      <div className="text-[13px] text-muted-foreground">Tomorrow · {fmtDay(t.date)}</div>
+      <div className="text-[13px] text-muted-foreground">{relDay(t.date) === fmtDay(t.date) ? fmtDay(t.date) : `${relDay(t.date)} · ${fmtDay(t.date)}`}</div>
       <div className="mt-2.5 flex items-end gap-3">
         <span className="num text-[64px] leading-none font-medium tracking-tighter">{Math.round(t.aqi)}</span>
         <CategoryChip aqi={t.aqi} className="mb-1.5" />

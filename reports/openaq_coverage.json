@@ -1,0 +1,2791 @@
+{
+ "Delhi": {
+  "stations": [
+   {
+    "id": 13,
+    "name": "Delhi Technological University, Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2016-11-02",
+    "last": "2018-02-22",
+    "parameters": [
+     "no2",
+     "o3",
+     "pm25"
+    ]
+   },
+   {
+    "id": 15,
+    "name": "IGI Airport",
+    "provider": "CPCB",
+    "first": "",
+    "last": "",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 16,
+    "name": "Civil Lines",
+    "provider": "CPCB",
+    "first": "",
+    "last": "",
+    "parameters": [
+     "co",
+     "no2",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 17,
+    "name": "R K Puram, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2016-02-05",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 50,
+    "name": "Punjabi Bagh, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2016-02-05",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 103,
+    "name": "Income Tax Office, Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2016-11-02",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 235,
+    "name": "Anand Vihar, New Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2016-02-05",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 236,
+    "name": "Mandir Marg, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2016-02-05",
+    "last": "2018-02-21",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 431,
+    "name": "IHBAS, Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2016-04-10",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2503,
+    "name": "Shadipur, Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2587,
+    "name": "Sector16A, Faridabad - HSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-22",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2597,
+    "name": "US Diplomatic Post: New Delhi",
+    "provider": "StateAir NewDelhi",
+    "first": "2016-01-30",
+    "last": "2016-11-09",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 5404,
+    "name": "Pusa, Delhi - IMD",
+    "provider": "CPCB",
+    "first": "2017-09-15",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5509,
+    "name": "Anand Vihar, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2022-10-31",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5540,
+    "name": "Punjabi Bagh, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2018-05-13",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5541,
+    "name": "Burari Crossing, New Delhi - IMD",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5570,
+    "name": "Aya Nagar, New Delhi - IMD",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5581,
+    "name": "Pusa, New Delhi - IMD",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2018-05-14",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5586,
+    "name": "Sirifort, Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5598,
+    "name": "Sector - 125, Noida, UP - UPPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5610,
+    "name": "North Campus, DU, Delhi - IMD",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5613,
+    "name": "ITO, New Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-29",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5616,
+    "name": "Sector - 62, Noida, UP - IMD",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5617,
+    "name": "Sector- 16A, Faridabad - HSPCB",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2022-10-31",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5622,
+    "name": "NSIT Dwarka, Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5626,
+    "name": "DTU, New Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5627,
+    "name": "CRRI Mathura Road, New Delhi - IMD",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5630,
+    "name": "Shadipur, Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5634,
+    "name": "Lodhi Road, New Delhi - IMD",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5639,
+    "name": "R K Puram, New Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5641,
+    "name": "Mandir Marg, New Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5650,
+    "name": "IGI Airport (T3), Delhi - IMD",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 5665,
+    "name": "Vasundhara, Ghaziabad - UPPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5742,
+    "name": "Patparganj, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-16",
+    "last": "2018-05-13",
+    "parameters": [
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5743,
+    "name": "Rohini, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-26",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5744,
+    "name": "Dr. Karni Singh Shooting Range, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-16",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5753,
+    "name": "Vivek Vihar, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-16",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5754,
+    "name": "Jawaharlal Nehru Stadium, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-16",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5755,
+    "name": "Major Dhyan Chand National Stadium, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-26",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5759,
+    "name": "Sonia Vihar, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-16",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5761,
+    "name": "Jahangirpuri, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-16",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5762,
+    "name": "Ashok Vihar, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-16",
+    "last": "2018-05-12",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5765,
+    "name": "Okhla Phase-2, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-26",
+    "last": "2018-05-13",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5766,
+    "name": "Nehru Nagar, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-04-15",
+    "last": "2018-05-13",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6356,
+    "name": "Pusa, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6357,
+    "name": "Punjabi Bagh, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-08-10",
+    "last": "2022-10-16",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6358,
+    "name": "Mandir Marg, New Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6359,
+    "name": "IHBAS, Dilshad Garden,New Delhi - CPCB",
+    "provider": "CPCB",
+    "first": "2018-04-28",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6924,
+    "name": "Indirapuram, Ghaziabad - UPPCB",
+    "provider": "CPCB",
+    "first": "2019-04-27",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6929,
+    "name": "Major Dhyan Chand National Stadium, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6931,
+    "name": "Dwarka-Sector 8, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6932,
+    "name": "Alipur, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-12-15",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6934,
+    "name": "Dr. Karni Singh Shooting Range, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6938,
+    "name": "Vivek Vihar, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-12-15",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6957,
+    "name": "Jawaharlal Nehru Stadium, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6960,
+    "name": "Patparganj, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6980,
+    "name": "Sector-1, Noida - UPPCB",
+    "provider": "CPCB",
+    "first": "2019-06-28",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6986,
+    "name": "Knowledge Park - V, Greater Noida - UPPCB",
+    "provider": "CPCB",
+    "first": "2019-06-28",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6988,
+    "name": "Sector-116, Noida - UPPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 7005,
+    "name": "Loni, Ghaziabad - UPPCB",
+    "provider": "CPCB",
+    "first": "2019-04-27",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 7044,
+    "name": "R K Puram, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-08-10",
+    "last": "2022-10-31",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 7434,
+    "name": "East Arjun Nagar, Delhi - CPCB",
+    "provider": "caaqm",
+    "first": "2018-08-10",
+    "last": "2020-02-10",
+    "parameters": [
+     "no2",
+     "o3",
+     "so2"
+    ]
+   },
+   {
+    "id": 8092,
+    "name": "East Arjun Nagar, Delhi - CPCB",
+    "provider": "caaqm",
+    "first": "2020-02-29",
+    "last": "2022-01-26",
+    "parameters": [
+     "no2",
+     "o3",
+     "so2"
+    ]
+   },
+   {
+    "id": 8118,
+    "name": "New Delhi",
+    "provider": "AirNow",
+    "first": "2016-11-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 8235,
+    "name": "Jahangirpuri, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8239,
+    "name": "Okhla Phase-2, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-22",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8365,
+    "name": "Nehru Nagar, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8472,
+    "name": "Bawana, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8475,
+    "name": "Sonia Vihar, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8915,
+    "name": "Wazirpur, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-12-15",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8917,
+    "name": "Ashok Vihar, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-12-15",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10484,
+    "name": "Sri Aurobindo Marg, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-12-15",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10486,
+    "name": "Mundka, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-12-15",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10487,
+    "name": "Anand Vihar, Delhi - DPCC",
+    "provider": "caaqm",
+    "first": "2018-08-13",
+    "last": "2021-09-20",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10489,
+    "name": "ITO, Delhi - CPCB",
+    "provider": "caaqm",
+    "first": "2020-01-20",
+    "last": "2022-10-31",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10820,
+    "name": "Sector 30, Faridabad - HSPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10831,
+    "name": "Rohini, Delhi - DPCC",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10900,
+    "name": "Teri Gram, Gurugram - HSPCB",
+    "provider": "CPCB",
+    "first": "2020-03-30",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 10921,
+    "name": "NISE Gwal Pahari, Gurugram - IMD",
+    "provider": "CPCB",
+    "first": "2018-11-16",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 11603,
+    "name": "Chandni Chowk, Delhi - IITM",
+    "provider": "CPCB",
+    "first": "2020-11-13",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 11607,
+    "name": "Lodhi Road, Delhi - IITM",
+    "provider": "CPCB",
+    "first": "2020-11-13",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2860223,
+    "name": "GK1 (Oberoi Terrace)",
+    "provider": "AirGradient",
+    "first": "2024-05-22",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 3409496,
+    "name": "New Moti Bagh, Delhi - MHUA",
+    "provider": "CPCB",
+    "first": "2026-03-10",
+    "last": "2026-06-13",
+    "parameters": [
+     "co",
+     "no2",
+     "pm25"
+    ]
+   },
+   {
+    "id": 4663956,
+    "name": "Santushti Apartments, Vasant Kunj",
+    "provider": "AirGradient",
+    "first": "2025-06-08",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 4712609,
+    "name": "Air Check",
+    "provider": "AirGradient",
+    "first": "2026-01-28",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 6105800,
+    "name": "Sector 1, Noida extension",
+    "provider": "AirGradient",
+    "first": "2025-10-23",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 6119272,
+    "name": "Sector - 5, Vasundhara, Ghaziabad, Uttar Pradesh ",
+    "provider": "AirGradient",
+    "first": "2025-11-04",
+    "last": "2026-03-26",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 6145551,
+    "name": "Anand Lok",
+    "provider": "AirGradient",
+    "first": "2025-11-28",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 6148686,
+    "name": "IIT Delhi, Delhi - IITM",
+    "provider": "N/A",
+    "first": "2025-12-01",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 6254594,
+    "name": "Talkatora Garden, Delhi - DPCC",
+    "provider": "N/A",
+    "first": "2026-02-27",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6254663,
+    "name": "JNU, Delhi - DPCC",
+    "provider": "N/A",
+    "first": "2026-02-27",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6254665,
+    "name": "Commonwealth Sports Complex, Delhi - DPCC",
+    "provider": "N/A",
+    "first": "2026-02-27",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6254666,
+    "name": "IGNOU_Maidan Garhi, Delhi - DPCC",
+    "provider": "N/A",
+    "first": "2026-02-27",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6257818,
+    "name": "Cantonment Area, Delhi - DPCC",
+    "provider": "N/A",
+    "first": "2026-03-02",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6299494,
+    "name": "Prashant Garden, Khora - UPPCB",
+    "provider": "N/A",
+    "first": "2026-04-07",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6299678,
+    "name": "Ved Vihar-Loni, Ghaziabad - UPPCB",
+    "provider": "N/A",
+    "first": "2026-04-07",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6551511,
+    "name": "Sector-26, Noida",
+    "provider": "AirGradient",
+    "first": "2026-10-12",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   }
+  ],
+  "pct_hours_best_station": {
+   "pm25": {
+    "2024": 98,
+    "2015": 101,
+    "2016": 132,
+    "2017": 128,
+    "2020": 136,
+    "2021": 165,
+    "2018": 159,
+    "2019": 153,
+    "2022": 170,
+    "2023": 174
+   },
+   "pm10": {
+    "2024": 83,
+    "2015": 100,
+    "2016": 101,
+    "2017": 60,
+    "2020": 75,
+    "2021": 85,
+    "2018": 91,
+    "2019": 128,
+    "2023": 92
+   },
+   "no2": {
+    "2024": 82,
+    "2015": 103,
+    "2016": 98,
+    "2017": 62,
+    "2020": 75,
+    "2021": 85,
+    "2018": 89,
+    "2019": 128
+   },
+   "so2": {
+    "2024": 82,
+    "2015": 15,
+    "2016": 49,
+    "2017": 62,
+    "2020": 75,
+    "2021": 85,
+    "2018": 87,
+    "2019": 128
+   },
+   "co": {
+    "2015": 103,
+    "2016": 89,
+    "2017": 61,
+    "2024": 82,
+    "2020": 75,
+    "2021": 85,
+    "2018": 91,
+    "2019": 128
+   },
+   "o3": {
+    "2015": 103,
+    "2016": 105,
+    "2017": 62,
+    "2024": 82,
+    "2020": 75,
+    "2021": 85,
+    "2018": 89,
+    "2019": 128
+   }
+  }
+ },
+ "Bengaluru": {
+  "stations": [
+   {
+    "id": 412,
+    "name": "Peenya, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-22",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 594,
+    "name": "BTM Layout, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-22",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 797,
+    "name": "City Railway Station - KSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "pm10",
+     "so2"
+    ]
+   },
+   {
+    "id": 2589,
+    "name": "SaneguravaHalli - KSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2018-02-21",
+    "parameters": [
+     "co",
+     "no2",
+     "pm10",
+     "so2"
+    ]
+   },
+   {
+    "id": 2592,
+    "name": "BWSSB Kadabesanahalli, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-22",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5547,
+    "name": "BWSSB Kadabesanahalli, Bengaluru - CPCB",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2022-08-02",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5548,
+    "name": "BTM Layout, Bengaluru - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5574,
+    "name": "City Railway Station, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-29",
+    "parameters": [
+     "co",
+     "no2",
+     "pm10",
+     "so2"
+    ]
+   },
+   {
+    "id": 5607,
+    "name": "Peenya, Bengaluru - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5644,
+    "name": "Sanegurava Halli, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "pm10",
+     "so2"
+    ]
+   },
+   {
+    "id": 6973,
+    "name": "Jayanagar 5th Block, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6974,
+    "name": "Bapuji Nagar, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6975,
+    "name": "Silk Board, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6983,
+    "name": "Hombegowda Nagar, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6984,
+    "name": "Hebbal, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2018-08-10",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 229473,
+    "name": "blore_India_07_14_official",
+    "provider": "HabitatMap",
+    "first": "",
+    "last": "",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 2498781,
+    "name": "SiriJaya",
+    "provider": "AirGradient",
+    "first": "2024-03-01",
+    "last": "2025-05-19",
+    "parameters": [
+     "pm10",
+     "pm25"
+    ]
+   },
+   {
+    "id": 3409312,
+    "name": "BWSSB Kadabesanahalli, Bengaluru - CPCB",
+    "provider": "CPCB",
+    "first": "2025-10-18",
+    "last": "2026-10-11",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 3409385,
+    "name": "RVCE-Mailasandra, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-07-07",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 3409388,
+    "name": "Kasturi Nagar, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-20",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 3409393,
+    "name": "Shivapura_Peenya, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-18",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 3409434,
+    "name": "Jigani, Bengaluru - KSPCB",
+    "provider": "CPCB",
+    "first": "2025-02-19",
+    "last": "2026-10-23",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6119271,
+    "name": "Kumaraswamy Layout",
+    "provider": "AirGradient",
+    "first": "2025-11-04",
+    "last": "2026-04-23",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 6146655,
+    "name": "Bellandur",
+    "provider": "AirGradient",
+    "first": "2025-11-29",
+    "last": "2026-10-14",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 6206921,
+    "name": "Koramangala",
+    "provider": "AirGradient",
+    "first": "2026-01-19",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 6514356,
+    "name": "Malleswaram, Bangalore ",
+    "provider": "AirGradient",
+    "first": "2026-08-30",
+    "last": "2026-08-30",
+    "parameters": [
+     "pm25"
+    ]
+   }
+  ],
+  "pct_hours_best_station": {
+   "pm25": {
+    "2017": 56,
+    "2018": 86,
+    "2019": 121,
+    "2020": 61,
+    "2021": 76,
+    "2024": 80,
+    "2023": 131
+   },
+   "pm10": {
+    "2020": 59,
+    "2021": 76,
+    "2024": 80,
+    "2017": 46,
+    "2018": 87,
+    "2019": 97,
+    "2023": 128
+   },
+   "no2": {
+    "2017": 56,
+    "2018": 87,
+    "2019": 121,
+    "2020": 68,
+    "2021": 68,
+    "2024": 80
+   },
+   "so2": {
+    "2017": 56,
+    "2018": 87,
+    "2019": 121,
+    "2020": 68,
+    "2021": 75,
+    "2024": 80
+   },
+   "co": {
+    "2017": 57,
+    "2018": 85,
+    "2019": 121,
+    "2020": 68,
+    "2021": 76,
+    "2024": 80
+   },
+   "o3": {
+    "2017": 54,
+    "2018": 87,
+    "2019": 109,
+    "2020": 65,
+    "2021": 76,
+    "2024": 81
+   }
+  }
+ },
+ "Chennai": {
+  "stations": [
+   {
+    "id": 378,
+    "name": "Alandur Bus Depot",
+    "provider": "CPCB",
+    "first": "2016-03-22",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2461,
+    "name": "US Diplomatic Post: Chennai",
+    "provider": "StateAir Chennai",
+    "first": "2016-01-30",
+    "last": "2016-11-09",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 2549,
+    "name": "IIT",
+    "provider": "CPCB",
+    "first": "2016-03-22",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2586,
+    "name": "Manali, Chennai - CPCB",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5655,
+    "name": "Velachery Res. Area, Chennai - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8558,
+    "name": "Chennai",
+    "provider": "AirNow",
+    "first": "2022-10-03",
+    "last": "2026-10-15",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 10780,
+    "name": "Manali Village, Chennai - TNPCB",
+    "provider": "CPCB",
+    "first": "2019-07-19",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 11578,
+    "name": "Royapuram, Chennai - TNPCB",
+    "provider": "CPCB",
+    "first": "2020-11-08",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 11579,
+    "name": "Kodungaiyur, Chennai - TNPCB",
+    "provider": "CPCB",
+    "first": "2020-11-08",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 11581,
+    "name": "Arumbakkam, Chennai - TNPCB",
+    "provider": "CPCB",
+    "first": "2020-11-08",
+    "last": "2026-10-30",
+    "parameters": [
+     "no2",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 12046,
+    "name": "Perungudi, Chennai - TNPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   }
+  ],
+  "pct_hours_best_station": {
+   "pm25": {
+    "2024": 81,
+    "2016": 109,
+    "2017": 71,
+    "2018": 73,
+    "2019": 112,
+    "2020": 61,
+    "2021": 80,
+    "2022": 108,
+    "2023": 174
+   },
+   "pm10": {
+    "2020": 61,
+    "2021": 80,
+    "2024": 81,
+    "2018": 57,
+    "2019": 85
+   },
+   "no2": {
+    "2024": 81,
+    "2015": 78,
+    "2016": 131,
+    "2017": 71,
+    "2018": 76,
+    "2019": 112,
+    "2020": 62,
+    "2021": 80
+   },
+   "so2": {
+    "2016": 58,
+    "2017": 70,
+    "2018": 77,
+    "2019": 112,
+    "2020": 57,
+    "2021": 80,
+    "2024": 81
+   },
+   "co": {
+    "2024": 81,
+    "2015": 75,
+    "2016": 130,
+    "2017": 71,
+    "2018": 77,
+    "2019": 112,
+    "2020": 58,
+    "2021": 80
+   },
+   "o3": {
+    "2024": 81,
+    "2020": 61,
+    "2021": 80,
+    "2017": 55,
+    "2018": 75,
+    "2019": 112
+   }
+  }
+ },
+ "Hyderabad": {
+  "stations": [
+   {
+    "id": 407,
+    "name": "Zoo Park, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2459,
+    "name": "US Diplomatic Post: Hyderabad",
+    "provider": "StateAir Hyderabad",
+    "first": "2016-01-30",
+    "last": "2016-11-09",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 2594,
+    "name": "Sanathnagar, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2016-03-22",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5599,
+    "name": "Bollaram Industrial Area, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5623,
+    "name": "Central University, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5647,
+    "name": "Sanathnagar, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 8557,
+    "name": "Hyderabad",
+    "provider": "AirNow",
+    "first": "2016-11-09",
+    "last": "2026-04-06",
+    "parameters": [
+     "pm25"
+    ]
+   },
+   {
+    "id": 344103,
+    "name": "ECIL Kapra, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2022-05-26",
+    "last": "2026-10-29",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 344104,
+    "name": "Kompally Municipal Office, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2022-05-26",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 344140,
+    "name": "Somajiguda, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2022-05-26",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 344142,
+    "name": "Nacharam_TSIIC IALA, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2022-05-26",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 346258,
+    "name": "Kokapet, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2022-06-02",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 352465,
+    "name": "New Malakpet, Hyderabad - TSPCB",
+    "provider": "CPCB",
+    "first": "2022-06-16",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 4720578,
+    "name": "Hyderabad",
+    "provider": "AirGradient",
+    "first": "2025-06-13",
+    "last": "2025-07-07",
+    "parameters": [
+     "pm25"
+    ]
+   }
+  ],
+  "pct_hours_best_station": {
+   "pm25": {
+    "2015": 83,
+    "2016": 132,
+    "2017": 128,
+    "2018": 159,
+    "2019": 155,
+    "2020": 140,
+    "2021": 165,
+    "2024": 78,
+    "2022": 169,
+    "2023": 173
+   },
+   "pm10": {
+    "2024": 78,
+    "2015": 83,
+    "2016": 124,
+    "2017": 57,
+    "2018": 89,
+    "2019": 107,
+    "2020": 58,
+    "2021": 81
+   },
+   "no2": {
+    "2015": 84,
+    "2016": 122,
+    "2017": 57,
+    "2018": 90,
+    "2019": 113,
+    "2020": 59,
+    "2021": 81,
+    "2024": 79
+   },
+   "so2": {
+    "2015": 84,
+    "2016": 124,
+    "2017": 58,
+    "2018": 90,
+    "2019": 113,
+    "2020": 59,
+    "2021": 81,
+    "2024": 79
+   },
+   "co": {
+    "2015": 84,
+    "2016": 124,
+    "2017": 58,
+    "2018": 90,
+    "2019": 113,
+    "2020": 59,
+    "2021": 81,
+    "2024": 79
+   },
+   "o3": {
+    "2024": 79,
+    "2015": 41,
+    "2016": 124,
+    "2017": 58,
+    "2018": 88,
+    "2019": 113,
+    "2020": 59,
+    "2021": 81
+   }
+  }
+ },
+ "Lucknow": {
+  "stations": [
+   {
+    "id": 354,
+    "name": "Lalbagh, DN Park",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2456,
+    "name": "Talkatora District Industries Center, Lucknow - CPCB",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 2463,
+    "name": "Central School",
+    "provider": "CPCB",
+    "first": "2016-03-21",
+    "last": "2018-02-22",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5604,
+    "name": "Nishant Ganj, Lucknow - UPPCB",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2019-08-21",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5657,
+    "name": "Central School, Lucknow - CPCB",
+    "provider": "caaqm",
+    "first": "2018-03-09",
+    "last": "2022-10-31",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5659,
+    "name": "Lalbagh, Lucknow - CPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 7140,
+    "name": "Gomti Nagar, Lucknow - UPPCB",
+    "provider": "CPCB",
+    "first": "2019-08-07",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 227386,
+    "name": "B R Ambedkar University, Lucknow - UPPCB",
+    "provider": "CPCB",
+    "first": "2021-06-02",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 229404,
+    "name": "Kukrail Picnic Spot-1, Lucknow - UPPCB",
+    "provider": "CPCB",
+    "first": "2021-07-12",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 3409318,
+    "name": "Central School, Lucknow - CPCB",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   }
+  ],
+  "pct_hours_best_station": {
+   "pm25": {
+    "2016": 102,
+    "2017": 66,
+    "2018": 92,
+    "2019": 112,
+    "2020": 61,
+    "2021": 85,
+    "2024": 83
+   },
+   "pm10": {
+    "2024": 83,
+    "2019": 25,
+    "2020": 53,
+    "2021": 85
+   },
+   "no2": {
+    "2024": 83,
+    "2015": 69,
+    "2016": 113,
+    "2017": 67,
+    "2018": 92,
+    "2019": 112,
+    "2020": 61,
+    "2021": 85
+   },
+   "so2": {
+    "2024": 83,
+    "2016": 61,
+    "2017": 66,
+    "2018": 91,
+    "2019": 112,
+    "2020": 61,
+    "2021": 85
+   },
+   "co": {
+    "2024": 83,
+    "2015": 54,
+    "2016": 118,
+    "2017": 65,
+    "2018": 92,
+    "2019": 112,
+    "2020": 53,
+    "2021": 85
+   },
+   "o3": {
+    "2024": 83,
+    "2019": 112,
+    "2020": 62,
+    "2021": 85,
+    "2017": 57,
+    "2018": 91
+   }
+  }
+ },
+ "Ahmedabad": {
+  "stations": [
+   {
+    "id": 5631,
+    "name": "Maninagar, Ahmedabad - GPCB",
+    "provider": "CPCB",
+    "first": "2018-03-09",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6937,
+    "name": "Sector-10, Gandhinagar - GPCB",
+    "provider": "CPCB",
+    "first": "2019-02-13",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 6942,
+    "name": "Phase-4 GIDC, Vatva - GPCB",
+    "provider": "CPCB",
+    "first": "2019-02-13",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 227533,
+    "name": "Rakhial, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2021-06-04",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 227534,
+    "name": "Gyaspur, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2021-06-04",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 227536,
+    "name": "Chandkheda, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2021-06-04",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 228297,
+    "name": "SVPI Airport Hansol, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2021-06-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 228298,
+    "name": "Sardar Vallabhbhai Patel Stadium, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2021-06-18",
+    "last": "2025-08-29",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 228299,
+    "name": "GIFT City, Gandhinagar - IITM",
+    "provider": "caaqm",
+    "first": "2021-06-18",
+    "last": "2022-07-07",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 228300,
+    "name": "SAC ISRO Satellite, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2021-06-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 228303,
+    "name": "SAC ISRO Bopal, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2021-06-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 301387,
+    "name": "Raikhad, Ahmedabad - IITM",
+    "provider": "CPCB",
+    "first": "2022-03-24",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 3409336,
+    "name": "GIFT City, Gandhinagar - IITM",
+    "provider": "CPCB",
+    "first": "2025-02-18",
+    "last": "2026-10-30",
+    "parameters": [
+     "co",
+     "no2",
+     "o3",
+     "pm10",
+     "pm25",
+     "so2"
+    ]
+   },
+   {
+    "id": 5057509,
+    "name": "IIMA Ventures",
+    "provider": "AirGradient",
+    "first": "2025-07-13",
+    "last": "2026-10-30",
+    "parameters": [
+     "pm25"
+    ]
+   }
+  ],
+  "pct_hours_best_station": {
+   "pm25": {
+    "2024": 82,
+    "2017": 52,
+    "2018": 91,
+    "2019": 106,
+    "2020": 61,
+    "2021": 83
+   },
+   "pm10": {
+    "2024": 82,
+    "2018": 88,
+    "2019": 105,
+    "2020": 60,
+    "2021": 83
+   },
+   "no2": {
+    "2024": 82,
+    "2017": 52,
+    "2018": 91,
+    "2019": 105,
+    "2020": 61,
+    "2021": 83
+   },
+   "so2": {
+    "2017": 51,
+    "2018": 91,
+    "2019": 96,
+    "2020": 60,
+    "2021": 83,
+    "2024": 82
+   },
+   "co": {
+    "2017": 52,
+    "2018": 89,
+    "2019": 105,
+    "2020": 61,
+    "2021": 83,
+    "2024": 82
+   },
+   "o3": {
+    "2017": 52,
+    "2018": 91,
+    "2019": 105,
+    "2020": 61,
+    "2021": 82,
+    "2024": 82
+   }
+  }
+ }
+}

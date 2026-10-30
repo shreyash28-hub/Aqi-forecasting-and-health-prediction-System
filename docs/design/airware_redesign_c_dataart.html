@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airware: Direction C, Data-art</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12151c; --bg-2: #191d26; --ink: #ece6da; --ink-2: #b4ad9f; --ink-3: #7c7668; --line: #2a2f3a;
+    --good: #3aa769; --sat: #9ccc5f; --mod: #f0c23a; --poor: #f0923a; --vpoor: #e2554e; --sev: #a8344a;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.55 "Bricolage Grotesque", sans-serif; }
+  .mono { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1640px; margin: 0 auto; padding: 0 clamp(20px, 3.5vw, 56px); }
+  .tiny { font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+
+  header { display: flex; align-items: center; gap: 30px; padding: 22px 0; }
+  .brand { font-weight: 700; font-size: 22px; letter-spacing: -.02em; display: flex; align-items: center; gap: 10px; }
+  .brand .mark { display: flex; gap: 2px; } .brand .mark i { width: 4px; height: 18px; border-radius: 2px; }
+  nav { display: flex; gap: 22px; color: var(--ink-2); font-size: 14.5px; } nav .on { color: var(--ink); }
+  .meta { margin-left: auto; color: var(--ink-3); font-size: 13px; }
+
+  .hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(30px, 4vw, 70px); align-items: end; padding: 36px 0 28px; border-bottom: 1px solid var(--line); }
+  .bignum { font-size: clamp(150px, 15vw, 250px); font-weight: 500; line-height: .78; letter-spacing: -.06em; }
+  .bignum small { font-size: .16em; letter-spacing: 0; font-weight: 400; color: var(--ink-3); margin-left: 8px; }
+  .htext h1 { font-size: clamp(30px, 3vw, 46px); line-height: 1.08; letter-spacing: -.025em; font-weight: 500; max-width: 22ch; }
+  .htext h1 span { color: var(--mod); }
+  .htext p { margin-top: 14px; color: var(--ink-2); font-size: 17px; max-width: 58ch; }
+  .chips { display: flex; gap: 22px; margin-top: 22px; }
+  .chips div b { display: block; font-size: 24px; font-weight: 500; } .chips div span { color: var(--ink-3); font-size: 12.5px; }
+
+  /* the ribbon */
+  .ribbon-sec { padding: 30px 0 10px; }
+  .rhead { display: flex; justify-content: space-between; align-items: end; }
+  .rhead h2 { font-size: 24px; font-weight: 500; letter-spacing: -.015em; }
+  .ribbon { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; margin-top: 18px; }
+  .ribbon div { height: 150px; border-radius: 3px; position: relative; display: flex; align-items: flex-end; justify-content: center; }
+  .ribbon div span { font-size: 11px; color: rgba(18,21,28,.75); padding-bottom: 6px; font-family: "IBM Plex Mono", monospace; }
+  .ribbon div.today { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .rlabels { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; margin-top: 8px; font-size: 11px; color: var(--ink-3); }
+  .legend { display: flex; gap: 18px; font-size: 12.5px; color: var(--ink-2); } .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(28px, 4vw, 70px); padding: 34px 0; }
+  .risk { background: var(--bg-2); border-radius: 6px; padding: 26px; }
+  .risk h3 { font-size: 30px; line-height: 1.1; font-weight: 500; letter-spacing: -.02em; margin-top: 10px; }
+  .risk .who { color: var(--ink-3); font-size: 13.5px; margin-top: 8px; }
+  .rbar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 22px; }
+  .rbar div { border-top: 3px solid; padding-top: 8px; font-size: 13px; color: var(--ink-2); }
+  .rbar b { display: block; color: var(--ink); font-weight: 500; font-size: 15px; }
+  .do { margin-top: 22px; display: grid; gap: 8px; font-size: 14.5px; color: var(--ink-2); }
+  .do div::before { content: "→ "; color: var(--mod); }
+  .fine { margin-top: 16px; color: var(--ink-3); font-size: 12.5px; }
+
+  .multi h2 { font-size: 24px; font-weight: 500; letter-spacing: -.015em; }
+  .mrow { display: grid; grid-template-columns: 120px 56px minmax(0, 1fr); gap: 14px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .mrow .n { font-size: 16px; } .mrow .v { font-size: 20px; text-align: right; }
+  .mini { display: grid; grid-template-columns: repeat(30, 1fr); gap: 2px; height: 22px; } .mini i { border-radius: 1.5px; }
+  footer { border-top: 1px solid var(--line); padding: 22px 0 40px; display: flex; justify-content: space-between; color: var(--ink-3); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand"><span class="mark"><i style="background:var(--good)"></i><i style="background:var(--mod)"></i><i style="background:var(--poor)"></i></span>airware</span>
+    <nav><span class="on">Today</span><span>Forecast</span><span>My risk</span><span>Hospitals</span><span>Models</span></nav>
+    <span class="meta mono">DELHI · ISSUED 01 JUL 2020</span>
+  </header>
+
+  <section class="hero">
+    <div class="bignum mono" id="bignum">112<small>AQI</small></div>
+    <div class="htext">
+      <div class="tiny">Tomorrow · Thursday 2 July</div>
+      <h1 style="margin-top:10px">Delhi stays <span>moderate</span> all month, easing slightly from 118 to 101 by late July.</h1>
+      <p>Thirty days of forecast air, one colour per day. The deeper the colour, the harder it is on your lungs.</p>
+      <div class="chips">
+        <div><b class="mono">33</b><span>PM2.5 µg/m³</span></div>
+        <div><b class="mono">19</b><span>NO2 µg/m³</span></div>
+        <div><b>SARIMA</b><span>best of 6 models here</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ribbon-sec">
+    <div class="rhead"><h2>The next 30 days in Delhi</h2>
+      <div class="legend"><span><i style="background:var(--good)"></i>Good</span><span><i style="background:var(--sat)"></i>Satisfactory</span><span><i style="background:var(--mod)"></i>Moderate</span><span><i style="background:var(--poor)"></i>Poor</span><span><i style="background:var(--vpoor)"></i>Very poor</span></div></div>
+    <div class="ribbon" id="ribbon"></div>
+    <div class="rlabels mono" id="rlabels"></div>
+  </section>
+
+  <section class="split">
+    <div class="risk">
+      <div class="tiny">What it means for one person</div>
+      <h3>Moderate risk every day this week.</h3>
+      <div class="who">Ramesh, 67 · COPD · retired · industrial area · no mask</div>
+      <div class="rbar" id="rbar"></div>
+      <div class="do"><div>Walk before 9 am, when the air is cleanest</div><div>N95 for anything longer than an hour outside</div><div>Windows shut at rush hour</div></div>
+      <p class="fine">An estimate for decision support, not a medical diagnosis.</p>
+    </div>
+    <div class="multi">
+      <h2>Six cities, thirty days</h2>
+      <div id="multi" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <footer><span>Built by [your name] · Time Series &amp; Analysis, 2026</span><span class="mono">DATA: CPCB STATIONS · 6 MODELS COMPARED PER CITY</span></footer>
+</div>
+
+<script>
+const DATA = {"cities": {"Delhi": {"model": "SARIMA", "days": [{"d": "2020-07-02", "aqi": 112, "pm25": 33, "no2": 19}, {"d": "2020-07-03", "aqi": 116, "pm25": 32, "no2": 18}, {"d": "2020-07-04", "aqi": 118, "pm25": 30, "no2": 18}, {"d": "2020-07-05", "aqi": 117, "pm25": 30, "no2": 17}, {"d": "2020-07-06", "aqi": 116, "pm25": 29, "no2": 18}, {"d": "2020-07-07", "aqi": 117, "pm25": 29, "no2": 18}, {"d": "2020-07-08", "aqi": 116, "pm25": 29, "no2": 18}, {"d": "2020-07-09", "aqi": 115, "pm25": 28, "no2": 18}, {"d": "2020-07-10", "aqi": 114, "pm25": 28, "no2": 17}, {"d": "2020-07-11", "aqi": 114, "pm25": 26, "no2": 17}, {"d": "2020-07-12", "aqi": 113, "pm25": 26, "no2": 16}, {"d": "2020-07-13", "aqi": 112, "pm25": 26, "no2": 17}, {"d": "2020-07-14", "aqi": 111, "pm25": 26, "no2": 17}, {"d": "2020-07-15", "aqi": 110, "pm25": 26, "no2": 17}, {"d": "2020-07-16", "aqi": 110, "pm25": 26, "no2": 17}, {"d": "2020-07-17", "aqi": 109, "pm25": 25, "no2": 17}, {"d": "2020-07-18", "aqi": 108, "pm25": 24, "no2": 16}, {"d": "2020-07-19", "aqi": 108, "pm25": 23, "no2": 15}, {"d": "2020-07-20", "aqi": 107, "pm25": 23, "no2": 16}, {"d": "2020-07-21", "aqi": 106, "pm25": 24, "no2": 17}, {"d": "2020-07-22", "aqi": 105, "pm25": 24, "no2": 17}, {"d": "2020-07-23", "aqi": 105, "pm25": 24, "no2": 17}, {"d": "2020-07-24", "aqi": 104, "pm25": 23, "no2": 16}, {"d": "2020-07-25", "aqi": 104, "pm25": 22, "no2": 16}, {"d": "2020-07-26", "aqi": 103, "pm25": 22, "no2": 15}, {"d": "2020-07-27", "aqi": 103, "pm25": 22, "no2": 16}, {"d": "2020-07-28", "aqi": 102, "pm25": 22, "no2": 17}, {"d": "2020-07-29", "aqi": 102, "pm25": 23, "no2": 17}, {"d": "2020-07-30", "aqi": 102, "pm25": 23, "no2": 17}, {"d": "2020-07-31", "aqi": 101, "pm25": 22, "no2": 16}]}, "Bengaluru": {"model": "SARIMA", "days": [{"d": "2020-07-02", "aqi": 52, "pm25": 19, "no2": 13}, {"d": "2020-07-03", "aqi": 56, "pm25": 19, "no2": 13}, {"d": "2020-07-04", "aqi": 59, "pm25": 20, "no2": 13}, {"d": "2020-07-05", "aqi": 61, "pm25": 20, "no2": 13}, {"d": "2020-07-06", "aqi": 62, "pm25": 21, "no2": 13}, {"d": "2020-07-07", "aqi": 63, "pm25": 20, "no2": 13}, {"d": "2020-07-08", "aqi": 63, "pm25": 21, "no2": 13}, {"d": "2020-07-09", "aqi": 64, "pm25": 21, "no2": 13}, {"d": "2020-07-10", "aqi": 65, "pm25": 21, "no2": 13}, {"d": "2020-07-11", "aqi": 65, "pm25": 21, "no2": 13}, {"d": "2020-07-12", "aqi": 66, "pm25": 21, "no2": 13}, {"d": "2020-07-13", "aqi": 66, "pm25": 21, "no2": 13}, {"d": "2020-07-14", "aqi": 67, "pm25": 21, "no2": 13}, {"d": "2020-07-15", "aqi": 68, "pm25": 21, "no2": 13}, {"d": "2020-07-16", "aqi": 68, "pm25": 21, "no2": 13}, {"d": "2020-07-17", "aqi": 68, "pm25": 21, "no2": 13}, {"d": "2020-07-18", "aqi": 69, "pm25": 21, "no2": 14}, {"d": "2020-07-19", "aqi": 69, "pm25": 21, "no2": 13}, {"d": "2020-07-20", "aqi": 70, "pm25": 21, "no2": 13}, {"d": "2020-07-21", "aqi": 70, "pm25": 21, "no2": 14}, {"d": "2020-07-22", "aqi": 70, "pm25": 21, "no2": 13}, {"d": "2020-07-23", "aqi": 71, "pm25": 21, "no2": 14}, {"d": "2020-07-24", "aqi": 71, "pm25": 21, "no2": 14}, {"d": "2020-07-25", "aqi": 71, "pm25": 21, "no2": 14}, {"d": "2020-07-26", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-27", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-28", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-29", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-30", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-31", "aqi": 73, "pm25": 21, "no2": 14}]}, "Chennai": {"model": "ARIMA", "days": [{"d": "2020-07-02", "aqi": 94, "pm25": 19, "no2": 11}, {"d": "2020-07-03", "aqi": 95, "pm25": 20, "no2": 11}, {"d": "2020-07-04", "aqi": 96, "pm25": 20, "no2": 12}, {"d": "2020-07-05", "aqi": 96, "pm25": 18, "no2": 12}, {"d": "2020-07-06", "aqi": 96, "pm25": 19, "no2": 12}, {"d": "2020-07-07", "aqi": 96, "pm25": 20, "no2": 12}, {"d": "2020-07-08", "aqi": 97, "pm25": 19, "no2": 12}, {"d": "2020-07-09", "aqi": 97, "pm25": 19, "no2": 13}, {"d": "2020-07-10", "aqi": 97, "pm25": 20, "no2": 13}, {"d": "2020-07-11", "aqi": 97, "pm25": 20, "no2": 13}, {"d": "2020-07-12", "aqi": 97, "pm25": 18, "no2": 13}, {"d": "2020-07-13", "aqi": 97, "pm25": 19, "no2": 13}, {"d": "2020-07-14", "aqi": 97, "pm25": 20, "no2": 13}, {"d": "2020-07-15", "aqi": 97, "pm25": 19, "no2": 13}, {"d": "2020-07-16", "aqi": 98, "pm25": 19, "no2": 13}, {"d": "2020-07-17", "aqi": 98, "pm25": 20, "no2": 13}, {"d": "2020-07-18", "aqi": 98, "pm25": 20, "no2": 13}, {"d": "2020-07-19", "aqi": 98, "pm25": 18, "no2": 14}, {"d": "2020-07-20", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-21", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-22", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-23", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-24", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-25", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-26", "aqi": 98, "pm25": 18, "no2": 14}, {"d": "2020-07-27", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-28", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-29", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-30", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-31", "aqi": 99, "pm25": 20, "no2": 14}]}, "Hyderabad": {"model": "Prophet", "days": [{"d": "2020-07-02", "aqi": 47, "pm25": 27, "no2": 26}, {"d": "2020-07-03", "aqi": 46, "pm25": 27, "no2": 24}, {"d": "2020-07-04", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-05", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-06", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-07", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-08", "aqi": 46, "pm25": 27, "no2": 25}, {"d": "2020-07-09", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-10", "aqi": 44, "pm25": 27, "no2": 24}, {"d": "2020-07-11", "aqi": 43, "pm25": 27, "no2": 24}, {"d": "2020-07-12", "aqi": 43, "pm25": 27, "no2": 24}, {"d": "2020-07-13", "aqi": 43, "pm25": 27, "no2": 24}, {"d": "2020-07-14", "aqi": 43, "pm25": 27, "no2": 25}, {"d": "2020-07-15", "aqi": 43, "pm25": 27, "no2": 25}, {"d": "2020-07-16", "aqi": 43, "pm25": 27, "no2": 25}, {"d": "2020-07-17", "aqi": 42, "pm25": 27, "no2": 24}, {"d": "2020-07-18", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-19", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-20", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-21", "aqi": 41, "pm25": 27, "no2": 25}, {"d": "2020-07-22", "aqi": 42, "pm25": 27, "no2": 25}, {"d": "2020-07-23", "aqi": 42, "pm25": 27, "no2": 25}, {"d": "2020-07-24", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-25", "aqi": 40, "pm25": 27, "no2": 25}, {"d": "2020-07-26", "aqi": 41, "pm25": 27, "no2": 25}, {"d": "2020-07-27", "aqi": 41, "pm25": 27, "no2": 25}, {"d": "2020-07-28", "aqi": 41, "pm25": 27, "no2": 26}, {"d": "2020-07-29", "aqi": 42, "pm25": 27, "no2": 26}, {"d": "2020-07-30", "aqi": 43, "pm25": 27, "no2": 26}, {"d": "2020-07-31", "aqi": 43, "pm25": 27, "no2": 25}]}, "Lucknow": {"model": "Prophet", "days": [{"d": "2020-07-02", "aqi": 63, "pm25": 28, "no2": 14}, {"d": "2020-07-03", "aqi": 62, "pm25": 26, "no2": 14}, {"d": "2020-07-04", "aqi": 60, "pm25": 26, "no2": 14}, {"d": "2020-07-05", "aqi": 58, "pm25": 25, "no2": 13}, {"d": "2020-07-06", "aqi": 56, "pm25": 24, "no2": 14}, {"d": "2020-07-07", "aqi": 57, "pm25": 24, "no2": 13}, {"d": "2020-07-08", "aqi": 56, "pm25": 23, "no2": 14}, {"d": "2020-07-09", "aqi": 54, "pm25": 23, "no2": 13}, {"d": "2020-07-10", "aqi": 53, "pm25": 22, "no2": 13}, {"d": "2020-07-11", "aqi": 52, "pm25": 22, "no2": 13}, {"d": "2020-07-12", "aqi": 51, "pm25": 22, "no2": 12}, {"d": "2020-07-13", "aqi": 50, "pm25": 22, "no2": 13}, {"d": "2020-07-14", "aqi": 51, "pm25": 22, "no2": 13}, {"d": "2020-07-15", "aqi": 50, "pm25": 21, "no2": 13}, {"d": "2020-07-16", "aqi": 50, "pm25": 22, "no2": 13}, {"d": "2020-07-17", "aqi": 49, "pm25": 21, "no2": 12}, {"d": "2020-07-18", "aqi": 49, "pm25": 22, "no2": 12}, {"d": "2020-07-19", "aqi": 48, "pm25": 22, "no2": 12}, {"d": "2020-07-20", "aqi": 48, "pm25": 22, "no2": 12}, {"d": "2020-07-21", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-22", "aqi": 50, "pm25": 22, "no2": 13}, {"d": "2020-07-23", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-24", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-25", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-26", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-27", "aqi": 50, "pm25": 24, "no2": 12}, {"d": "2020-07-28", "aqi": 52, "pm25": 24, "no2": 12}, {"d": "2020-07-29", "aqi": 52, "pm25": 24, "no2": 13}, {"d": "2020-07-30", "aqi": 52, "pm25": 24, "no2": 13}, {"d": "2020-07-31", "aqi": 52, "pm25": 24, "no2": 12}]}, "Ahmedabad": {"model": "Holt-Winters", "days": [{"d": "2020-07-02", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-03", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-04", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-05", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-06", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-07", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-08", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-09", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-10", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-11", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-12", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-13", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-14", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-15", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-16", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-17", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-18", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-19", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-20", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-21", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-22", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-23", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-24", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-25", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-26", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-27", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-28", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-29", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-30", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-31", "aqi": 103, "pm25": 35, "no2": 35}]}}, "risk": [{"d": "2020-07-02", "level": "Moderate", "alert": "Moderate", "conf": 81, "score": 1.572}, {"d": "2020-07-03", "level": "Moderate", "alert": "Moderate", "conf": 78, "score": 1.601}, {"d": "2020-07-04", "level": "Moderate", "alert": "Moderate", "conf": 79, "score": 1.594}, {"d": "2020-07-05", "level": "Moderate", "alert": "Moderate", "conf": 81, "score": 1.573}, {"d": "2020-07-06", "level": "Moderate", "alert": "Moderate", "conf": 82, "score": 1.57}, {"d": "2020-07-07", "level": "Moderate", "alert": "Moderate", "conf": 81, "score": 1.576}, {"d": "2020-07-08", "level": "Moderate", "alert": "Moderate", "conf": 82, "score": 1.571}]};
+const CATS = [[50,"Good","--good"],[100,"Satisfactory","--sat"],[200,"Moderate","--mod"],[300,"Poor","--poor"],[400,"Very poor","--vpoor"],[1e9,"Severe","--sev"]];
+const cat = (v) => CATS.find((c) => v <= c[0]);
+const col = (v) => getComputedStyle(document.documentElement).getPropertyValue(cat(v)[2]).trim();
+const wd = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("en-GB", { weekday: "narrow" });
+const dd = (iso) => new Date(iso + "T00:00:00").getDate();
+
+const d30 = DATA.cities.Delhi.days.slice(0, 30), mx = Math.max(...d30.map((d) => d.aqi));
+document.getElementById("ribbon").innerHTML = d30.map((d, i) => {
+  const h = 70 + (d.aqi / mx) * 80;   // height follows the AQI, colour follows the CPCB band
+  return `<div class="${i === 0 ? "today" : ""}" style="background:${col(d.aqi)};height:${h}px;align-self:end;opacity:${.55 + .45 * d.aqi / mx}" title="${d.d}: AQI ${d.aqi}"><span>${d.aqi}</span></div>`;
+}).join("");
+document.getElementById("ribbon").style.alignItems = "end";
+document.getElementById("rlabels").innerHTML = d30.map((d) => `<span style="text-align:center">${dd(d.d)}</span>`).join("");
+
+const lv = { Low: "--good", Moderate: "--mod", High: "--poor", Severe: "--vpoor" };
+document.getElementById("rbar").innerHTML = DATA.risk.map((r) => `<div style="border-color:var(${lv[r.alert]})"><b>${r.level}</b>${new Date(r.d + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short" })} · ${r.conf}%</div>`).join("");
+
+document.getElementById("multi").innerHTML = Object.entries(DATA.cities).map(([n, c]) => {
+  const v = c.days.slice(0, 30).map((d) => d.aqi);
+  return `<div class="mrow"><span class="n">${n}</span><span class="v mono">${v[0]}</span><div class="mini">${v.map((a) => `<i style="background:${col(a)}"></i>`).join("")}</div></div>`;
+}).join("");
+</script>
+</body>
+</html>

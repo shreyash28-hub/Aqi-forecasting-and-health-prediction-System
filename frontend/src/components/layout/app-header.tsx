@@ -13,6 +13,7 @@ const NAV = [
   { href: "/forecast", label: "Forecast" },
   { href: "/risk", label: "My risk" },
   { href: "/history", label: "History" },
+  { href: "/hospitals", label: "Hospitals" },
   { href: "/models", label: "Models" },
 ];
 

@@ -15,7 +15,7 @@ pipeline. It's ~76 MB and publicly re-downloadable, so it's kept out of git.
 
 Both extracted files are git-ignored.
 
-## `synthetic_person_health.csv` (tracked)
+## `person_health.csv` (tracked)
 
 Health-risk training data for the health prediction pipeline. It is a constructed
 dataset: real city-and-date AQI/pollutant values from `city_day.csv` joined to

@@ -17,3 +17,8 @@ data/Aqi.zip
 
 # Progress doc generator dependencies
 docs/progress/node_modules/
+
+# Hospital lookups cached by src/api/hospitals.py
+data/cache/
+# Live station data downloaded by scripts/download_openaq.py
+data/openaq/

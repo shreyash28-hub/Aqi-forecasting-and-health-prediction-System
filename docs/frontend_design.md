@@ -40,7 +40,7 @@ folder in this repo; npm; a small in-house ECharts React wrapper; `react-leaflet
 | My risk | `/risk` | Built |
 | History | `/history`, `/history/[id]` | Built |
 | Models leaderboard | `/models?tab=AQI` (also PM2.5, NO2, health) | Built |
-| Hospitals map | inside My risk, when `alert_level` is High or Severe | Planned, later |
+| Hospitals map | `/hospitals?city=` (public) and inside My risk when `alert_level` is High or Severe | Built |
 
 ## Visual direction
 
@@ -208,8 +208,12 @@ for now so it reads as a product.
   summary tiles (deployed model, mean RMSE, gain over naive, MAPE), ranking table and
   RMSE bars, test windows. Health tab: primary/fallback switch, classification and
   regression tables, recall by level, boundary-rule stats.
-- **Hospitals (later):** Leaflet map and contact cards when `alert_level` is High or Severe.
-  Enquiry only, no booking.
+- **Hospitals:** Leaflet map (OpenStreetMap tiles, darkened in dark mode) beside a list,
+  nearest first: name, distance, emergency badge, address, phone (tap to call), website,
+  directions and the OpenStreetMap entry. Radius 3/5/10 km, "Use my location" (rounded to
+  about 100 m, never stored), and a phone-only filter. A footer says to call 112 (108 for an
+  ambulance) in an emergency and that Airware never books appointments. Shown on its own page
+  and on My risk when `alert_level` is High or Severe.
 
 ## Content rules (from CLAUDE.md)
 

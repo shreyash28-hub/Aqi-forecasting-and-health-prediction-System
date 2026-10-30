@@ -10,7 +10,7 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "8 October 2026";
+const LAST_UPDATED = "30 October 2026";
 const LATEST_COMMIT = "75af4ea Landing page and dashboard; signed-in pages pending commit";
 
 const AT_A_GLANCE = [
@@ -26,7 +26,9 @@ const AT_A_GLANCE = [
   ["Frontend design (Airware)", "Done", "Landing page and dashboard designs approved; spec in docs/frontend_design.md"],
   ["Next.js frontend: landing + dashboard", "Done", "Built and connected to the live API; checked at 1280, 1536 and 1920 px"],
   ["Frontend: sign-in, profile, my risk, history, models", "Done", "Built on the live API; sign-in flow to be tested by you with a real account"],
-  ["Hospital map", "Not started", "Leaflet + OpenStreetMap (Overpass)"],
+  ["Hospital map", "Done", "Leaflet + OpenStreetMap; nearby hospitals with phone, address, directions; shown at High/Severe risk"],
+  ["Live 2026 data: station download + daily AQI", "Done", "24 CPCB stations (4 per city), Feb 2025 to today; daily AQI matches CPCB bulletins"],
+  ["Live 2026 data: retrain + forecast from today", "Done", "18 live models (6 cities x AQI, PM2.5, NO2); the site now forecasts from today; daily refresh command"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Not started", "Vercel (frontend), Render or Railway (backend)"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
@@ -116,6 +118,17 @@ DONE.push({
 });
 
 DONE.push({
+  title: "Hospital enquiry map",
+  items: [
+    "New public endpoint /api/hospitals finds hospitals near a city centre or the user's location using OpenStreetMap (Overpass API): name, distance, address, phone numbers, website and whether it has an emergency department.",
+    "Results are cleaned (unnamed, duplicate and clearly non-medical entries removed), sorted nearest first and cached for a week, because a fresh lookup can take 30-70 seconds.",
+    "Website: a Leaflet map with OpenStreetMap tiles and a list of hospitals with tap-to-call phone numbers, website and directions links; 3, 5 or 10 km radius and an optional 'use my location'.",
+    "Shown on its own Hospitals page and automatically on My risk when risk reaches High or Severe. Contact details only (no booking), with a reminder to call 112 or 108 in an emergency.",
+    "9 new automated tests (50 in total); type check, lint and production build pass; checked at 1280, 1536 and 1920 px in light and dark.",
+  ],
+});
+
+DONE.push({
   title: "Frontend: sign-in, profile, my risk, history and models",
   items: [
     "Sign in and create account (email and password through Supabase); new accounts confirm by email and go straight to the profile form.",
@@ -166,9 +179,8 @@ const HEALTH_RESULTS = [
 const REMAINING = [
   // [task, needs, notes]
   ["Frontend: forecast detail page", "Frontend", "City forecast page (/forecast); the other pages are built"],
-  ["Hospital map", "Frontend", "Shown when the alert level is High/Severe; contact details only, no booking"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
-  ["Live 2026 data", "After the frontend", "Show today's AQI and forecast from today using recent station data; needs a free OpenAQ API key"],
+  ["Live data: daily refresh", "Deployment", "Run python -m src.refresh_live once a day (Task Scheduler now, a cron job after deployment)"],
   ["Deployment", "All of the above", "Vercel + Render/Railway; handle the ~20 s model-loading startup"],
   ["Mid-sem report/presentation (19-30 Oct)", "You + me", "Classical models: ARIMA, SARIMA, Holt-Winters, decomposition"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
@@ -188,6 +200,9 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["30 Oct 2026", "Forecasting models retrained on Feb 2025 to 29 Oct 2026 station data, using the 2015-2020 seasonal pattern as a guide; best model beats the naive baseline for every city's AQI and PM2.5 (Lucknow NO2 keeps the baseline). The site now forecasts from today; the 2015-2020 coursework results are unchanged."],
+  ["30 Oct 2026", "Live data: hourly readings from 24 CPCB stations downloaded from OpenAQ (Feb 2025 to today) and turned into daily AQI per city (src/live_data.py), with faulty-sensor cleaning; spot-checks match CPCB bulletins (Delhi 20 Oct 2025: 346 vs 345)."],
+  ["30 Oct 2026", "Hospital enquiry map built: /hospitals page and a panel on My risk at High/Severe risk; OpenAQ coverage check started for live data."],
   ["8 Oct 2026", "Project working guide written (22 pages, theory and technical): docs/Project_Working_Guide.docx."],
   ["7 Oct 2026", "Precautions now follow the selected day's risk (tomorrow by default) instead of the week's highest level; day cards are clickable."],
   ["6 Oct 2026", "Risk score now shown out of 100 (each risk level fills a quarter of the scale)."],

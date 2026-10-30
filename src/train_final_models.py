@@ -12,6 +12,11 @@ Usage::
     python -m src.train_final_models --target PM2.5           # pollutant models
     python -m src.train_final_models --cities Delhi
     python -m src.train_final_models --cities Delhi --model Prophet   # override the winner
+    python -m src.train_final_models --source live --target AQI       # live models (models/live/)
+
+For ``--source live`` run ``python -m src.run_forecasting --source live --target <T>``
+first; the live models are refitted on all the live data with the same 2015-2020
+seasonal prior the evaluation used.
 """
 from __future__ import annotations
 
@@ -21,10 +26,10 @@ import time
 
 import numpy as np
 
-from src.data_loader import TARGETS, load_all_cities
-from src.model_store import SUPPORTED, fit_and_save, load_forecaster, write_registry
+from src.data_loader import TARGETS
+from src.model_store import SOURCES, SUPPORTED, fit_and_save, load_forecaster, write_registry
 from src.preprocessing import TEST_DAYS
-from src.run_forecasting import out_dir
+from src.run_forecasting import load_data, load_profiles, out_dir
 
 
 def main():
@@ -32,12 +37,14 @@ def main():
     ap.add_argument("--target", default="AQI", choices=list(TARGETS))
     ap.add_argument("--cities", nargs="+")
     ap.add_argument("--model", choices=SUPPORTED, help="override the leaderboard winner")
+    ap.add_argument("--source", default="history", choices=SOURCES)
     args = ap.parse_args()
 
-    target, col = args.target, TARGETS[args.target]
-    board = json.loads((out_dir(target) / "leaderboard.json").read_text(encoding="utf-8"))
+    target, col, source = args.target, TARGETS[args.target], args.source
+    board = json.loads((out_dir(target, source) / "leaderboard.json").read_text(encoding="utf-8"))
     cities = args.cities or list(board["cities"])
-    data = load_all_cities(cities, target=target)
+    data = load_data(cities, target, source)
+    profiles = load_profiles(cities, target) if board.get("seasonal_prior") else {}
 
     metas = []
     for city in cities:
@@ -60,12 +67,13 @@ def main():
                                                      if r["model"] == mw["best_baseline"])}
 
         t0 = time.perf_counter()
-        meta, in_memory = fit_and_save(city, model_name, data[city], eval_info, target=target)
+        meta, in_memory = fit_and_save(city, model_name, data[city], eval_info, target=target,
+                                       source=source, profile=profiles.get(city))
         fit_s = time.perf_counter() - t0
 
         # Round trip: the model loaded from disk must reproduce the freshly trained one,
         # and a 7-day forecast must be the prefix of the 30-day one.
-        fc = load_forecaster(city, target)
+        fc = load_forecaster(city, target, source)
         f30 = fc.forecast(TEST_DAYS)
         expected = in_memory.forecast(TEST_DAYS)
         f7 = fc.forecast(7)
@@ -78,8 +86,9 @@ def main():
               f"({meta['n_train']} days) in {fit_s:5.1f}s  ->  "
               f"next 7 days {target}: {', '.join(f'{v:.0f}' for v in f7[col])}")
 
-    write_registry(metas, target)
-    print(f"\nSaved {len(metas)} {target} model(s) under models/{col}/ and updated its registry.json")
+    write_registry(metas, target, source)
+    where = f"models/live/{col}/" if source == "live" else f"models/{col}/"
+    print(f"\nSaved {len(metas)} {target} model(s) under {where} and updated its registry.json")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 
@@ -42,10 +43,11 @@ def test_forecast_matches_saved_models(client, horizon):
     assert r.status_code == 200
     body = r.json()
     assert len(body["days"]) == horizon
-    expected = forecast_air("Delhi", horizon)
+    expected = forecast_air("Delhi", horizon, client.app.state.models.source)
     got = np.array([d["aqi"] for d in body["days"]])
     assert np.allclose(got, expected["aqi"].round(1), atol=0.051)
-    assert body["days"][0]["date"] == "2020-07-02"
+    first = pd.Timestamp(body["origin_date"]) + pd.Timedelta(days=1)
+    assert body["days"][0]["date"] == first.date().isoformat()
     assert {"AQI", "PM2.5", "NO2"} <= set(body["models"])
 
 

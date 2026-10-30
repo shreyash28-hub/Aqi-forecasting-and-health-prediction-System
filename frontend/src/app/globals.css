@@ -147,3 +147,23 @@
     padding-inline: clamp(16px, 2.5vw, 32px);
   }
 }
+
+/* Hospital map (Leaflet). Pins are plain CSS so no marker images are needed. */
+.hm-pin {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--brand);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.hm-pin.is-er { background: #d9453f; }
+.hm-pin.is-selected { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 1px; transform: rotate(-45deg) scale(1.25); }
+.leaflet-container { font-family: var(--font-plex-sans), sans-serif; background: var(--muted); }
+.dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.88); }
+.hm-ring { stroke: var(--brand); fill: var(--brand); }
+.dark .leaflet-container .leaflet-control-attribution,
+.dark .leaflet-container .leaflet-bar a { background: var(--card); color: var(--muted-foreground); border-color: var(--border); }
+.dark .leaflet-container .leaflet-control-attribution a { color: var(--brand-ink); }

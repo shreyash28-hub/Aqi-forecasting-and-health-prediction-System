@@ -5,7 +5,7 @@ import { DISCLAIMER } from "@/lib/content";
 /** Full footer for the landing page. */
 export function SiteFooter() {
   const cols = [
-    { title: "Product", links: [["/dashboard", "Dashboard"], ["/risk", "My risk"], ["/history", "History"], ["/models", "Models"]] },
+    { title: "Product", links: [["/dashboard", "Dashboard"], ["/risk", "My risk"], ["/history", "History"], ["/hospitals", "Hospitals"], ["/models", "Models"]] },
     { title: "Learn", links: [["/#how", "How it works"], ["/#data", "Data and methodology"], ["/#faq", "FAQ"]] },
     { title: "Account", links: [["/sign-in", "Sign in"], ["/sign-in?mode=sign-up", "Create account"]] },
   ];

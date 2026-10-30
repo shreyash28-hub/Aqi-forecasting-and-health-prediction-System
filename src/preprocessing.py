@@ -108,3 +108,32 @@ def to_model_space(s: pd.Series) -> pd.Series:
 
 def from_model_space(s):
     return np.expm1(s)
+
+
+# --------------------------------------------------------------------------- seasonal prior
+
+PROFILE_SMOOTH_DAYS = 31
+
+
+def historic_profile(y: pd.Series, smooth: int = PROFILE_SMOOTH_DAYS) -> np.ndarray:
+    """Average annual shape of a log1p series, by day of year (366 values, mean 0).
+
+    Used for the live models: the 2020-2026 station data covers under two years, too
+    little to learn the annual cycle, so its shape is borrowed from 2015-2020. Each
+    year is first measured against its own centred 365-day mean, so a change in the
+    overall level between years (e.g. cleaner air) does not leak into the shape.
+    Smoothed with a circular ``smooth``-day moving average.
+    """
+    level = y.rolling(365, center=True, min_periods=180).mean()
+    anomaly = (y - level).dropna()
+    by_day = anomaly.groupby(anomaly.index.dayofyear).mean().reindex(range(1, 367))
+    by_day = by_day.interpolate(limit_direction="both").to_numpy()
+    pad = smooth // 2
+    wrapped = np.r_[by_day[-pad:], by_day, by_day[:pad]]
+    smoothed = np.convolve(wrapped, np.ones(smooth) / smooth, mode="valid")
+    return smoothed - smoothed.mean()
+
+
+def profile_at(profile, index: pd.DatetimeIndex) -> np.ndarray:
+    """The profile's values for the given dates."""
+    return np.asarray(profile, dtype=float)[index.dayofyear.to_numpy() - 1]

@@ -3,10 +3,15 @@
 All saved models are loaded once at startup, and each city's 30-day forecast is
 computed once and cached: the models are fixed until they're retrained, so every
 request after startup is a slice of a cached frame.
+
+Which forecasters are served (``source``): the live ones (``models/live/``, trained on
+recent station data, forecasting from the latest day) when they exist, otherwise the
+2015-2020 ones. ``FORECAST_SOURCE=history|live`` forces one.
 """
 from __future__ import annotations
 
 import json
+import os
 import time
 from dataclasses import dataclass, field
 
@@ -23,6 +28,14 @@ REPORTS = PROJECT_ROOT / "reports"
 FORECAST_LEADERBOARDS = {"AQI": REPORTS / "forecasting" / "leaderboard.json",
                          "PM2.5": REPORTS / "forecasting" / "pm25" / "leaderboard.json",
                          "NO2": REPORTS / "forecasting" / "no2" / "leaderboard.json"}
+LIVE_LEADERBOARDS = {t: REPORTS / "forecasting" / "live" / slug / "leaderboard.json" for t, slug in TARGETS.items()}
+
+
+def default_source() -> str:
+    forced = os.getenv("FORECAST_SOURCE")
+    if forced in ("history", "live"):
+        return forced
+    return "live" if saved_cities("AQI", "live") else "history"
 HEALTH_LEADERBOARD = REPORTS / "health" / "leaderboard.json"
 ELEVATED = ("High", "Severe")
 
@@ -74,15 +87,16 @@ class ModelService:
     defaults: dict[str, object] = field(default_factory=dict)          # health feature -> fill value
     training_ranges: dict[str, tuple[float, float]] = field(default_factory=dict)
     startup_seconds: float = 0.0
+    source: str = "history"
 
     @classmethod
-    def load(cls) -> "ModelService":
+    def load(cls, source: str | None = None) -> "ModelService":
         t0 = time.perf_counter()
-        svc = cls()
+        svc = cls(source=source or default_source())
         for target in TARGETS:
-            for city in saved_cities(target):
-                svc.forecasters[(target, city)] = load_forecaster(city, target)
-        for city in saved_cities("AQI"):
+            for city in saved_cities(target, svc.source):
+                svc.forecasters[(target, city)] = load_forecaster(city, target, svc.source)
+        for city in saved_cities("AQI", svc.source):
             df = svc.forecasters[("AQI", city)].forecast(MAX_HORIZON)
             for target in ("PM2.5", "NO2"):
                 fc = svc.forecasters.get((target, city))
@@ -214,8 +228,8 @@ def _read_json(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def forecast_leaderboard(target: str) -> dict:
-    board = _read_json(FORECAST_LEADERBOARDS[target])
+def forecast_leaderboard(target: str, source: str = "history") -> dict:
+    board = _read_json((LIVE_LEADERBOARDS if source == "live" else FORECAST_LEADERBOARDS)[target])
     cities = {}
     for city, c in board["cities"].items():
         mw = c["multi_window"]
@@ -224,7 +238,8 @@ def forecast_leaderboard(target: str) -> dict:
                         "best_model_beats_baseline": mw["best_model_beats_baseline"],
                         "best_baseline": mw["best_baseline"], "windows": mw["windows"],
                         "ranking": mw["ranking"]}
-    return {"target": target, "selection": board["multi_window_selection"], "n_windows": board["n_windows"],
+    return {"target": target, "source": source, "selection": board["multi_window_selection"],
+            "n_windows": board["n_windows"],
             "horizon_days": board["horizon_days"], "generated_at": board["generated_at"], "cities": cities}
 
 

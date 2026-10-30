@@ -133,6 +133,28 @@ export interface HistoryDetail extends HistoryItem {
   days: RiskDay[];
 }
 
+export interface Hospital {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  distance_km: number;
+  address: string | null;
+  phones: string[];
+  website: string | null;
+  emergency: boolean;
+  osm_url: string;
+}
+
+export interface HospitalsResponse {
+  centre: { lat: number; lon: number };
+  radius_km: number;
+  source: string;
+  hospitals: Hospital[];
+}
+
+export type HospitalQuery = { city: string; radiusKm: number } | { lat: number; lon: number; radiusKm: number };
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -171,6 +193,10 @@ export const api = {
   forecastLeaderboard: (target: "AQI" | "PM2.5" | "NO2" = "AQI", signal?: AbortSignal) =>
     request<ForecastLeaderboard>(`/api/leaderboard/forecast?target=${encodeURIComponent(target)}`, { signal }),
   healthLeaderboard: (signal?: AbortSignal) => request<HealthLeaderboard>("/api/leaderboard/health", { signal }),
+  hospitals: (q: HospitalQuery, signal?: AbortSignal) => {
+    const where = "city" in q ? `city=${encodeURIComponent(q.city)}` : `lat=${q.lat.toFixed(3)}&lon=${q.lon.toFixed(3)}`;
+    return request<HospitalsResponse>(`/api/hospitals?${where}&radius_km=${q.radiusKm}`, { signal });
+  },
 };
 
 /** Signed-in endpoints: the Supabase access token lets the backend apply row-level security. */

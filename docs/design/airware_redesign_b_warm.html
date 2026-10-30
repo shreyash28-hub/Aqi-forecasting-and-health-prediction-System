@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airware: Direction B, Warm and calm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbf8f3; --card: #ffffff; --ink: #2a2620; --ink-2: #5d564b; --ink-3: #978e80; --line: #ebe4d8;
+    --accent: #0b6e74; --haze: #e8b923;
+    --good: #2e9e5b; --sat: #8cc152; --mod: #e8b923; --poor: #ea8a2e; --vpoor: #d9453f; --sev: #8e2436;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.6 "Plus Jakarta Sans", sans-serif; }
+  .serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+  .mono { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1600px; margin: 0 auto; padding: 0 clamp(20px, 3.5vw, 56px); }
+
+  /* hero: illustrated sky, tinted by the day's AQI */
+  .hero { position: relative; overflow: hidden; color: #fff; }
+  .hero svg.sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .top { position: relative; display: flex; align-items: center; gap: 30px; padding: 22px 0; }
+  .brand { font-size: 30px; letter-spacing: -.01em; }
+  nav { display: flex; gap: 24px; font-size: 14px; } nav a { color: rgba(255,255,255,.8); text-decoration: none; } nav a.on { color: #fff; font-weight: 600; }
+  .city { margin-left: auto; display: flex; gap: 6px; }
+  .city a { color: rgba(255,255,255,.85); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 999px; }
+  .city a.on { background: rgba(255,255,255,.92); color: var(--ink); font-weight: 600; }
+  .heroin { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 40px; padding: 70px 0 120px; }
+  .when { font-size: 15px; opacity: .9; }
+  .hero h1 { font-size: clamp(46px, 5vw, 76px); line-height: 1.02; margin-top: 10px; max-width: 14ch; text-shadow: 0 1px 18px rgba(60,40,0,.25); }
+  .hero h1 i { font-style: italic; }
+  .hero p { margin-top: 16px; font-size: 18px; max-width: 46ch; text-shadow: 0 1px 2px rgba(50,35,5,.55), 0 0 22px rgba(50,35,5,.35); }
+  .heroin::before { content: ""; position: absolute; inset: -40px -60px 40px -60px; background: radial-gradient(60% 70% at 20% 60%, rgba(70,50,10,.28), transparent 70%); pointer-events: none; }
+  .heroin > * { position: relative; z-index: 1; }
+  .num { text-align: right; }
+  .num .v { font-size: clamp(120px, 11vw, 180px); line-height: .8; letter-spacing: -.03em; }
+  .num .c { font-size: 15px; margin-top: 10px; opacity: .92; }
+
+  /* sheet overlapping the sky */
+  .sheet { position: relative; margin-top: -72px; background: var(--bg); border-radius: 28px 28px 0 0; padding: 38px 0 10px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 64px); }
+  h2 { font-size: 34px; line-height: 1.1; }
+  .muted { color: var(--ink-3); font-size: 14px; }
+
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 22px; }
+  .day { background: var(--card); border-radius: 18px; padding: 16px 14px 14px; box-shadow: 0 1px 0 var(--line), 0 10px 26px -18px rgba(80,60,20,.25); }
+  .day .w { font-size: 13px; color: var(--ink-3); } .day .w b { color: var(--ink); font-weight: 600; }
+  .day .a { font-size: 34px; margin-top: 8px; line-height: 1; } .day .k { font-size: 12.5px; color: var(--ink-2); margin-top: 4px; }
+  .day .blob { width: 26px; height: 26px; border-radius: 50%; margin-top: 12px; }
+  .day.today { outline: 2px solid var(--ink); }
+
+  .curve { margin-top: 26px; background: var(--card); border-radius: 22px; padding: 22px 24px 12px; box-shadow: 0 1px 0 var(--line); }
+
+  .person { background: #f3ede2; border-radius: 26px; padding: 28px 28px 24px; }
+  .who { display: flex; gap: 14px; align-items: center; }
+  .avatar { width: 52px; height: 52px; border-radius: 50%; background: #d9cbb2; display: grid; place-items: center; font-size: 22px; color: #6b5a3c; }
+  .person h3 { font-size: 28px; line-height: 1.15; margin-top: 18px; }
+  .riskline { display: flex; gap: 6px; margin-top: 18px; }
+  .riskline span { flex: 1; text-align: center; font-size: 12px; color: var(--ink-2); }
+  .riskline i { display: block; height: 34px; border-radius: 10px; margin-bottom: 6px; }
+  .tod { margin-top: 22px; display: grid; gap: 10px; }
+  .tod div { display: grid; grid-template-columns: 92px 1fr; gap: 14px; background: #fffaf2; border-radius: 16px; padding: 13px 16px; }
+  .tod b { font-weight: 600; font-size: 14px; } .tod span { font-size: 14px; color: var(--ink-2); }
+  .fine { font-size: 12.5px; color: var(--ink-3); margin-top: 14px; }
+
+  .cities { margin-top: 44px; }
+  .cgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 16px; }
+  .cc { border-radius: 20px; padding: 18px; color: var(--ink); position: relative; overflow: hidden; background: var(--card); box-shadow: 0 1px 0 var(--line); }
+  .cc .wash { position: absolute; inset: auto 0 0 0; height: 46%; opacity: .22; }
+  .cc .n { font-weight: 600; } .cc .v { font-size: 46px; line-height: 1; margin-top: 18px; position: relative; } .cc .k { font-size: 13px; color: var(--ink-2); position: relative; }
+  footer { margin-top: 48px; padding: 26px 0 44px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; color: var(--ink-3); font-size: 13.5px; }
+  footer .serif { font-size: 20px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<section class="hero">
+  <svg class="sky" viewBox="0 0 1600 620" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7c8fa0"/><stop offset=".55" stop-color="#c7a85e"/><stop offset="1" stop-color="#e9c873"/>
+      </linearGradient>
+      <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d68a" stop-opacity="0"/><stop offset="1" stop-color="#f3d68a" stop-opacity=".75"/></linearGradient>
+    </defs>
+    <rect width="1600" height="620" fill="url(#sky)"/>
+    <circle cx="1240" cy="250" r="54" fill="#fff3cf" opacity=".55"/>
+    <!-- far skyline -->
+    <path d="M0 470 L0 430 L60 430 L60 400 L110 400 L110 440 L170 440 L170 380 L220 380 L220 420 L300 420 L300 395 L340 395 L340 430 L420 430 L420 360 L450 360 L450 330 L480 330 L480 360 L510 360 L510 430 L600 430 L600 405 L680 405 L680 440 L760 440 L760 390 L820 390 L820 430 L900 430 L900 400 L980 400 L980 440 L1060 440 L1060 370 L1110 370 L1110 420 L1200 420 L1200 395 L1290 395 L1290 440 L1380 440 L1380 405 L1460 405 L1460 430 L1600 430 L1600 470 Z" fill="#a3895a" opacity=".55"/>
+    <!-- India Gate and near skyline -->
+    <g fill="#7a6440" opacity=".8">
+      <path d="M700 520 L700 380 L720 372 L780 372 L800 380 L800 520 L772 520 L772 448 Q750 418 728 448 L728 520 Z"/>
+      <rect x="712" y="360" width="76" height="14"/><rect x="726" y="346" width="48" height="16"/>
+      <path d="M0 520 L0 470 L80 470 L80 450 L150 450 L150 480 L240 480 L240 455 L330 455 L330 490 L420 490 L420 470 L520 470 L520 495 L640 495 L640 520 Z"/>
+      <path d="M860 520 L860 490 L960 490 L960 460 L1040 460 L1040 485 L1140 485 L1140 450 L1230 450 L1230 480 L1330 480 L1330 465 L1440 465 L1440 490 L1600 490 L1600 520 Z"/>
+    </g>
+    <rect y="300" width="1600" height="320" fill="url(#haze)"/>
+    <rect y="520" width="1600" height="100" fill="#8d7448" opacity=".55"/>
+  </svg>
+  <div class="wrap">
+    <div class="top">
+      <span class="brand serif">Airware</span>
+      <nav><a class="on" href="#">Today</a><a href="#">Forecast</a><a href="#">My risk</a><a href="#">Hospitals</a><a href="#">Models</a></nav>
+      <div class="city" id="cityTabs"></div>
+    </div>
+    <div class="heroin">
+      <div>
+        <div class="when">Thursday, 2 July · Delhi</div>
+        <h1 class="serif">A hazy, <i>moderate</i> week in Delhi.</h1>
+        <p>Fine for most of the day. Sensitive lungs will feel the evenings near busy roads.</p>
+      </div>
+      <div class="num"><div class="v serif">112</div><div class="c">AQI tomorrow · Moderate</div></div>
+    </div>
+  </div>
+</section>
+
+<main class="sheet">
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:end"><h2 class="serif">Your week of air</h2><span class="muted">Daily AQI · forecast by SARIMA</span></div>
+        <div class="days" id="days"></div>
+        <div class="curve"><div class="muted">How the week moves</div><div id="curve"></div></div>
+      </div>
+      <aside class="person">
+        <div class="who"><span class="avatar serif">R</span><div><b>Ramesh, 67</b><div class="muted" style="font-size:13px">COPD · retired · industrial area · 3 h outdoors</div></div></div>
+        <h3 class="serif">A moderate-risk week. Plan outdoor time for the mornings.</h3>
+        <div class="riskline" id="riskline"></div>
+        <div class="tod">
+          <div><b>Morning</b><span>Best time for a walk. Air is at its cleanest before 9.</span></div>
+          <div><b>Afternoon</b><span>Indoors is fine. Wear an N95 if you’re out for over an hour.</span></div>
+          <div><b>Evening</b><span>Skip the walk near main roads; keep windows shut until 10 pm.</span></div>
+        </div>
+        <p class="fine">An estimate for decision support, not a medical diagnosis.</p>
+      </aside>
+    </div>
+
+    <section class="cities">
+      <h2 class="serif">Other cities tomorrow</h2>
+      <div class="cgrid" id="cgrid"></div>
+    </section>
+
+    <footer><span class="serif">Made with care by [your name] · Time Series &amp; Analysis, 2026</span><span>Air data from CPCB monitoring stations</span></footer>
+  </div>
+</main>
+
+<script>
+const DATA = {"cities": {"Delhi": {"model": "SARIMA", "days": [{"d": "2020-07-02", "aqi": 112, "pm25": 33, "no2": 19}, {"d": "2020-07-03", "aqi": 116, "pm25": 32, "no2": 18}, {"d": "2020-07-04", "aqi": 118, "pm25": 30, "no2": 18}, {"d": "2020-07-05", "aqi": 117, "pm25": 30, "no2": 17}, {"d": "2020-07-06", "aqi": 116, "pm25": 29, "no2": 18}, {"d": "2020-07-07", "aqi": 117, "pm25": 29, "no2": 18}, {"d": "2020-07-08", "aqi": 116, "pm25": 29, "no2": 18}, {"d": "2020-07-09", "aqi": 115, "pm25": 28, "no2": 18}, {"d": "2020-07-10", "aqi": 114, "pm25": 28, "no2": 17}, {"d": "2020-07-11", "aqi": 114, "pm25": 26, "no2": 17}, {"d": "2020-07-12", "aqi": 113, "pm25": 26, "no2": 16}, {"d": "2020-07-13", "aqi": 112, "pm25": 26, "no2": 17}, {"d": "2020-07-14", "aqi": 111, "pm25": 26, "no2": 17}, {"d": "2020-07-15", "aqi": 110, "pm25": 26, "no2": 17}, {"d": "2020-07-16", "aqi": 110, "pm25": 26, "no2": 17}, {"d": "2020-07-17", "aqi": 109, "pm25": 25, "no2": 17}, {"d": "2020-07-18", "aqi": 108, "pm25": 24, "no2": 16}, {"d": "2020-07-19", "aqi": 108, "pm25": 23, "no2": 15}, {"d": "2020-07-20", "aqi": 107, "pm25": 23, "no2": 16}, {"d": "2020-07-21", "aqi": 106, "pm25": 24, "no2": 17}, {"d": "2020-07-22", "aqi": 105, "pm25": 24, "no2": 17}, {"d": "2020-07-23", "aqi": 105, "pm25": 24, "no2": 17}, {"d": "2020-07-24", "aqi": 104, "pm25": 23, "no2": 16}, {"d": "2020-07-25", "aqi": 104, "pm25": 22, "no2": 16}, {"d": "2020-07-26", "aqi": 103, "pm25": 22, "no2": 15}, {"d": "2020-07-27", "aqi": 103, "pm25": 22, "no2": 16}, {"d": "2020-07-28", "aqi": 102, "pm25": 22, "no2": 17}, {"d": "2020-07-29", "aqi": 102, "pm25": 23, "no2": 17}, {"d": "2020-07-30", "aqi": 102, "pm25": 23, "no2": 17}, {"d": "2020-07-31", "aqi": 101, "pm25": 22, "no2": 16}]}, "Bengaluru": {"model": "SARIMA", "days": [{"d": "2020-07-02", "aqi": 52, "pm25": 19, "no2": 13}, {"d": "2020-07-03", "aqi": 56, "pm25": 19, "no2": 13}, {"d": "2020-07-04", "aqi": 59, "pm25": 20, "no2": 13}, {"d": "2020-07-05", "aqi": 61, "pm25": 20, "no2": 13}, {"d": "2020-07-06", "aqi": 62, "pm25": 21, "no2": 13}, {"d": "2020-07-07", "aqi": 63, "pm25": 20, "no2": 13}, {"d": "2020-07-08", "aqi": 63, "pm25": 21, "no2": 13}, {"d": "2020-07-09", "aqi": 64, "pm25": 21, "no2": 13}, {"d": "2020-07-10", "aqi": 65, "pm25": 21, "no2": 13}, {"d": "2020-07-11", "aqi": 65, "pm25": 21, "no2": 13}, {"d": "2020-07-12", "aqi": 66, "pm25": 21, "no2": 13}, {"d": "2020-07-13", "aqi": 66, "pm25": 21, "no2": 13}, {"d": "2020-07-14", "aqi": 67, "pm25": 21, "no2": 13}, {"d": "2020-07-15", "aqi": 68, "pm25": 21, "no2": 13}, {"d": "2020-07-16", "aqi": 68, "pm25": 21, "no2": 13}, {"d": "2020-07-17", "aqi": 68, "pm25": 21, "no2": 13}, {"d": "2020-07-18", "aqi": 69, "pm25": 21, "no2": 14}, {"d": "2020-07-19", "aqi": 69, "pm25": 21, "no2": 13}, {"d": "2020-07-20", "aqi": 70, "pm25": 21, "no2": 13}, {"d": "2020-07-21", "aqi": 70, "pm25": 21, "no2": 14}, {"d": "2020-07-22", "aqi": 70, "pm25": 21, "no2": 13}, {"d": "2020-07-23", "aqi": 71, "pm25": 21, "no2": 14}, {"d": "2020-07-24", "aqi": 71, "pm25": 21, "no2": 14}, {"d": "2020-07-25", "aqi": 71, "pm25": 21, "no2": 14}, {"d": "2020-07-26", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-27", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-28", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-29", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-30", "aqi": 72, "pm25": 21, "no2": 14}, {"d": "2020-07-31", "aqi": 73, "pm25": 21, "no2": 14}]}, "Chennai": {"model": "ARIMA", "days": [{"d": "2020-07-02", "aqi": 94, "pm25": 19, "no2": 11}, {"d": "2020-07-03", "aqi": 95, "pm25": 20, "no2": 11}, {"d": "2020-07-04", "aqi": 96, "pm25": 20, "no2": 12}, {"d": "2020-07-05", "aqi": 96, "pm25": 18, "no2": 12}, {"d": "2020-07-06", "aqi": 96, "pm25": 19, "no2": 12}, {"d": "2020-07-07", "aqi": 96, "pm25": 20, "no2": 12}, {"d": "2020-07-08", "aqi": 97, "pm25": 19, "no2": 12}, {"d": "2020-07-09", "aqi": 97, "pm25": 19, "no2": 13}, {"d": "2020-07-10", "aqi": 97, "pm25": 20, "no2": 13}, {"d": "2020-07-11", "aqi": 97, "pm25": 20, "no2": 13}, {"d": "2020-07-12", "aqi": 97, "pm25": 18, "no2": 13}, {"d": "2020-07-13", "aqi": 97, "pm25": 19, "no2": 13}, {"d": "2020-07-14", "aqi": 97, "pm25": 20, "no2": 13}, {"d": "2020-07-15", "aqi": 97, "pm25": 19, "no2": 13}, {"d": "2020-07-16", "aqi": 98, "pm25": 19, "no2": 13}, {"d": "2020-07-17", "aqi": 98, "pm25": 20, "no2": 13}, {"d": "2020-07-18", "aqi": 98, "pm25": 20, "no2": 13}, {"d": "2020-07-19", "aqi": 98, "pm25": 18, "no2": 14}, {"d": "2020-07-20", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-21", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-22", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-23", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-24", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-25", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-26", "aqi": 98, "pm25": 18, "no2": 14}, {"d": "2020-07-27", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-28", "aqi": 98, "pm25": 20, "no2": 14}, {"d": "2020-07-29", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-30", "aqi": 98, "pm25": 19, "no2": 14}, {"d": "2020-07-31", "aqi": 99, "pm25": 20, "no2": 14}]}, "Hyderabad": {"model": "Prophet", "days": [{"d": "2020-07-02", "aqi": 47, "pm25": 27, "no2": 26}, {"d": "2020-07-03", "aqi": 46, "pm25": 27, "no2": 24}, {"d": "2020-07-04", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-05", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-06", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-07", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-08", "aqi": 46, "pm25": 27, "no2": 25}, {"d": "2020-07-09", "aqi": 45, "pm25": 27, "no2": 25}, {"d": "2020-07-10", "aqi": 44, "pm25": 27, "no2": 24}, {"d": "2020-07-11", "aqi": 43, "pm25": 27, "no2": 24}, {"d": "2020-07-12", "aqi": 43, "pm25": 27, "no2": 24}, {"d": "2020-07-13", "aqi": 43, "pm25": 27, "no2": 24}, {"d": "2020-07-14", "aqi": 43, "pm25": 27, "no2": 25}, {"d": "2020-07-15", "aqi": 43, "pm25": 27, "no2": 25}, {"d": "2020-07-16", "aqi": 43, "pm25": 27, "no2": 25}, {"d": "2020-07-17", "aqi": 42, "pm25": 27, "no2": 24}, {"d": "2020-07-18", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-19", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-20", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-21", "aqi": 41, "pm25": 27, "no2": 25}, {"d": "2020-07-22", "aqi": 42, "pm25": 27, "no2": 25}, {"d": "2020-07-23", "aqi": 42, "pm25": 27, "no2": 25}, {"d": "2020-07-24", "aqi": 41, "pm25": 27, "no2": 24}, {"d": "2020-07-25", "aqi": 40, "pm25": 27, "no2": 25}, {"d": "2020-07-26", "aqi": 41, "pm25": 27, "no2": 25}, {"d": "2020-07-27", "aqi": 41, "pm25": 27, "no2": 25}, {"d": "2020-07-28", "aqi": 41, "pm25": 27, "no2": 26}, {"d": "2020-07-29", "aqi": 42, "pm25": 27, "no2": 26}, {"d": "2020-07-30", "aqi": 43, "pm25": 27, "no2": 26}, {"d": "2020-07-31", "aqi": 43, "pm25": 27, "no2": 25}]}, "Lucknow": {"model": "Prophet", "days": [{"d": "2020-07-02", "aqi": 63, "pm25": 28, "no2": 14}, {"d": "2020-07-03", "aqi": 62, "pm25": 26, "no2": 14}, {"d": "2020-07-04", "aqi": 60, "pm25": 26, "no2": 14}, {"d": "2020-07-05", "aqi": 58, "pm25": 25, "no2": 13}, {"d": "2020-07-06", "aqi": 56, "pm25": 24, "no2": 14}, {"d": "2020-07-07", "aqi": 57, "pm25": 24, "no2": 13}, {"d": "2020-07-08", "aqi": 56, "pm25": 23, "no2": 14}, {"d": "2020-07-09", "aqi": 54, "pm25": 23, "no2": 13}, {"d": "2020-07-10", "aqi": 53, "pm25": 22, "no2": 13}, {"d": "2020-07-11", "aqi": 52, "pm25": 22, "no2": 13}, {"d": "2020-07-12", "aqi": 51, "pm25": 22, "no2": 12}, {"d": "2020-07-13", "aqi": 50, "pm25": 22, "no2": 13}, {"d": "2020-07-14", "aqi": 51, "pm25": 22, "no2": 13}, {"d": "2020-07-15", "aqi": 50, "pm25": 21, "no2": 13}, {"d": "2020-07-16", "aqi": 50, "pm25": 22, "no2": 13}, {"d": "2020-07-17", "aqi": 49, "pm25": 21, "no2": 12}, {"d": "2020-07-18", "aqi": 49, "pm25": 22, "no2": 12}, {"d": "2020-07-19", "aqi": 48, "pm25": 22, "no2": 12}, {"d": "2020-07-20", "aqi": 48, "pm25": 22, "no2": 12}, {"d": "2020-07-21", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-22", "aqi": 50, "pm25": 22, "no2": 13}, {"d": "2020-07-23", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-24", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-25", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-26", "aqi": 50, "pm25": 23, "no2": 12}, {"d": "2020-07-27", "aqi": 50, "pm25": 24, "no2": 12}, {"d": "2020-07-28", "aqi": 52, "pm25": 24, "no2": 12}, {"d": "2020-07-29", "aqi": 52, "pm25": 24, "no2": 13}, {"d": "2020-07-30", "aqi": 52, "pm25": 24, "no2": 13}, {"d": "2020-07-31", "aqi": 52, "pm25": 24, "no2": 12}]}, "Ahmedabad": {"model": "Holt-Winters", "days": [{"d": "2020-07-02", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-03", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-04", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-05", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-06", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-07", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-08", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-09", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-10", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-11", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-12", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-13", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-14", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-15", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-16", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-17", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-18", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-19", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-20", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-21", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-22", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-23", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-24", "aqi": 103, "pm25": 35, "no2": 35}, {"d": "2020-07-25", "aqi": 100, "pm25": 38, "no2": 35}, {"d": "2020-07-26", "aqi": 96, "pm25": 33, "no2": 35}, {"d": "2020-07-27", "aqi": 92, "pm25": 34, "no2": 35}, {"d": "2020-07-28", "aqi": 104, "pm25": 40, "no2": 35}, {"d": "2020-07-29", "aqi": 107, "pm25": 37, "no2": 35}, {"d": "2020-07-30", "aqi": 105, "pm25": 36, "no2": 35}, {"d": "2020-07-31", "aqi": 103, "pm25": 35, "no2": 35}]}}, "risk": [{"d": "2020-07-02", "level": "Moderate", "alert": "Moderate", "conf": 81, "score": 1.572}, {"d": "2020-07-03", "level": "Moderate", "alert": "Moderate", "conf": 78, "score": 1.601}, {"d": "2020-07-04", "level": "Moderate", "alert": "Moderate", "conf": 79, "score": 1.594}, {"d": "2020-07-05", "level": "Moderate", "alert": "Moderate", "conf": 81, "score": 1.573}, {"d": "2020-07-06", "level": "Moderate", "alert": "Moderate", "conf": 82, "score": 1.57}, {"d": "2020-07-07", "level": "Moderate", "alert": "Moderate", "conf": 81, "score": 1.576}, {"d": "2020-07-08", "level": "Moderate", "alert": "Moderate", "conf": 82, "score": 1.571}]};
+const CATS = [[50,"Good","--good"],[100,"Satisfactory","--sat"],[200,"Moderate","--mod"],[300,"Poor","--poor"],[400,"Very poor","--vpoor"],[1e9,"Severe","--sev"]];
+const cat = (v) => CATS.find((c) => v <= c[0]);
+const col = (v) => getComputedStyle(document.documentElement).getPropertyValue(cat(v)[2]).trim();
+const wd = (iso) => new Date(iso + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short" });
+const dd = (iso) => new Date(iso + "T00:00:00").getDate();
+
+document.getElementById("cityTabs").innerHTML = Object.keys(DATA.cities).map((n) => `<a href="#" class="${n === "Delhi" ? "on" : ""}">${n}</a>`).join("");
+const days = DATA.cities.Delhi.days.slice(0, 7);
+document.getElementById("days").innerHTML = days.map((d, i) => `<div class="day ${i === 0 ? "today" : ""}"><div class="w"><b>${wd(d.d)}</b> ${dd(d.d)}</div>
+  <div class="a serif">${d.aqi}</div><div class="k">${cat(d.aqi)[1]}</div><div class="blob" style="background:${col(d.aqi)};opacity:.85"></div></div>`).join("");
+
+(function curve() {
+  const v = DATA.cities.Delhi.days.slice(0, 30).map((d) => d.aqi), W = 900, H = 130, lo = Math.min(...v) - 10, hi = Math.max(...v) + 10;
+  const x = (i) => (i * W) / (v.length - 1), y = (a) => 10 + ((hi - a) * (H - 30)) / (hi - lo);
+  let p = `M0,${y(v[0])}`;
+  for (let i = 1; i < v.length; i++) { const cx = (x(i - 1) + x(i)) / 2; p += ` C${cx},${y(v[i - 1])} ${cx},${y(v[i])} ${x(i)},${y(v[i])}`; }
+  document.getElementById("curve").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8b923" stop-opacity=".35"/><stop offset="1" stop-color="#e8b923" stop-opacity="0"/></linearGradient></defs>
+    <path d="${p} L${W},${H} L0,${H} Z" fill="url(#g)"/><path d="${p}" fill="none" stroke="#b8901a" stroke-width="2.2"/>
+    <text x="4" y="${H - 4}" font-size="12" fill="var(--ink-3)" font-family="Plus Jakarta Sans">Next 30 days</text>
+    <text x="${W - 4}" y="${H - 4}" font-size="12" fill="var(--ink-3)" text-anchor="end" font-family="Plus Jakarta Sans">easing to ${v[v.length - 1]} by the end of July</text></svg>`;
+})();
+
+const lv = { Low: "--good", Moderate: "--mod", High: "--poor", Severe: "--vpoor" };
+document.getElementById("riskline").innerHTML = DATA.risk.map((r) => `<span><i style="background:var(${lv[r.alert]});opacity:.8"></i>${wd(r.d)}</span>`).join("");
+
+document.getElementById("cgrid").innerHTML = Object.entries(DATA.cities).map(([n, c]) => {
+  const a = c.days[0].aqi;
+  return `<div class="cc"><div class="wash" style="background:${col(a)}"></div><div class="n">${n}</div><div class="v serif">${a}</div><div class="k">${cat(a)[1]}</div></div>`;
+}).join("");
+</script>
+</body>
+</html>
