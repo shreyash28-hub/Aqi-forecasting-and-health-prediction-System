@@ -11,7 +11,7 @@ const {
 // =========================================================================== CONTENT
 
 const LAST_UPDATED = "30 October 2026";
-const LATEST_COMMIT = "9d6062a Forecast from today: live station data, live models, hospital map";
+const LATEST_COMMIT = "2e89295 Daily refresh for a deployed site, and the API reloads by itself";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -30,7 +30,7 @@ const AT_A_GLANCE = [
   ["Live 2026 data: station download + daily AQI", "Done", "24 CPCB stations (4 per city), Feb 2025 to today; daily AQI matches CPCB bulletins"],
   ["Live 2026 data: retrain + forecast from today", "Done", "18 live models (6 cities x AQI, PM2.5, NO2); the site now forecasts from today; daily refresh command"],
   ["Live data: today's readings in the forecast", "Done", "Today's and the next days' forecast adjusted with station readings so far; backtested"],
-  ["Live data: automatic daily refresh", "Done (not switched on)", "GitHub Actions job + Supabase bundle + API auto-reload; tested locally end to end (86 s), needs deployment to run"],
+  ["Live data: automatic daily refresh", "Done", "GitHub Actions job runs daily at 06:00 IST; first run succeeded and the bundle is in Supabase Storage; the API side starts once deployed"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Not started", "Vercel (frontend), Render or Railway (backend)"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
@@ -182,7 +182,7 @@ const REMAINING = [
   // [task, needs, notes]
   ["Frontend: forecast detail page", "Frontend", "City forecast page (/forecast); the other pages are built"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
-  ["Live data: switch on the daily refresh", "Deployment", "Follow docs/live_refresh.md: Supabase bucket, GitHub secrets, API environment variables"],
+  ["Live data: API settings", "Deployment", "Set LIVE_BUNDLE_URL, LIVE_REFRESH_MINUTES and OPENAQ_API_KEY on the API host (docs/live_refresh.md, step 4)"],
   ["Deployment", "All of the above", "Vercel + Render/Railway; handle the ~20 s model-loading startup"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
   ["Mid-sem report/presentation (due 7 Nov)", "You + me", "Classical models; the deadline moved and the guidelines changed, so they are to be shared"],
@@ -205,6 +205,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["30 Oct 2026", "Daily refresh switched on: Supabase bucket and GitHub secrets set up, first workflow run succeeded, bundle (26 MB, models trained to 29 Oct) verified by downloading it."],
   ["30 Oct 2026", "Daily refresh built for the deployed site: a scheduled GitHub Actions job fetches the last days of readings, retrains the 18 live models and publishes them; the API downloads them and reloads by itself, no restart or redeploy. Setup steps in docs/live_refresh.md; switched on when the site is deployed."],
   ["30 Oct 2026", "Today's forecast now starts from the readings so far today (Delhi showed 256 when stations read about 107): in the winter-season backtest it cuts today's AQI error by about 57% and the next two days by 12% and 5%. Dashboard shows when the readings were last updated."],
   ["30 Oct 2026", "Forecasting models retrained on Feb 2025 to 29 Oct 2026 station data, using the 2015-2020 seasonal pattern as a guide; best model beats the naive baseline for every city's AQI and PM2.5 (Lucknow NO2 keeps the baseline). The site now forecasts from today; the 2015-2020 coursework results are unchanged."],
