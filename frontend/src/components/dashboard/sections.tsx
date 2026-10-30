@@ -8,7 +8,7 @@ import { Sparkline } from "@/components/charts/sparkline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChartColors } from "@/components/theme/theme-provider";
 import { AQI_CATEGORIES, RISK_COLOR, RISK_LEVELS, aqiCategory, scoreToPoints } from "@/lib/aqi";
-import { fmtDate, fmtDay, fmtDayMonth, fmtWeekday, relDay, round } from "@/lib/format";
+import { fmtDate, fmtDay, fmtDayMonth, fmtWeekday, relDay, round, timeOf } from "@/lib/format";
 import { DISCLAIMER, EXAMPLE_PROFILES, PRECAUTIONS, type Precaution } from "@/lib/content";
 import type { ForecastDay, ForecastResponse, RiskDay, RiskResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,9 @@ export function PageHead({ city, forecast, horizon, onHorizon }: {
         <div className="mt-1 flex flex-wrap gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5"><CalendarDays className="size-4" aria-hidden />Issued {forecast ? fmtDate(forecast.origin_date) : "…"}</span>
           <span className="flex items-center gap-1.5"><LineIcon className="size-4" aria-hidden />Model: <b className="font-medium text-foreground">{forecast?.models.AQI?.model ?? "…"}</b></span>
-          <span className="flex items-center gap-1.5"><Clock3 className="size-4" aria-hidden />CPCB monitoring stations</span>
+          <span className="flex items-center gap-1.5"><Clock3 className="size-4" aria-hidden />
+            {forecast?.readings_as_of ? `Today updated with readings to ${timeOf(forecast.readings_as_of)}` : "CPCB monitoring stations"}
+          </span>
         </div>
       </div>
       <div role="radiogroup" aria-label="Forecast horizon" className="ml-auto inline-flex overflow-hidden rounded-[7px] border border-border-strong bg-card">

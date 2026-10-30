@@ -21,6 +21,7 @@ from src.data_loader import PROJECT_ROOT, TARGETS
 from src.health.data import CATEGORIES, PERSON_NUMERIC, load_health_dataset, score_to_level
 from src.health.store import HealthRiskPredictor, load_health_predictor
 from src.model_store import Forecaster, load_forecaster, saved_cities
+from src.nowcast import apply_signals, load_signals
 from src.preprocessing import TEST_DAYS
 
 MAX_HORIZON = TEST_DAYS
@@ -88,6 +89,7 @@ class ModelService:
     training_ranges: dict[str, tuple[float, float]] = field(default_factory=dict)
     startup_seconds: float = 0.0
     source: str = "history"
+    readings_as_of: dict[str, str] = field(default_factory=dict)       # city -> latest reading used
 
     @classmethod
     def load(cls, source: str | None = None) -> "ModelService":
@@ -102,6 +104,11 @@ class ModelService:
                 fc = svc.forecasters.get((target, city))
                 if fc is not None:
                     df[TARGETS[target]] = fc.forecast(MAX_HORIZON)[TARGETS[target]].to_numpy()
+            if svc.source == "live":   # start today from today's readings so far
+                signals = load_signals()
+                df, used = apply_signals(city, df, signals)
+                if used:
+                    svc.readings_as_of[city] = signals[city]["as_of"]
             svc.forecasts[city] = df
         svc.health = load_health_predictor()
 
@@ -159,7 +166,8 @@ class ModelService:
     def forecast(self, city: str, horizon: int) -> dict:
         city = self.canonical_city(city)
         return {"city": city, "horizon": horizon, "origin_date": self.origin_date(city),
-                "models": self.model_info(city), "days": self.forecast_days(self.air_forecast(city, horizon))}
+                "models": self.model_info(city), "readings_as_of": self.readings_as_of.get(city),
+                "days": self.forecast_days(self.air_forecast(city, horizon))}
 
     # ------------------------------------------------------------------ risk
 

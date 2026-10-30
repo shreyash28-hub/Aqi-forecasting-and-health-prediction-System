@@ -74,6 +74,9 @@ class ForecastResponse(BaseModel):
     horizon: int
     origin_date: date = Field(description="Last day of observed data; forecasts start the day after")
     models: dict[str, ModelInfo]
+    readings_as_of: str | None = Field(default=None, description=(
+        "Time (IST) of the latest station reading used to adjust today's and the next days' "
+        "forecast (see src/nowcast.py); null if the forecast is the model's own"))
     days: list[ForecastDay]
 
 

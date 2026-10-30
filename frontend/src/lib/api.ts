@@ -23,6 +23,8 @@ export interface ForecastResponse {
   city: string;
   horizon: number;
   origin_date: string;
+  /** IST time of the latest station reading used to adjust today's forecast, if any */
+  readings_as_of?: string | null;
   models: Record<string, { model: string; config: string; selection?: string | null }>;
   days: ForecastDay[];
 }

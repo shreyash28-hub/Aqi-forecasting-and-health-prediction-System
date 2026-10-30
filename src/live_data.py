@@ -118,13 +118,18 @@ def city_hourly(city: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     return pd.DataFrame(means).asfreq("h"), pd.DataFrame(counts).asfreq("h").fillna(0).astype(int)
 
 
-def city_daily(city: str) -> pd.DataFrame:
-    """Daily AQI and 24-hour mean pollutants for one city."""
+def city_hourly_aqi(city: str) -> tuple[pd.Series, pd.DataFrame, pd.DataFrame]:
+    """Hourly AQI, hourly concentrations and station counts for one city (IST hours)."""
     conc, counts = city_hourly(city)
     frame = conc.reindex(columns=list(COLUMNS.values()))   # a missing pollutant becomes NaN
     frame["NOx"] = frame["NO2"]   # the AQI's NO2 sub-index reads the NOx column (see docstring)
     frame["NH3"] = np.nan
-    aqi_h = hourly_aqi(frame.rename_axis("Datetime").reset_index())
+    return hourly_aqi(frame.rename_axis("Datetime").reset_index()), conc, counts
+
+
+def city_daily(city: str) -> pd.DataFrame:
+    """Daily AQI and 24-hour mean pollutants for one city."""
+    aqi_h, conc, counts = city_hourly_aqi(city)
 
     daily = pd.DataFrame(index=aqi_h.resample("D").mean().index)
     daily["AQI"] = aqi_h.resample("D").mean().round().where(aqi_h.resample("D").count() >= MIN_HOURS)

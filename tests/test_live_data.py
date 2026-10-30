@@ -96,3 +96,30 @@ def test_live_model_with_prior_round_trips(tmp_path, monkeypatch):
     meta_b, _ = model_store.fit_and_save("Y", "Naive (last value)", series, source="live", profile=prof)
     assert "seasonal_prior" not in meta_b["params"]
     assert to_model_space(series["value"]).iloc[-1] == pytest.approx(meta_b["params"]["history"]["values"][-1])
+
+
+def test_nudge_moves_today_most_and_fades():
+    from src.nowcast import adjust_values
+    fc = np.full(7, 200.0)
+    out = adjust_values(fc, 0, signal=100.0, hours=14)
+    assert out[0] < 150 and out[0] < out[1] < out[6] < 200      # largest fall today, then fading
+    assert np.allclose(adjust_values(fc, 0, 200.0, 14), fc)      # no gap, no change
+    assert np.allclose(adjust_values(fc, 3, 100.0, 14)[:3], 200)  # days before the signal's day stay
+    assert np.allclose(adjust_values(fc, 0, float("nan"), 14), fc)
+    few = adjust_values(fc, 0, 100.0, hours=2)
+    assert few[0] > out[0]                                       # fewer hours known, smaller nudge
+
+
+def test_partial_mean_and_signal_dates():
+    from src.nowcast import apply_signals, partial_mean
+    idx = pd.date_range("2026-10-30", periods=48, freq="h")
+    s = pd.Series(np.r_[np.arange(24, dtype=float), np.full(24, 99.0)], index=idx)
+    value, n = partial_mean(s, pd.Timestamp("2026-10-30"), pd.Timestamp("2026-10-30 09:00"))
+    assert n == 10 and value == pytest.approx(4.5)
+    air = pd.DataFrame({"date": pd.date_range("2026-10-30", periods=5), "aqi": 200.0, "pm25": 90.0, "no2": 30.0})
+    sig = {"X": {"date": "2026-10-30", "as_of": "2026-10-30T13:00:00", "aqi": {"value": 100.0, "hours": 14}}}
+    out, used = apply_signals("X", air, sig)
+    assert used == "2026-10-30" and out["aqi"].iloc[0] < 150 and (out["pm25"] == 90).all()
+    out, used = apply_signals("X", air, {"X": {**sig["X"], "date": "2026-11-20"}})   # not a forecast day
+    assert used is None and out["aqi"].equals(air["aqi"])
+    assert apply_signals("Y", air, sig)[1] is None

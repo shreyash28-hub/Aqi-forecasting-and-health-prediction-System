@@ -23,3 +23,6 @@ export const relDay = (iso: string) => {
   const days = Math.round((parse(iso).getTime() - today.getTime()) / 86_400_000);
   return days === 0 ? "Today" : days === 1 ? "Tomorrow" : fmtDay(iso);
 };
+
+/** "13:00" from an ISO time such as 2026-10-30T13:00:00 */
+export const timeOf = (iso: string) => iso.slice(11, 16);

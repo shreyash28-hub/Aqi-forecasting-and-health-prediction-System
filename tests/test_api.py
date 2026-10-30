@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from src.api.main import app
 from src.data_loader import CITIES
 from src.model_store import forecast_air
+from src.nowcast import apply_signals, load_signals
 
 FULL_PROFILE = {"age": 67, "gender": "M", "condition": "COPD", "smoker": False, "bmi": 27.5,
                 "exercise_hours": 1.0, "outdoor_hours": 3.0, "mask_usage": "No",
@@ -43,7 +44,11 @@ def test_forecast_matches_saved_models(client, horizon):
     assert r.status_code == 200
     body = r.json()
     assert len(body["days"]) == horizon
-    expected = forecast_air("Delhi", horizon, client.app.state.models.source)
+    svc = client.app.state.models
+    expected = forecast_air("Delhi", horizon, svc.source)
+    if svc.source == "live":   # today's readings so far nudge the first days (src/nowcast.py)
+        expected, used = apply_signals("Delhi", expected, load_signals())
+        assert (used is not None) == (body["readings_as_of"] is not None)
     got = np.array([d["aqi"] for d in body["days"]])
     assert np.allclose(got, expected["aqi"].round(1), atol=0.051)
     first = pd.Timestamp(body["origin_date"]) + pd.Timedelta(days=1)

@@ -11,7 +11,7 @@ const {
 // =========================================================================== CONTENT
 
 const LAST_UPDATED = "30 October 2026";
-const LATEST_COMMIT = "75af4ea Landing page and dashboard; signed-in pages pending commit";
+const LATEST_COMMIT = "9d6062a Forecast from today: live station data, live models, hospital map";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -29,6 +29,7 @@ const AT_A_GLANCE = [
   ["Hospital map", "Done", "Leaflet + OpenStreetMap; nearby hospitals with phone, address, directions; shown at High/Severe risk"],
   ["Live 2026 data: station download + daily AQI", "Done", "24 CPCB stations (4 per city), Feb 2025 to today; daily AQI matches CPCB bulletins"],
   ["Live 2026 data: retrain + forecast from today", "Done", "18 live models (6 cities x AQI, PM2.5, NO2); the site now forecasts from today; daily refresh command"],
+  ["Live data: today's readings in the forecast", "Done", "Today's and the next days' forecast adjusted with station readings so far; backtested"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Not started", "Vercel (frontend), Render or Railway (backend)"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
@@ -180,13 +181,16 @@ const REMAINING = [
   // [task, needs, notes]
   ["Frontend: forecast detail page", "Frontend", "City forecast page (/forecast); the other pages are built"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
-  ["Live data: daily refresh", "Deployment", "Run python -m src.refresh_live once a day (Task Scheduler now, a cron job after deployment)"],
+  ["Live data: daily refresh", "Deployment", "Run python -m src.refresh_live once a day and python -m src.refresh_live --nowcast-only during the day, then restart the API (to be automated after deployment)"],
   ["Deployment", "All of the above", "Vercel + Render/Railway; handle the ~20 s model-loading startup"],
-  ["Mid-sem report/presentation (19-30 Oct)", "You + me", "Classical models: ARIMA, SARIMA, Holt-Winters, decomposition"],
+  ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
+  ["Mid-sem report/presentation (due 7 Nov)", "You + me", "Classical models; the deadline moved and the guidelines changed, so they are to be shared"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
 ];
 
 const ACTIONS_FOR_YOU = [
+  "Push the latest commit to GitHub (git push origin main) so the hospital map and live-data work are in the repository.",
+  "Share the website references for the redesign and the new mid-sem guidelines.",
   "Test the signed-in pages with a real account: create an account, confirm the email, fill in the profile, check My risk, then History (open and delete a run).",
   "Try the site locally: start the API, then run npm run dev in frontend/ and open http://localhost:3000.",
   "Fill in the title-page details in docs/Project_Report.docx before submitting it.",
@@ -200,6 +204,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["30 Oct 2026", "Today's forecast now starts from the readings so far today (Delhi showed 256 when stations read about 107): in the winter-season backtest it cuts today's AQI error by about 57% and the next two days by 12% and 5%. Dashboard shows when the readings were last updated."],
   ["30 Oct 2026", "Forecasting models retrained on Feb 2025 to 29 Oct 2026 station data, using the 2015-2020 seasonal pattern as a guide; best model beats the naive baseline for every city's AQI and PM2.5 (Lucknow NO2 keeps the baseline). The site now forecasts from today; the 2015-2020 coursework results are unchanged."],
   ["30 Oct 2026", "Live data: hourly readings from 24 CPCB stations downloaded from OpenAQ (Feb 2025 to today) and turned into daily AQI per city (src/live_data.py), with faulty-sensor cleaning; spot-checks match CPCB bulletins (Delhi 20 Oct 2025: 346 vs 345)."],
   ["30 Oct 2026", "Hospital enquiry map built: /hospitals page and a panel on My risk at High/Severe risk; OpenAQ coverage check started for live data."],
