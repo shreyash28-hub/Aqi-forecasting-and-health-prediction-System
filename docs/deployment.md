@@ -11,9 +11,13 @@
 Loading the 18 forecasters needs statsmodels, Prophet, XGBoost and PyTorch, about 490 MB
 in all. The models change once a day, so the daily job saves their 30-day forecasts to
 `data/processed/live_forecasts.json` (`src/forecast_export.py`) and the API serves those:
-it needs about 170 MB and starts in ~2 s. It only loads the models if that file is missing
-or out of step with them (then it needs ~490 MB, too close to 512 MB on Render's free and
-Starter plans).
+it needs about 170 MB and starts in ~2 s. Locally it loads the models if that file is
+missing or out of step with them (~490 MB); on Render `LIVE_EXPORT_ONLY=1` stops that and
+serves the file even if it is a day older than the models, because 490 MB is too close to
+the 512 MB of Render's free and Starter plans.
+
+`/api/health` has a `live` section: where forecasts come from (`export`), their issue date,
+when today's readings were last fetched, and the last bundle check with any error.
 
 ## 1. API on Render
 

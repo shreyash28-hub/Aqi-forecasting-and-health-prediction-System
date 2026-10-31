@@ -64,9 +64,11 @@ def export(source: str = "live", path: Path = EXPORT_PATH) -> dict:
     return out
 
 
-def load_export(source: str = "live", path: Path = EXPORT_PATH):
+def load_export(source: str = "live", path: Path = EXPORT_PATH, strict: bool = True):
     """``(infos, forecasts)`` from the export file, or None when it is missing, unreadable or
-    out of step with the saved models. ``infos`` maps (target, city) to ``ForecastInfo``."""
+    (``strict``) out of step with the saved models. ``infos`` maps (target, city) to
+    ``ForecastInfo``. ``strict=False`` serves the file even if the models moved on: older
+    forecasts, but no model libraries loaded (see ``EXPORT_ONLY`` in the API)."""
     if not path.exists():
         return None
     try:
@@ -76,11 +78,14 @@ def load_export(source: str = "live", path: Path = EXPORT_PATH):
     if data.get("source") != source:
         return None
     infos, forecasts = {}, {}
-    for target in TARGETS:
-        for city, reg in _registry(target, source).items():
-            got = data["cities"].get(city, {}).get("models", {}).get(target)
-            if not got or got["model"] != reg["model"] or got["last_train_date"] != reg["train_end"]:
-                return None                 # the models changed since the export: don't trust it
+    if strict:
+        for target in TARGETS:
+            for city, reg in _registry(target, source).items():
+                got = data["cities"].get(city, {}).get("models", {}).get(target)
+                if not got or got["model"] != reg["model"] or got["last_train_date"] != reg["train_end"]:
+                    return None             # the models changed since the export: don't trust it
+    for city, c in data.get("cities", {}).items():
+        for target, got in c.get("models", {}).items():
             infos[(target, city)] = ForecastInfo(got["model"], got)
     for city, c in data["cities"].items():
         if ("AQI", city) not in infos:

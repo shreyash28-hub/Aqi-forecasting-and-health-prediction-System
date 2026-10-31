@@ -75,7 +75,8 @@ def health(request: Request):
     return {"status": "ok", "cities": len(svc.forecasts), "forecasters": len(svc.forecasters),
             "health_models": sorted(f"{t}/{fs}" for t, fs in svc.health.models),
             "startup_seconds": svc.startup_seconds,
-            "accounts_enabled": request.app.state.supabase is not None}
+            "accounts_enabled": request.app.state.supabase is not None,
+            "live": svc.live_status() if svc.source == "live" else None}
 
 
 @app.get("/api/cities", response_model=list[CityInfo], tags=["forecast"])

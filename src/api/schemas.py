@@ -124,6 +124,9 @@ class HealthStatus(BaseModel):
     health_models: list[str]
     startup_seconds: float
     accounts_enabled: bool
+    live: dict | None = Field(default=None, description=(
+        "Live forecasts: where they are served from (precomputed export or the models), their "
+        "issue date, and the last bundle and readings refreshes with any error"))
 
 
 # ---------------------------------------------------------------------------- signed-in user

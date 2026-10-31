@@ -66,6 +66,9 @@ def load_air(source: str) -> tuple[dict, dict, dict]:
     Live models: from the precomputed export when it matches the saved models (no model
     libraries loaded; see ``src/forecast_export.py``), else from the models themselves."""
     exported = load_export(source) if source == "live" else None
+    if source == "live" and not exported and os.getenv("LIVE_EXPORT_ONLY") == "1":
+        # A small server (512 MB) can't load the models: serve the export even if it is a day old.
+        exported = load_export(source, strict=False)
     forecasters, forecasts = exported if exported else _forecasts_from_models(source)
     readings_as_of = {}
     signals = load_signals() if source == "live" else {}
@@ -191,6 +194,15 @@ class ModelService:
         self.last_check = now
         if air_fingerprint(self.source) != self.fingerprint:
             threading.Thread(target=self.reload_air, daemon=True, name="air-reload").start()
+
+    def live_status(self) -> dict:
+        from src.api.refresher import STATUS
+        from src.forecast_export import ForecastInfo
+        any_fc = next(iter(self.forecasters.values()), None)
+        return {"served_from": "export" if isinstance(any_fc, ForecastInfo) else "models",
+                "origin_dates": sorted({self.origin_date(c) for c in self.forecasts}),
+                "readings_as_of": max(self.readings_as_of.values(), default=None),
+                "reload_error": self.reload_error, **STATUS}
 
     # ------------------------------------------------------------------ lookups
 

@@ -17,6 +17,8 @@ services:
         value: https://oopbjwhsauqmoqgheljm.supabase.co/storage/v1/object/public/live/live_bundle.tar.gz
       - key: LIVE_REFRESH_MINUTES
         value: "60"
+      - key: LIVE_EXPORT_ONLY      # never load the model libraries (~490 MB) on this 512 MB server
+        value: "1"
       - key: ALLOWED_ORIGINS     # the Vercel site address(es), comma-separated; set after the frontend is deployed
         sync: false
       - key: SUPABASE_URL

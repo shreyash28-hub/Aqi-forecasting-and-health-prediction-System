@@ -262,3 +262,17 @@ def test_api_serves_the_export_without_the_model_libraries():
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True,
                          cwd=forecast_export.DATA_DIR.parent).stdout.split("\n")[-2]
     assert out == "6 []"
+
+
+def test_export_only_mode_serves_an_older_export(tmp_path):
+    from src import forecast_export
+    if not forecast_export._registry("AQI", "live"):
+        pytest.skip("live models not available")
+    path = tmp_path / "live_forecasts.json"
+    forecast_export.export("live", path)
+    data = json.loads(path.read_text())
+    data["cities"]["Delhi"]["models"]["AQI"]["last_train_date"] = "2000-01-01"
+    path.write_text(json.dumps(data))
+    assert forecast_export.load_export("live", path) is None
+    infos, forecasts = forecast_export.load_export("live", path, strict=False)
+    assert infos[("AQI", "Delhi")].meta["last_train_date"] == "2000-01-01" and len(forecasts) == 6
