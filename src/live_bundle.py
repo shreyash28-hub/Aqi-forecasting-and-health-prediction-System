@@ -59,34 +59,48 @@ def _allowed(name: str) -> bool:
             and any(name == c or name.startswith(c + "/") for c in CONTENT))
 
 
+def _put(src: Path, dst: Path) -> None:
+    """Replace one file: copy beside it, then swap it in with an atomic rename. Folders are never
+    renamed: on Render's filesystem a folder that came with the deploy cannot be (EXDEV)."""
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    part = dst.with_name(dst.name + ".part")
+    shutil.copy2(src, part)
+    os.replace(part, dst)
+
+
 def install(bundle: Path, root: Path = PROJECT_ROOT) -> list[str]:
     """Extract a bundle over ``root``. Only the expected paths are accepted (a bundle with any
-    other path is refused whole); each folder is replaced in one move, so the API never reads
-    a half-written ``models/live``. Returns the installed top-level paths."""
+    other path is refused whole). Files are swapped in one at a time, with the model registries
+    last: the API reloads when a registry changes, so by then every other file is in place.
+    Files in ``models/live`` that the bundle no longer has are removed. Returns the installed
+    top-level paths."""
     with tarfile.open(bundle, "r:gz") as tar:
         members = tar.getmembers()
         bad = [m.name for m in members if not _allowed(m.name) or not (m.isfile() or m.isdir())]
         if bad:
             raise ValueError(f"Refusing bundle with unexpected paths: {bad[:3]}")
-        with tempfile.TemporaryDirectory(dir=root) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             tar.extractall(tmp, filter="data")
-            done = []
+            done, files, keep = [], [], {}
             for rel in CONTENT:
-                src, dst = Path(tmp) / rel, root / rel
+                src = Path(tmp) / rel
                 if not src.exists():
                     continue
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                if src.is_dir():
-                    old = dst.with_name(dst.name + ".old")
-                    if old.exists():
-                        shutil.rmtree(old)
-                    if dst.exists():
-                        dst.rename(old)
-                    shutil.move(str(src), str(dst))
-                    shutil.rmtree(old, ignore_errors=True)
-                else:
-                    shutil.move(str(src), str(dst))
                 done.append(rel)
+                if src.is_dir():
+                    names = sorted(p.relative_to(src) for p in src.rglob("*") if p.is_file())
+                    keep[rel] = set(names)
+                    files += [(src / n, root / rel / n) for n in names]
+                else:
+                    files.append((src, root / rel))
+            for src, dst in sorted(files, key=lambda f: (f[1].name == "registry.json", str(f[1]))):
+                _put(src, dst)
+            for rel, names in keep.items():           # drop files of models no longer deployed
+                for p in sorted((root / rel).rglob("*"), reverse=True):
+                    if p.is_file() and p.relative_to(root / rel) not in names:
+                        p.unlink()
+                    elif p.is_dir() and not any(p.iterdir()):
+                        p.rmdir()
     return done
 
 

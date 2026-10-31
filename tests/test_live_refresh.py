@@ -276,3 +276,27 @@ def test_export_only_mode_serves_an_older_export(tmp_path):
     assert forecast_export.load_export("live", path) is None
     infos, forecasts = forecast_export.load_export("live", path, strict=False)
     assert infos[("AQI", "Delhi")].meta["last_train_date"] == "2000-01-01" and len(forecasts) == 6
+
+
+def test_install_never_renames_folders(tmp_path, monkeypatch):
+    """Render's filesystem refuses to rename a folder that came with the deploy (EXDEV)."""
+    import errno
+    import os
+    src, dst = tmp_path / "src", tmp_path / "dst"
+    make_root(src)
+    bundle = live_bundle.pack(tmp_path / "b.tar.gz", src)
+    make_root(dst)
+    (dst / "models/live/aqi/old_model.joblib").write_text("old")
+    real_replace = os.replace
+
+    def replace(a, b):
+        if os.path.isdir(a):
+            raise OSError(errno.EXDEV, "Invalid cross-device link")
+        return real_replace(a, b)
+
+    monkeypatch.setattr(live_bundle.os, "replace", replace)
+    monkeypatch.setattr(type(dst), "rename", lambda self, t: (_ for _ in ()).throw(OSError(errno.EXDEV, "x")))
+    live_bundle.install(bundle, dst)
+    assert (dst / "models/live/aqi/registry.json").read_text() == '{"v": 1}'
+    assert not (dst / "models/live/aqi/old_model.joblib").exists()
+    assert not list(dst.rglob("*.part"))
