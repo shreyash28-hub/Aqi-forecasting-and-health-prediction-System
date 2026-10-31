@@ -1,6 +1,6 @@
 # PM2.5 forecasting: evaluation summary
 
-Generated 2026-10-30T14:01:51+00:00. Models fitted on log1p(PM2.5), scored on the original scale (observed days only). Horizon 30 days. Multi-window: 5 non-overlapping 30-day test windows per city, stepping back 45 days from the end (expanding training window); window 0 is the final hold-out. LSTM metrics are the mean of seeds [42, 43, 44]. Data: live CPCB station readings via OpenAQ (src/live_data.py). Models (not baselines) use the 2015-2020 seasonal prior.
+Generated 2026-10-31T09:18:11+00:00. Models fitted on log1p(PM2.5), scored on the original scale (observed days only). Horizon 30 days. Multi-window: 5 non-overlapping 30-day test windows per city, stepping back 45 days from the end (expanding training window); window 0 is the final hold-out. LSTM metrics are the mean of seeds [42, 43, 44]. Data: live CPCB station readings via OpenAQ (src/live_data.py). Models (not baselines) use the 2015-2020 seasonal prior.
 
 ## Multi-window results (primary)
 
@@ -8,37 +8,37 @@ Best model = lowest mean RMSE across windows. Win = lowest RMSE of all candidate
 
 | City | Best model | Mean RMSE | Win rate | Beats baseline in | Most frequent window winner | Best baseline (mean RMSE) | Beats baseline |
 |---|---|---|---|---|---|---|---|
-| Ahmedabad | SARIMA | 9.71 | 40% | 60% | SARIMA | Naive (last value) (10.50) | yes |
-| Bengaluru | Prophet | 9.44 | 20% | 60% | Naive (last value) | Naive (last value) (11.17) | yes |
-| Chennai | SARIMA | 7.55 | 60% | 80% | SARIMA | Naive (last value) (8.64) | yes |
-| Delhi | SARIMA | 15.73 | 80% | 80% | SARIMA | Seasonal naive (weekly) (22.43) | yes |
-| Hyderabad | XGBoost | 4.92 | 20% | 40% | SARIMA | Naive (last value) (5.52) | yes |
-| Lucknow | SARIMA | 12.87 | 20% | 60% | XGBoost | Naive (last value) (16.54) | yes |
+| Ahmedabad | ARIMA | 10.39 | 20% | 40% | Naive (last value) | Naive (last value) (10.50) | yes |
+| Bengaluru | ARIMA | 9.99 | 20% | 40% | Naive (last value) | Naive (last value) (11.17) | yes |
+| Chennai | LSTM | 8.53 | 0% | 20% | ARIMA | Naive (last value) (8.64) | yes |
+| Delhi | Holt-Winters | 18.84 | 20% | 60% | Holt-Winters | Seasonal naive (weekly) (22.43) | yes |
+| Hyderabad | Holt-Winters | 5.24 | 0% | 60% | XGBoost | Naive (last value) (5.52) | yes |
+| Lucknow | XGBoost | 12.57 | 40% | 60% | XGBoost | Naive (last value) (16.54) | yes |
 
 ### Win rate (share of 5 windows where the model had the lowest RMSE)
 
 | Model | Ahmedabad | Bengaluru | Chennai | Delhi | Hyderabad | Lucknow |
 |---|---|---|---|---|---|---|
-| Naive (last value) | 20% | 40% | 0% | 0% | 0% | 20% |
+| Naive (last value) | 40% | 20% | 20% | 0% | 40% | 20% |
 | Seasonal naive (weekly) | 0% | 0% | 0% | 20% | 0% | 0% |
 | Seasonal naive (annual) | 0% | 0% | 0% | 0% | 0% | 0% |
-| ARIMA | 20% | 20% | 20% | 0% | 20% | 20% |
-| SARIMA | 40% | 0% | 60% | 80% | 40% | 20% |
-| Holt-Winters | 0% | 0% | 0% | 0% | 0% | 0% |
-| LSTM | 20% | 0% | 0% | 0% | 20% | 0% |
-| XGBoost | 0% | 20% | 0% | 0% | 20% | 40% |
-| Prophet | 0% | 20% | 20% | 0% | 0% | 0% |
+| ARIMA | 20% | 20% | 40% | 20% | 0% | 20% |
+| SARIMA | 20% | 20% | 0% | 0% | 0% | 0% |
+| Holt-Winters | 0% | 20% | 0% | 20% | 0% | 20% |
+| LSTM | 20% | 0% | 0% | 20% | 0% | 0% |
+| XGBoost | 0% | 0% | 40% | 0% | 40% | 40% |
+| Prophet | 0% | 20% | 0% | 20% | 20% | 0% |
 
 ### Beat-baseline rate (share of windows beating that window's best baseline)
 
 | Model | Ahmedabad | Bengaluru | Chennai | Delhi | Hyderabad | Lucknow |
 |---|---|---|---|---|---|---|
-| ARIMA | 40% | 40% | 40% | 80% | 20% | 60% |
-| SARIMA | 60% | 40% | 80% | 80% | 60% | 60% |
-| Holt-Winters | 20% | 20% | 0% | 60% | 20% | 20% |
-| LSTM | 60% | 40% | 60% | 80% | 40% | 40% |
-| XGBoost | 20% | 60% | 40% | 80% | 40% | 40% |
-| Prophet | 20% | 60% | 40% | 60% | 40% | 60% |
+| ARIMA | 40% | 40% | 40% | 80% | 60% | 60% |
+| SARIMA | 40% | 40% | 40% | 80% | 60% | 60% |
+| Holt-Winters | 20% | 40% | 0% | 60% | 60% | 20% |
+| LSTM | 60% | 40% | 20% | 60% | 40% | 60% |
+| XGBoost | 0% | 40% | 40% | 60% | 60% | 60% |
+| Prophet | 40% | 40% | 0% | 60% | 20% | 60% |
 
 ### Mean RMSE across windows
 
@@ -47,26 +47,26 @@ Best model = lowest mean RMSE across windows. Win = lowest RMSE of all candidate
 | Naive (last value) | 10.50 | 11.17 | 8.64 | 24.48 | 5.52 | 16.54 |
 | Seasonal naive (weekly) | 15.28 | 13.57 | 10.19 | 22.43 | 9.07 | 19.52 |
 | Seasonal naive (annual) | 19.59 | 15.03 | 12.47 | 25.10 | 12.04 | 20.32 |
-| ARIMA | 10.06 | 9.61 | 8.70 | 16.21 | 6.09 | 14.31 |
-| SARIMA | 9.71 | 12.54 | 7.55 | 15.73 | 5.05 | 12.87 |
-| Holt-Winters | 10.74 | 9.92 | 10.03 | 19.49 | 6.35 | 19.17 |
-| LSTM | 12.13 | 10.94 | 8.32 | 17.15 | 5.98 | 14.01 |
-| XGBoost | 13.83 | 10.82 | 8.61 | 18.30 | 4.92 | 13.65 |
-| Prophet | 11.50 | 9.44 | 8.47 | 23.38 | 8.19 | 13.06 |
+| ARIMA | 10.39 | 9.99 | 8.99 | 19.13 | 7.15 | 13.23 |
+| SARIMA | 10.40 | 11.56 | 9.02 | 19.78 | 7.05 | 13.19 |
+| Holt-Winters | 11.34 | 10.19 | 10.72 | 18.84 | 5.24 | 16.38 |
+| LSTM | 12.71 | 12.06 | 8.53 | 19.50 | 9.48 | 13.38 |
+| XGBoost | 14.78 | 11.62 | 8.59 | 23.17 | 6.07 | 12.57 |
+| Prophet | 11.55 | 10.33 | 9.97 | 25.77 | 6.89 | 14.01 |
 
 ### Mean rank across windows (1 = best of all candidates)
 
 | Model | Ahmedabad | Bengaluru | Chennai | Delhi | Hyderabad | Lucknow |
 |---|---|---|---|---|---|---|
-| Naive (last value) | 4.2 | 4.6 | 4.6 | 7.0 | 3.2 | 4.4 |
-| Seasonal naive (weekly) | 7.2 | 6.2 | 7.2 | 5.6 | 7.8 | 7.6 |
-| Seasonal naive (annual) | 7.6 | 7.8 | 7.2 | 7.6 | 7.8 | 8.2 |
-| ARIMA | 3.8 | 4.0 | 4.2 | 3.6 | 4.4 | 3.6 |
-| SARIMA | 2.4 | 5.6 | 1.8 | 1.6 | 2.4 | 3.4 |
-| Holt-Winters | 4.4 | 4.4 | 6.6 | 5.6 | 4.8 | 6.6 |
-| LSTM | 4.0 | 4.8 | 4.2 | 3.8 | 4.8 | 4.2 |
-| XGBoost | 6.8 | 4.0 | 5.0 | 4.0 | 4.0 | 3.6 |
-| Prophet | 4.6 | 3.6 | 4.2 | 6.2 | 5.8 | 3.4 |
+| Naive (last value) | 3.8 | 4.4 | 3.6 | 6.8 | 4.0 | 4.8 |
+| Seasonal naive (weekly) | 6.8 | 5.8 | 6.2 | 5.2 | 7.4 | 7.8 |
+| Seasonal naive (annual) | 7.2 | 7.8 | 6.4 | 6.8 | 7.6 | 8.2 |
+| ARIMA | 3.2 | 3.0 | 4.0 | 3.2 | 4.6 | 3.0 |
+| SARIMA | 3.0 | 4.4 | 4.6 | 4.4 | 4.0 | 3.2 |
+| Holt-Winters | 4.4 | 4.8 | 6.0 | 4.0 | 2.8 | 6.0 |
+| LSTM | 4.8 | 6.0 | 4.4 | 4.4 | 6.2 | 3.6 |
+| XGBoost | 6.8 | 4.8 | 4.0 | 4.6 | 3.6 | 3.4 |
+| Prophet | 5.0 | 4.0 | 5.8 | 5.6 | 4.8 | 5.0 |
 
 ### Test windows
 
@@ -83,12 +83,12 @@ Best model = lowest mean RMSE across windows. Win = lowest RMSE of all candidate
 
 | City | Window | Best model | RMSE | MAE | MAPE % | Best baseline (RMSE) | Beats baseline |
 |---|---|---|---|---|---|---|---|
-| Ahmedabad | 2026-09-30 to 2026-10-29 | SARIMA | 13.40 | 10.42 | 18.2 | Naive (last value) (17.13) | yes |
-| Bengaluru | 2026-09-30 to 2026-10-29 | Holt-Winters | 13.87 | 11.70 | 47.0 | Naive (last value) (13.34) | **no** |
-| Chennai | 2026-09-30 to 2026-10-29 | Prophet | 12.85 | 10.56 | 46.0 | Seasonal naive (weekly) (13.81) | yes |
-| Delhi | 2026-09-30 to 2026-10-29 | SARIMA | 19.50 | 16.93 | 23.6 | Seasonal naive (annual) (42.32) | yes |
-| Hyderabad | 2026-09-30 to 2026-10-29 | XGBoost | 4.52 | 3.64 | 9.8 | Naive (last value) (8.42) | yes |
-| Lucknow | 2026-09-30 to 2026-10-29 | SARIMA | 14.46 | 10.67 | 26.2 | Naive (last value) (15.09) | yes |
+| Ahmedabad | 2026-09-30 to 2026-10-29 | SARIMA | 13.81 | 10.38 | 17.4 | Naive (last value) (17.13) | yes |
+| Bengaluru | 2026-09-30 to 2026-10-29 | ARIMA | 13.81 | 11.96 | 44.7 | Naive (last value) (13.34) | **no** |
+| Chennai | 2026-09-30 to 2026-10-29 | ARIMA | 13.13 | 10.29 | 46.8 | Seasonal naive (weekly) (13.81) | yes |
+| Delhi | 2026-09-30 to 2026-10-29 | Holt-Winters | 27.12 | 23.16 | 30.2 | Seasonal naive (annual) (42.32) | yes |
+| Hyderabad | 2026-09-30 to 2026-10-29 | XGBoost | 6.93 | 5.52 | 14.8 | Naive (last value) (8.42) | yes |
+| Lucknow | 2026-09-30 to 2026-10-29 | XGBoost | 13.91 | 11.61 | 31.5 | Naive (last value) (15.09) | yes |
 
 ### RMSE on the final hold-out
 
@@ -97,23 +97,23 @@ Best model = lowest mean RMSE across windows. Win = lowest RMSE of all candidate
 | Naive (last value) | 17.13 | 13.34 | 17.34 | 45.73 | 8.42 | 15.09 |
 | Seasonal naive (weekly) | 21.24 | 17.32 | 13.81 | 44.03 | 12.79 | 28.60 |
 | Seasonal naive (annual) | 33.83 | 21.47 | 28.45 | 42.32 | 8.60 | 35.00 |
-| ARIMA | 13.92 | 13.98 | 13.18 | 20.79 | 9.51 | 19.82 |
-| SARIMA | 13.40 | 15.49 | 13.18 | 19.50 | 7.92 | 14.46 |
-| Holt-Winters | 14.86 | 13.87 | 21.00 | 32.52 | 10.06 | 28.84 |
-| LSTM | 14.77 | 16.87 | 14.49 | 23.49 | 10.91 | 17.51 |
-| XGBoost | 16.83 | 15.12 | 14.23 | 30.96 | 4.52 | 21.80 |
-| Prophet | 15.60 | 16.14 | 12.85 | 48.92 | 13.58 | 14.67 |
+| ARIMA | 13.83 | 13.81 | 13.13 | 31.55 | 7.43 | 14.36 |
+| SARIMA | 13.81 | 14.65 | 13.19 | 33.37 | 7.10 | 14.04 |
+| Holt-Winters | 15.95 | 16.76 | 23.18 | 27.12 | 8.25 | 16.20 |
+| LSTM | 14.65 | 16.89 | 14.32 | 30.75 | 7.29 | 14.90 |
+| XGBoost | 18.37 | 15.01 | 15.10 | 49.32 | 6.93 | 13.91 |
+| Prophet | 14.87 | 14.46 | 14.30 | 61.81 | 11.37 | 14.18 |
 
 ### LSTM seed spread (std of RMSE across seeds, mean over windows)
 
 | City | Mean seed std of RMSE |
 |---|---|
-| Ahmedabad | 0.14 |
-| Bengaluru | 0.46 |
-| Chennai | 0.17 |
-| Delhi | 0.27 |
-| Hyderabad | 1.02 |
-| Lucknow | 0.24 |
+| Ahmedabad | 0.17 |
+| Bengaluru | 0.32 |
+| Chennai | 0.14 |
+| Delhi | 1.44 |
+| Hyderabad | 0.60 |
+| Lucknow | 0.27 |
 
 ## Stationarity (final training series)
 
@@ -128,4 +128,5 @@ Best model = lowest mean RMSE across windows. Win = lowest RMSE of all candidate
 
 ## Issues log
 
-- Chennai: never beat the baseline in any window: Holt-Winters
+- Ahmedabad: never beat the baseline in any window: XGBoost
+- Chennai: never beat the baseline in any window: Prophet, Holt-Winters

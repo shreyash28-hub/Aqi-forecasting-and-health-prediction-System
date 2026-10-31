@@ -97,9 +97,28 @@ def load_export(source: str = "live", path: Path = EXPORT_PATH, strict: bool = T
     return infos, forecasts
 
 
+def inconsistent_days(out: dict, tolerance: float = 1.10) -> dict[str, int]:
+    """Days where the PM2.5 forecast alone implies a higher AQI than the AQI forecast. The AQI
+    is the highest pollutant sub-index, so this can't happen in reality: if it does, the
+    AQI and PM2.5 models disagree (Delhi and Lucknow did on ~29 of 30 days before the
+    seasonal prior was scaled and the models' own annual terms switched off)."""
+    from src.aqi import sub_index
+    bad = {}
+    for city, c in out["cities"].items():
+        v = c["values"]
+        if "pm25" in v:
+            si = sub_index(pd.Series(v["pm25"]), "PM2.5").to_numpy()
+            n = int((si > tolerance * pd.Series(v["aqi"]).to_numpy()).sum())
+            if n:
+                bad[city] = n
+    return bad
+
+
 def main() -> None:
     out = export()
     print(f"Wrote {EXPORT_PATH} ({len(out['cities'])} cities, {out['horizon']} days)")
+    for city, n in inconsistent_days(out).items():
+        print(f"WARNING {city}: on {n} days the PM2.5 forecast implies a higher AQI than the AQI forecast")
 
 
 if __name__ == "__main__":

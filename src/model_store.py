@@ -115,7 +115,11 @@ def fit_and_save(city: str, model_name: str, series: pd.DataFrame, eval_info: di
     if model_name in BASELINES:
         profile = None
     y = to_model_space(series["value"])
+    prior_scale = None
     if profile is not None:
+        from src.preprocessing import fit_prior_scale
+        prior_scale = fit_prior_scale(y, profile)       # same rule as the evaluation
+        profile = prior_scale * np.asarray(profile)
         y = y - profile_at(profile, y.index)
     out_dir = _city_dir(city, target, source)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -134,11 +138,13 @@ def fit_and_save(city: str, model_name: str, series: pd.DataFrame, eval_info: di
         files = ["model.joblib"]
     elif model_name == "SARIMA":
         from src.models.statistical import ANNUAL, FOURIER_K, fit_sarima
-        res, config = fit_sarima(y)
+        annual = profile is None           # the prior already carries the annual shape
+        res, config = fit_sarima(y, annual)
         fitted = res
         joblib.dump(res, out_dir / "model.joblib", compress=3)
         files = ["model.joblib"]
-        params = {"fourier_k": FOURIER_K, "fourier_period": ANNUAL, "fourier_origin": "2015-01-01"}
+        params = ({"fourier_k": FOURIER_K, "fourier_period": ANNUAL, "fourier_origin": "2015-01-01"}
+                  if annual else {"annual": False})
     elif model_name == "Holt-Winters":
         from src.models.statistical import fit_holt_winters
         res, config = fit_holt_winters(y)
@@ -170,14 +176,15 @@ def fit_and_save(city: str, model_name: str, series: pd.DataFrame, eval_info: di
     else:  # Prophet
         from src.models.prophet_model import fit_prophet  # first: quietens prophet's import logging
         from prophet.serialize import model_to_json
-        model, config = fit_prophet(y)
+        model, config = fit_prophet(y, annual=profile is None)
         fitted = model
         (out_dir / "model.json").write_text(model_to_json(model), encoding="utf-8")
         files = ["model.json"]
 
     if profile is not None:
-        params["seasonal_prior"] = [round(float(v), 6) for v in profile]
-        config += " + 2015-2020 seasonal prior"
+        params["seasonal_prior"] = [round(float(v), 6) for v in profile]   # already scaled
+        params["prior_scale"] = round(prior_scale, 4)
+        config += f" + 2015-2020 seasonal prior x{prior_scale:.2f}"
     meta = {
         "city": city,
         "target": target,
@@ -248,7 +255,7 @@ class Forecaster:
             yhat = np.asarray(self.model.forecast(horizon))
         elif self.model_name == "SARIMA":
             from src.models.statistical import predict_sarima
-            yhat = predict_sarima(self.model, self.last_train_date, horizon)
+            yhat = predict_sarima(self.model, self.last_train_date, horizon, p.get("annual", True))
         elif self.model_name == "XGBoost":
             from src.models.ml_models import predict_xgboost
             yhat = predict_xgboost(self.model, _series_from_payload(p["history"]), horizon)

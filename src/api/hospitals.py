@@ -1,8 +1,12 @@
 """Nearby hospitals from OpenStreetMap (Overpass API), for the enquiry map.
 
 Contact details only: Airware never books appointments. Hospitals are not stored in
-the database; they are fetched live from Overpass and cached for a week (in memory and
-in ``data/cache/hospitals.json``), because one Overpass query can take 30-70 seconds.
+the database. For the six cities they come from ``data/hospitals.json``, a snapshot of
+OpenStreetMap within ``STORED_RADIUS_KM`` of each city centre built by
+``scripts/build_hospitals.py``: the public Overpass servers are often overloaded (a query
+takes 30-70 s, or times out), so the map must not depend on them. A request outside the
+stored areas goes to Overpass live, cached for a week (in memory and in
+``data/cache/hospitals.json``).
 """
 from __future__ import annotations
 
@@ -27,6 +31,8 @@ OVERPASS_URLS = ["https://overpass-api.de/api/interpreter", "https://overpass.ku
 USER_AGENT = "Airware/0.1 (student air-quality project; hospital enquiry map)"
 CACHE_SECONDS = 7 * 24 * 3600
 CACHE_FILE = Path(__file__).resolve().parents[2] / "data" / "cache" / "hospitals.json"
+STORED_FILE = Path(__file__).resolve().parents[2] / "data" / "hospitals.json"
+STORED_RADIUS_KM = 25
 MAX_RESULTS = 80
 # OpenStreetMap is edited by anyone; drop entries whose name is clearly not a medical place.
 NOT_MEDICAL = ("infotech", "technolog", "software", "solutions", "builders", "real estate", "consultancy")
@@ -135,7 +141,7 @@ def _website(tags: dict) -> str | None:
     return url if url.startswith(("http://", "https://")) else f"https://{url}"
 
 
-def parse(elements: list[dict], lat: float, lon: float) -> list[dict]:
+def parse(elements: list[dict], lat: float, lon: float, limit: int | None = MAX_RESULTS) -> list[dict]:
     """Named hospitals with contact details, nearest first. Duplicates (same name and spot) are dropped."""
     seen, out = set(), []
     for e in elements:
@@ -158,12 +164,45 @@ def parse(elements: list[dict], lat: float, lon: float) -> list[dict]:
             "osm_url": f"https://www.openstreetmap.org/{e['type']}/{e['id']}",
         })
     out.sort(key=lambda h: h["distance_km"])
-    return out[:MAX_RESULTS]
+    return out[:limit]
+
+
+_stored: dict | None = None
+
+
+def _load_stored() -> dict:
+    global _stored
+    if _stored is None:
+        try:
+            _stored = json.loads(STORED_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            _stored = {}
+    return _stored
+
+
+def from_stored(lat: float, lon: float, radius_km: float) -> list[dict] | None:
+    """Hospitals from the stored snapshot, if the whole search circle lies inside one city's
+    stored area; None otherwise (the caller then asks Overpass)."""
+    stored = _load_stored()
+    for c in stored.get("cities", {}).values():
+        clat, clon = c["centre"]
+        if _distance_km(lat, lon, clat, clon) + radius_km <= stored.get("radius_km", 0):
+            out = []
+            for h in c["hospitals"]:
+                d = _distance_km(lat, lon, h["lat"], h["lon"])
+                if d <= radius_km:
+                    out.append({**h, "distance_km": round(d, 2)})
+            out.sort(key=lambda h: h["distance_km"])
+            return out[:MAX_RESULTS]
+    return None
 
 
 def nearby(lat: float, lon: float, radius_km: float) -> list[dict]:
     """Cached lookup. Coordinates are rounded to about 100 m, so nearby requests share a result."""
     lat, lon = round(lat, 3), round(lon, 3)
+    stored = from_stored(lat, lon, radius_km)
+    if stored is not None:
+        return stored
     key = (lat, lon, radius_km)
     now = time.time()
     with _lock:
@@ -198,4 +237,4 @@ def hospitals(city: str | None = Query(None, description="One of the six cities;
     except UpstreamError:
         raise HTTPException(503, "The hospital directory (OpenStreetMap) is not responding. Try again in a minute.")
     return {"centre": {"lat": round(lat, 3), "lon": round(lon, 3)}, "radius_km": radius_km,
-            "source": "OpenStreetMap contributors, via the Overpass API", "hospitals": found}
+            "source": "OpenStreetMap contributors", "hospitals": found}

@@ -300,3 +300,10 @@ def test_install_never_renames_folders(tmp_path, monkeypatch):
     assert (dst / "models/live/aqi/registry.json").read_text() == '{"v": 1}'
     assert not (dst / "models/live/aqi/old_model.joblib").exists()
     assert not list(dst.rglob("*.part"))
+
+
+def test_consistency_check_flags_pm25_above_aqi():
+    from src.forecast_export import inconsistent_days
+    out = {"cities": {"A": {"values": {"aqi": [60.0] * 3, "pm25": [150.0, 20.0, 20.0]}},     # PM2.5 150 -> ~300
+                      "B": {"values": {"aqi": [300.0] * 3, "pm25": [100.0] * 3}}}}           # fine: PM10 may lead
+    assert inconsistent_days(out) == {"A": 1}

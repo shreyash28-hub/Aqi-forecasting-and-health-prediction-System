@@ -68,8 +68,10 @@ export function ForecastView() {
               <TrendPanel metric="aqi" title="AQI" sub="last 30 days measured, next 30 forecast" fc={fc} obs={observed.data}
                 obsError={observed.error?.message} className="col-span-12" height="h-[340px]" />
               <TrendPanel metric="pm25" title="PM2.5" sub="fine particles, µg/m³" fc={fc} obs={observed.data} standard={60}
+                obsError={observed.error?.message}
                 className="col-span-12 lg:col-span-6" />
               <TrendPanel metric="no2" title="NO2" sub="nitrogen dioxide, µg/m³" fc={fc} obs={observed.data} standard={80}
+                obsError={observed.error?.message}
                 className="col-span-12 lg:col-span-6" />
               <DayTable days={fc?.days} />
             </div>
@@ -174,6 +176,7 @@ function TrendPanel({ metric, title, sub, fc, obs, obsError, standard, className
         <TrendChart observed={observed} forecast={forecast} today={today} metric={metric}
           unit={metric === "aqi" ? "" : "µg/m³"} color={color} standard={standard} className={`mt-2 ${height}`} />
       )}
+      {obsError && <p className="mt-1 text-[12px] text-faint">Measured days could not be loaded; showing the forecast only.</p>}
       {standard && <p className="mt-1 text-[12px] text-faint">Dashed grey line: India&apos;s 24-hour air quality standard ({standard} µg/m³).</p>}
     </Panel>
   );

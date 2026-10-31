@@ -38,6 +38,7 @@ def client(monkeypatch):
     monkeypatch.setattr(h, "_query_overpass", fake_query)
     monkeypatch.setattr(h, "_cache", {})
     monkeypatch.setattr(h, "_loaded", True)
+    monkeypatch.setattr(h, "_stored", {})          # no stored snapshot: these tests exercise Overpass
     monkeypatch.setattr(h, "_save_disk_cache", lambda: None)
     app = FastAPI()
     app.include_router(h.router)
@@ -91,8 +92,10 @@ def test_upstream_failure_is_503(monkeypatch):
     monkeypatch.setattr(h, "_loaded", True)
     app = FastAPI()
     app.include_router(h.router)
-    r = TestClient(app).get("/api/hospitals?city=Chennai")
+    r = TestClient(app).get("/api/hospitals?lat=20.0&lon=75.0")      # outside the stored city areas
     assert r.status_code == 503 and "not responding" in r.json()["detail"]
+    if h._load_stored().get("cities"):                               # a city search doesn't need Overpass
+        assert TestClient(app).get("/api/hospitals?city=Chennai").status_code == 200
 
 
 def test_disk_cache_round_trip(tmp_path, monkeypatch):
@@ -102,3 +105,33 @@ def test_disk_cache_round_trip(tmp_path, monkeypatch):
     monkeypatch.setattr(h, "_cache", {})
     h._load_disk_cache()
     assert h._cache == {(28.614, 77.209, 5.0): (123.0, [{"name": "X"}])}
+
+
+# ------------------------------------------------------------------ stored snapshot
+
+def stored_snapshot():
+    return {"radius_km": 25, "cities": {"Delhi": {"centre": list(DELHI), "hospitals": [
+        {k: v for k, v in r.items() if k != "distance_km"} for r in h.parse(ELEMENTS, *DELHI, limit=None)]}}}
+
+
+def test_stored_snapshot_answers_without_overpass(monkeypatch):
+    monkeypatch.setattr(h, "_stored", stored_snapshot())
+    monkeypatch.setattr(h, "_query_overpass", lambda *a: pytest.fail("Overpass must not be called"))
+    app = FastAPI()
+    app.include_router(h.router)
+    body = TestClient(app).get("/api/hospitals?city=Delhi&radius_km=1").json()
+    assert [x["name"] for x in body["hospitals"]] == ["Near Hospital"]          # Far Hospital is 2.2 km
+    near_me = TestClient(app).get(f"/api/hospitals?lat={DELHI[0] + 0.02}&lon={DELHI[1]}&radius_km=3").json()
+    assert near_me["hospitals"][0]["name"] == "Far Hospital" and near_me["hospitals"][0]["distance_km"] < 0.1
+
+
+def test_outside_the_stored_area_falls_back_to_overpass(monkeypatch):
+    monkeypatch.setattr(h, "_stored", stored_snapshot())
+    monkeypatch.setattr(h, "_cache", {})
+    monkeypatch.setattr(h, "_loaded", True)
+    monkeypatch.setattr(h, "_save_disk_cache", lambda: None)
+    calls = []
+    monkeypatch.setattr(h, "_query_overpass", lambda lat, lon, r: calls.append(lat) or ELEMENTS)
+    assert h.from_stored(DELHI[0] + 0.25, DELHI[1], 5) is None                  # ~28 km out
+    h.nearby(DELHI[0] + 0.25, DELHI[1], 5)
+    assert len(calls) == 1

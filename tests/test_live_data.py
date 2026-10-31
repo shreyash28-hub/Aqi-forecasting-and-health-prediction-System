@@ -123,3 +123,22 @@ def test_partial_mean_and_signal_dates():
     out, used = apply_signals("X", air, {"X": {**sig["X"], "date": "2026-11-20"}})   # not a forecast day
     assert used is None and out["aqi"].equals(air["aqi"])
     assert apply_signals("Y", air, sig)[1] is None
+
+
+def test_sarima_with_prior_has_no_annual_terms_and_round_trips(tmp_path, monkeypatch):
+    from src import model_store
+    monkeypatch.setattr(model_store, "MODELS_ROOT", tmp_path)
+    monkeypatch.setattr(model_store, "MODELS_DIR", tmp_path / "aqi")   # the 2015-2020 models' folder
+    idx = pd.date_range("2025-03-01", periods=150, freq="D")
+    rng = np.random.default_rng(3)
+    series = pd.DataFrame({"value": 90 + 8 * np.sin(np.arange(150) / 2) + rng.normal(0, 3, 150),
+                           "is_interpolated": False}, index=idx)
+    prof = np.linspace(-0.2, 0.2, 366)
+    meta, fitted = model_store.fit_and_save("X", "SARIMA", series, source="live", profile=prof)
+    assert "Fourier" not in meta["config"] and meta["params"]["annual"] is False
+    assert fitted.model.model.exog is None          # the prior is the only annual term
+    loaded = model_store.load_forecaster("X", source="live").forecast(10)
+    assert np.allclose(loaded["aqi"], fitted.forecast(10)["aqi"])
+    # without a prior (2015-2020 models) the Fourier pairs stay
+    meta_h, _ = model_store.fit_and_save("Y", "SARIMA", series)
+    assert "Fourier" in meta_h["config"] and "annual" not in meta_h["params"]

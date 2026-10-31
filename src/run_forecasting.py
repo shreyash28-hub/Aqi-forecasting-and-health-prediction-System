@@ -20,7 +20,10 @@ instead of 2015-2020. That series is under two years long, so: the test windows 
 back ``LIVE_STEP`` days (5 windows fit after a year of training), and the models
 (not the naive baselines) get a seasonal prior: the city's average annual shape from
 2015-2020 (``historic_profile``) is subtracted before fitting and added back to the
-forecast. ``--no-prior`` turns that off, to measure what it is worth.
+forecast. The shape is scaled per city and series by how strongly the training data
+follows it (``fit_prior_scale``), and SARIMA's Fourier terms and Prophet's yearly
+seasonality are switched off so the annual cycle isn't fitted twice. ``--no-prior`` turns
+the prior off, to measure what it is worth.
 
 Outputs (``reports/forecasting/`` for AQI, ``reports/forecasting/<pm25|no2>/`` for pollutants,
 ``reports/forecasting/live/<aqi|pm25|no2>/`` for ``--source live``):
@@ -59,7 +62,7 @@ from src.live_data import load_live_cities  # noqa: E402
 from src.evaluation import forecast_metrics  # noqa: E402
 from src.models.baselines import BASELINES  # noqa: E402
 from src.preprocessing import (N_WINDOWS, TEST_DAYS, WINDOW_STEP,  # noqa: E402
-                               dominant_seasonal_period, from_model_space, historic_profile,
+                               dominant_seasonal_period, fit_prior_scale, from_model_space, historic_profile,
                                profile_at, rolling_origin_splits, seasonal_strength,
                                stationarity_report, to_model_space)
 
@@ -128,6 +131,11 @@ MODELS = {
 }
 
 
+# Models with their own annual seasonality term; it is switched off when the seasonal prior
+# already removed the annual shape (see fit_sarima).
+OWN_ANNUAL = {"SARIMA", "Prophet"}
+
+
 def _resolve(name):
     module, fn, seeds_attr = MODELS[name]
     mod = importlib.import_module(f"src.models.{module}")
@@ -176,6 +184,9 @@ def evaluate_window(city: str, window: int, train: pd.DataFrame, test: pd.DataFr
     """
     horizon = len(test)
     y_train = to_model_space(train["value"])
+    if profile is not None:   # how strongly this city follows the 2015-2020 shape today
+        scale = fit_prior_scale(y_train, profile)
+        profile = scale * np.asarray(profile)
     shift_train = profile_at(profile, train.index) if profile is not None else 0.0
     shift_test = profile_at(profile, test.index) if profile is not None else 0.0
     observed = ~test["is_interpolated"].to_numpy()
@@ -198,7 +209,8 @@ def evaluate_window(city: str, window: int, train: pd.DataFrame, test: pd.DataFr
                 fn, seeds = _resolve(name)
                 y_fit, add_back = y_train - shift_train, shift_test
             if seeds is None:
-                out = fn(y_fit, horizon)
+                extra_args = {"annual": False} if kind == "model" and profile is not None and name in OWN_ANNUAL else {}
+                out = fn(y_fit, horizon, **extra_args)
                 yhat_log, config = out if isinstance(out, tuple) else (out, name)
                 yhat = _to_aqi(np.asarray(yhat_log, dtype=float) + add_back)
                 metrics = forecast_metrics(test["value"], yhat, mask=observed)
@@ -219,7 +231,7 @@ def evaluate_window(city: str, window: int, train: pd.DataFrame, test: pd.DataFr
                 config = config.rsplit(", seed=", 1)[0] + f", mean of seeds {list(seeds)}"
                 yhat = np.mean(forecasts, axis=0)  # for plotting only; metrics are per-run means
             if kind == "model" and profile is not None:
-                config += " + 2015-2020 seasonal prior"
+                config += f" + 2015-2020 seasonal prior x{scale:.2f}"
             preds[name] = yhat
             error = None
         except Exception as exc:  # record and keep going; one bad model shouldn't kill the run

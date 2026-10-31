@@ -142,3 +142,19 @@ def historic_profile(y: pd.Series, smooth: int = PROFILE_SMOOTH_DAYS) -> np.ndar
 def profile_at(profile, index: pd.DatetimeIndex) -> np.ndarray:
     """The profile's values for the given dates."""
     return np.asarray(profile, dtype=float)[index.dayofyear.to_numpy() - 1]
+
+
+def fit_prior_scale(y: pd.Series, profile, lo: float = 0.0, hi: float = 1.5) -> float:
+    """How strongly a (log) series follows the historic annual shape: the slope ``b`` of
+    ``y ~ a + c*t + b*profile`` by least squares, clipped to [lo, hi].
+
+    The 2015-2020 shape can be too strong or too weak for a city today (Lucknow's recent
+    winters rise about half as much as they used to), so the live models use ``b * profile``.
+    Needs most of a year of data to see the annual cycle; with less it returns 1."""
+    y = y.dropna()
+    if len(y) < 300:
+        return 1.0
+    t = (y.index - y.index[0]).days.to_numpy(dtype=float)
+    X = np.column_stack([np.ones(len(y)), t / max(t[-1], 1), profile_at(profile, y.index)])
+    coef, *_ = np.linalg.lstsq(X, y.to_numpy(dtype=float), rcond=None)
+    return float(np.clip(coef[2], lo, hi))

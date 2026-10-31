@@ -204,6 +204,8 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["31 Oct 2026", "Lucknow and Delhi forecasts fixed: their AQI and PM2.5 forecasts contradicted each other (Lucknow AQI 56 against 148 measured last November). The models now scale the 2015-2020 seasonal pattern to each city's recent data and no longer fit the yearly cycle twice; every city's forecasts are now consistent."],
+  ["31 Oct 2026", "Hospital map made reliable: hospitals within 25 km of each city are stored with the site (5,000+ in total), so the map loads in a fraction of a second instead of depending on the often-overloaded OpenStreetMap lookup service."],
   ["31 Oct 2026", "Forecast page built: for each city, the last 30 measured days running into the 30-day forecast for AQI, PM2.5 and NO2, a week-by-week summary, how reliable each forecast is, and a day-by-day table."],
   ["31 Oct 2026", "Site deployed: https://aqi-forecasting-and-health-predicti.vercel.app (Vercel) with the API on Render. Fixed while deploying: the model download on the server, and forecasts now always start at today."],
   ["31 Oct 2026", "Deployment prepared: Render Blueprint (render.yaml) and step-by-step guide. The API now serves the daily job's precomputed forecasts, cutting its memory from about 490 MB to 170 MB and startup from 11 s to 1.5 s. The scheduled daily refresh ran on its own this morning."],

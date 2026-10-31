@@ -92,17 +92,22 @@ def future_index(last_date: pd.Timestamp, horizon: int) -> pd.DatetimeIndex:
 
 
 @_silenced
-def fit_sarima(train: pd.Series):
-    """SARIMA(p,d,q)(P,0,Q)_7 with annual Fourier regressors. Returns ``(results, config)``."""
+def fit_sarima(train: pd.Series, annual: bool = True):
+    """SARIMA(p,d,q)(P,0,Q)_7 with annual Fourier regressors. Returns ``(results, config)``.
+
+    ``annual=False`` leaves the Fourier regressors out: used when the series already has its
+    annual shape removed (the live models' 2015-2020 seasonal prior). Fitting the annual
+    cycle a second time from under two years of data made winter forecasts swing far off
+    (Lucknow PM2.5 up to 150 and AQI down to 50, against ~70 and ~150 a year earlier)."""
     d = stationarity_report(train)["recommended_d"]
     order = select_arima_order(train, d, max_p=2, max_q=2)
-    x_train = fourier_terms(train.index)
+    x_train = fourier_terms(train.index).to_numpy() if annual else None
 
     best = (np.inf, None, None)
     for P, Q in [(1, 1), (1, 0), (0, 1)]:
         seasonal = (P, 0, Q, 7)
         try:
-            res = SARIMAX(train.to_numpy(), exog=x_train.to_numpy(), order=order,
+            res = SARIMAX(train.to_numpy(), exog=x_train, order=order,
                           seasonal_order=seasonal, trend=_trend_for(d)).fit(disp=False)
         except Exception:
             continue
@@ -111,18 +116,20 @@ def fit_sarima(train: pd.Series):
     if best[2] is None:
         raise RuntimeError("No SARIMA configuration could be fitted")
     _, seasonal, res = best
-    return res, f"SARIMA{order}x{seasonal} + {FOURIER_K} annual Fourier pairs"
+    return res, f"SARIMA{order}x{seasonal}" + (f" + {FOURIER_K} annual Fourier pairs" if annual else "")
 
 
-def predict_sarima(res, last_train_date: pd.Timestamp, horizon: int) -> np.ndarray:
+def predict_sarima(res, last_train_date: pd.Timestamp, horizon: int, annual: bool = True) -> np.ndarray:
     """Forecast from a fitted SARIMA; the Fourier regressors are rebuilt for the future dates."""
+    if not annual:
+        return res.forecast(horizon)
     x_future = fourier_terms(future_index(last_train_date, horizon))
     return res.forecast(horizon, exog=x_future.to_numpy())
 
 
-def sarima_forecast(train: pd.Series, horizon: int):
-    res, config = fit_sarima(train)
-    return predict_sarima(res, train.index[-1], horizon), config
+def sarima_forecast(train: pd.Series, horizon: int, annual: bool = True):
+    res, config = fit_sarima(train, annual)
+    return predict_sarima(res, train.index[-1], horizon, annual), config
 
 
 @_silenced
