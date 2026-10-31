@@ -29,6 +29,21 @@ export interface ForecastResponse {
   days: ForecastDay[];
 }
 
+export interface ObservedDay {
+  date: string;
+  aqi: number | null;
+  pm25: number | null;
+  no2: number | null;
+}
+
+export interface ObservedResponse {
+  city: string;
+  /** Complete past days, oldest first (empty when the site serves the 2015-2020 models). */
+  days: ObservedDay[];
+  /** Average of today's readings so far. */
+  today_so_far: { date: string; as_of: string; hours: number; aqi: number | null; pm25: number | null; no2: number | null } | null;
+}
+
 export interface Profile {
   age: number;
   gender: "F" | "M";
@@ -190,6 +205,8 @@ export const api = {
   cities: (signal?: AbortSignal) => request<CityInfo[]>("/api/cities", { signal }),
   forecast: (city: string, horizon: number, signal?: AbortSignal) =>
     request<ForecastResponse>(`/api/forecast/${encodeURIComponent(city)}?horizon=${horizon}`, { signal }),
+  observed: (city: string, days: number, signal?: AbortSignal) =>
+    request<ObservedResponse>(`/api/observed/${encodeURIComponent(city)}?days=${days}`, { signal }),
   predictRisk: (body: { city: string; horizon: number; profile: Profile }, signal?: AbortSignal) =>
     request<RiskResponse>("/api/risk/predict", { method: "POST", body: JSON.stringify(body), signal }),
   forecastLeaderboard: (target: "AQI" | "PM2.5" | "NO2" = "AQI", signal?: AbortSignal) =>

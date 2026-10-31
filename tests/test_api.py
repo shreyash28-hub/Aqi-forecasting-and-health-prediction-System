@@ -161,3 +161,26 @@ def test_health_leaderboard(client):
     assert b["tasks"]["classification"]["selected"]["aqi_pm25_no2"] == "MLP"
     only = client.get("/api/leaderboard/health?task=regression").json()
     assert list(only["tasks"]) == ["regression"]
+
+
+def test_observed_days_and_today_so_far(client):
+    r = client.get("/api/observed/delhi?days=10")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["city"] == "Delhi"
+    if client.app.state.models.source != "live":
+        assert body["days"] == [] and body["today_so_far"] is None
+        return
+    days = body["days"]
+    assert 1 <= len(days) <= 10 and [d["date"] for d in days] == sorted(d["date"] for d in days)
+    assert all(d["aqi"] is None or 0 < d["aqi"] < 1000 for d in days)
+    first_forecast = client.get("/api/forecast/Delhi?horizon=1").json()["days"][0]["date"]
+    assert days[-1]["date"] < first_forecast          # observed days end before the forecast starts
+    t = body["today_so_far"]
+    assert t is None or (t["hours"] >= 6 and t["aqi"] > 0)
+
+
+def test_observed_rejects_unknown_city_and_bad_days(client):
+    assert client.get("/api/observed/Atlantis").status_code == 404
+    assert client.get("/api/observed/Delhi?days=0").status_code == 422
+    assert client.get("/api/observed/Delhi?days=500").status_code == 422

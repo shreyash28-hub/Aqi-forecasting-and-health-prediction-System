@@ -26,6 +26,7 @@ const AT_A_GLANCE = [
   ["Frontend design (Airware)", "Done", "Landing page and dashboard designs approved; spec in docs/frontend_design.md"],
   ["Next.js frontend: landing + dashboard", "Done", "Built and connected to the live API; checked at 1280, 1536 and 1920 px"],
   ["Frontend: sign-in, profile, my risk, history, models", "Done", "Built on the live API; sign-in flow to be tested by you with a real account"],
+  ["Frontend: forecast page", "Done", "Measured 30 days into the 30-day forecast for AQI, PM2.5 and NO2; weekly summary; reliability; day-by-day table"],
   ["Hospital map", "Done", "Leaflet + OpenStreetMap; nearby hospitals with phone, address, directions; shown at High/Severe risk"],
   ["Live 2026 data: station download + daily AQI", "Done", "24 CPCB stations (4 per city), Feb 2025 to today; daily AQI matches CPCB bulletins"],
   ["Live 2026 data: retrain + forecast from today", "Done", "18 live models (6 cities x AQI, PM2.5, NO2); the site now forecasts from today; daily refresh command"],
@@ -180,7 +181,6 @@ const HEALTH_RESULTS = [
 
 const REMAINING = [
   // [task, needs, notes]
-  ["Frontend: forecast detail page", "Frontend", "City forecast page (/forecast); the other pages are built"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
   ["Deployment: keep an eye on it", "You", "Free Render plan sleeps after 15 min idle (first visit ~1 min); open the site once before a demo, or switch to Starter ($7/month)"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
@@ -204,6 +204,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["31 Oct 2026", "Forecast page built: for each city, the last 30 measured days running into the 30-day forecast for AQI, PM2.5 and NO2, a week-by-week summary, how reliable each forecast is, and a day-by-day table."],
   ["31 Oct 2026", "Site deployed: https://aqi-forecasting-and-health-predicti.vercel.app (Vercel) with the API on Render. Fixed while deploying: the model download on the server, and forecasts now always start at today."],
   ["31 Oct 2026", "Deployment prepared: Render Blueprint (render.yaml) and step-by-step guide. The API now serves the daily job's precomputed forecasts, cutting its memory from about 490 MB to 170 MB and startup from 11 s to 1.5 s. The scheduled daily refresh ran on its own this morning."],
   ["30 Oct 2026", "Daily refresh switched on: Supabase bucket and GitHub secrets set up, first workflow run succeeded, bundle (26 MB, models trained to 29 Oct) verified by downloading it."],

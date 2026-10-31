@@ -63,6 +63,28 @@ class ForecastDay(BaseModel):
     no2: float | None = None
 
 
+class ObservedDay(BaseModel):
+    date: date
+    aqi: float | None = Field(default=None, description="Daily AQI from station readings; null if too few hours")
+    pm25: float | None = None
+    no2: float | None = None
+
+
+class TodaySoFar(BaseModel):
+    date: date
+    as_of: str = Field(description="Time (IST) of the latest reading")
+    hours: int
+    aqi: float | None = None
+    pm25: float | None = None
+    no2: float | None = None
+
+
+class ObservedResponse(BaseModel):
+    city: str
+    days: list[ObservedDay] = Field(description="Complete past days, oldest first")
+    today_so_far: TodaySoFar | None = Field(default=None, description="Average of today's readings so far")
+
+
 class ModelInfo(BaseModel):
     model: str
     config: str

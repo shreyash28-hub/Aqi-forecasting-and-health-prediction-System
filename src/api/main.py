@@ -23,7 +23,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import hospitals, me
 from src.api import refresher
-from src.api.schemas import CityInfo, ForecastResponse, HealthStatus, RiskRequest, RiskResponse, Target
+from src.api.schemas import (CityInfo, ForecastResponse, HealthStatus, ObservedResponse, RiskRequest, RiskResponse,
+                             Target)
 from src.api.services import MAX_HORIZON, ModelService, UnknownCity, forecast_leaderboard, health_leaderboard
 from src.api.supabase_client import SupabaseClient
 
@@ -82,6 +83,16 @@ def health(request: Request):
 @app.get("/api/cities", response_model=list[CityInfo], tags=["forecast"])
 def cities(request: Request):
     return _svc(request).cities()
+
+
+@app.get("/api/observed/{city}", response_model=ObservedResponse, tags=["forecast"])
+def observed(request: Request, city: str, days: int = Query(30, ge=1, le=120, description="Past days to return")):
+    """Recent daily AQI, PM2.5 and NO2 measured at the city's stations, and today so far."""
+    svc = _svc(request)
+    try:
+        return svc.observed(city, days)
+    except UnknownCity:
+        raise _unknown_city(city, svc)
 
 
 @app.get("/api/forecast/{city}", response_model=ForecastResponse, tags=["forecast"])

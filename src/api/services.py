@@ -35,6 +35,23 @@ LIVE_LEADERBOARDS = {t: REPORTS / "forecasting" / "live" / slug / "leaderboard.j
 
 
 RELOAD_CHECK_SECONDS = 10
+OBSERVED_COLUMNS = {"aqi": "AQI", "pm25": "PM2.5", "no2": "NO2"}   # API name -> column in the daily file
+_observed_cache: dict = {}
+
+
+def _num(v) -> float | None:
+    return None if v is None or pd.isna(v) else round(float(v), 1)
+
+
+def _observed_frame() -> pd.DataFrame | None:
+    """The live daily data, read again only when the file changes (the daily bundle replaces it)."""
+    from src.live_data import OUT_PATH
+    if not OUT_PATH.exists():
+        return None
+    mtime = OUT_PATH.stat().st_mtime_ns
+    if _observed_cache.get("mtime") != mtime:
+        _observed_cache.update(mtime=mtime, frame=pd.read_csv(OUT_PATH, parse_dates=["Date"]))
+    return _observed_cache["frame"]
 
 
 def air_fingerprint(source: str) -> tuple:
@@ -250,6 +267,25 @@ class ModelService:
                     d[col] = round(float(getattr(r, col)), 1)
             days.append(d)
         return days
+
+    def observed(self, city: str, days: int) -> dict:
+        """The last ``days`` complete days of station readings, and today's readings so far.
+        Live models only: the 2015-2020 models have no recent observations to show."""
+        city = self.canonical_city(city)
+        out = {"city": city, "days": [], "today_so_far": None}
+        if self.source != "live":
+            return out
+        df = _observed_frame()
+        if df is not None:
+            rows = df[df["City"] == city].sort_values("Date").tail(days)
+            records = rows.to_dict("records")
+            out["days"] = [{"date": r["Date"].date(), **{k: _num(r[col]) for k, col in OBSERVED_COLUMNS.items()}}
+                           for r in records]
+        sig = load_signals().get(city)
+        if sig and "aqi" in sig:
+            out["today_so_far"] = {"date": sig["date"], "as_of": sig["as_of"], "hours": sig["aqi"]["hours"],
+                                   **{k: (sig[k]["value"] if k in sig else None) for k in OBSERVED_COLUMNS}}
+        return out
 
     def forecast(self, city: str, horizon: int) -> dict:
         city = self.canonical_city(city)

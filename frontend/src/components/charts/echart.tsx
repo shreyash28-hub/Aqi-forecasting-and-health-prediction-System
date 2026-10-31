@@ -3,11 +3,11 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts/core";
 import { LineChart } from "echarts/charts";
-import { GridComponent, MarkAreaComponent, TooltipComponent, VisualMapComponent } from "echarts/components";
+import { GridComponent, MarkAreaComponent, MarkLineComponent, TooltipComponent, VisualMapComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import type { EChartsCoreOption } from "echarts/core";
 
-echarts.use([LineChart, GridComponent, TooltipComponent, VisualMapComponent, MarkAreaComponent, CanvasRenderer]);
+echarts.use([LineChart, GridComponent, TooltipComponent, VisualMapComponent, MarkAreaComponent, MarkLineComponent, CanvasRenderer]);
 
 /** Minimal ECharts wrapper: one instance per element, resizes with its container. */
 export function EChart({ option, className, ariaLabel }: { option: EChartsCoreOption; className?: string; ariaLabel?: string }) {
