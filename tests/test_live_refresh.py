@@ -81,6 +81,7 @@ def make_root(root):
     (root / "data" / "processed").mkdir(parents=True)
     (root / "data" / "processed" / "live_city_day.csv").write_text("City,Date\nX,2026-01-01\n")
     (root / "data" / "processed" / "live_nowcast.json").write_text("{}")
+    (root / "data" / "processed" / "live_forecasts.json").write_text("{}")
     (root / "models" / "health").mkdir(parents=True)
     (root / "models" / "health" / "secret.txt").write_text("not part of the bundle")
 
@@ -221,3 +222,43 @@ def test_refresher_tick_runs_each_step_and_survives_failures(monkeypatch):
 
     assert refresher.refresh_once(Svc()) == {"bundle": True, "nowcast": False, "reloaded": True}
     assert calls == ["sync", "nowcast", "reload"]
+
+
+# ------------------------------------------------------------------ precomputed forecasts
+
+def test_export_matches_the_models_and_is_ignored_once_they_change(tmp_path, monkeypatch):
+    from src import forecast_export
+    from src.api.services import _forecasts_from_models
+    if not forecast_export._registry("AQI", "live"):
+        pytest.skip("live models not available")
+    path = tmp_path / "live_forecasts.json"
+    forecast_export.export("live", path)
+    infos, forecasts = forecast_export.load_export("live", path)
+    _, reference = _forecasts_from_models("live")
+    assert set(forecasts) == set(reference) and len(infos) == 18
+    for city, df in reference.items():
+        assert (forecasts[city]["date"] == df["date"]).all()
+        for col in ("aqi", "pm25", "no2"):
+            assert np.allclose(forecasts[city][col], df[col])
+    assert infos[("AQI", "Delhi")].meta["config"]
+    # a model retrained after the export: the export must not be used
+    data = json.loads(path.read_text())
+    data["cities"]["Delhi"]["models"]["AQI"]["last_train_date"] = "2000-01-01"
+    path.write_text(json.dumps(data))
+    assert forecast_export.load_export("live", path) is None
+    path.write_text("{ broken")
+    assert forecast_export.load_export("live", path) is None
+    assert forecast_export.load_export("live", tmp_path / "missing.json") is None
+
+
+def test_api_serves_the_export_without_the_model_libraries():
+    import subprocess
+    import sys
+    from src import forecast_export
+    if forecast_export.load_export() is None:
+        pytest.skip("no up-to-date export")
+    code = ("import sys; from src.api.services import ModelService; s = ModelService.load('live'); "
+            "print(len(s.forecasts), [m for m in ('torch', 'prophet', 'statsmodels', 'xgboost') if m in sys.modules])")
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True,
+                         cwd=forecast_export.DATA_DIR.parent).stdout.split("\n")[-2]
+    assert out == "6 []"

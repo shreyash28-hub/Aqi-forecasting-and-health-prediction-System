@@ -5,8 +5,9 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from statsmodels.tsa.seasonal import STL
-from statsmodels.tsa.stattools import acf, adfuller, kpss
+
+# statsmodels is imported inside the diagnostics below, not here: the API imports this module
+# for the transforms and must stay light enough for a 512 MB server.
 
 TEST_DAYS = 30
 
@@ -14,6 +15,7 @@ TEST_DAYS = 30
 def adf_test(s: pd.Series) -> dict:
     with warnings.catch_warnings():  # statsmodels 0.15 FutureWarning about the return type
         warnings.simplefilter("ignore", FutureWarning)
+        from statsmodels.tsa.stattools import adfuller
         stat, p, lags, nobs, crit, _ = adfuller(s.dropna(), autolag="AIC")
     return {"adf_stat": stat, "adf_p": p, "adf_lags": lags, "adf_crit_5": crit["5%"]}
 
@@ -21,6 +23,7 @@ def adf_test(s: pd.Series) -> dict:
 def kpss_test(s: pd.Series) -> dict:
     with warnings.catch_warnings():  # KPSS warns when p is outside its lookup table
         warnings.simplefilter("ignore")
+        from statsmodels.tsa.stattools import kpss
         stat, p, _, _ = kpss(s.dropna(), regression="c", nlags="auto")
     return {"kpss_stat": stat, "kpss_p": p}
 
@@ -51,6 +54,7 @@ def dominant_seasonal_period(s: pd.Series, candidates=(7, 30, 182, 365), window:
     """
     detrended = s - s.rolling(365, center=True, min_periods=180).mean()
     nlags = min(max(candidates) + window, len(s) // 2)
+    from statsmodels.tsa.stattools import acf
     r = acf(detrended.dropna(), nlags=nlags, fft=True)
     out = {}
     for lag in candidates:
@@ -67,6 +71,7 @@ def seasonal_strength(s: pd.Series, period: int) -> float:
 
     ~0 = no seasonality at this period, ~1 = seasonality dominates the remainder.
     """
+    from statsmodels.tsa.seasonal import STL
     res = STL(s.dropna().to_numpy(), period=period, robust=True).fit()
     return float(max(0.0, 1 - np.var(res.resid) / np.var(res.seasonal + res.resid)))
 

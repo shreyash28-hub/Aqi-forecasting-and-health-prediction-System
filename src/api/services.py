@@ -21,6 +21,7 @@ import pandas as pd
 from src.data_loader import PROJECT_ROOT, TARGETS
 from src.health.data import CATEGORIES, PERSON_NUMERIC, load_health_dataset, score_to_level
 from src.health.store import HealthRiskPredictor, load_health_predictor
+from src.forecast_export import EXPORT_PATH, load_export
 from src.model_store import Forecaster, load_forecaster, registry_path, saved_cities
 from src.nowcast import NOWCAST_PATH, apply_signals, load_signals
 from src.preprocessing import TEST_DAYS
@@ -39,24 +40,36 @@ RELOAD_CHECK_SECONDS = 10
 def air_fingerprint(source: str) -> tuple:
     """Modification times of the files the air forecasts are built from: the model registries
     and, for live models, today's readings. A change means the forecasts are out of date."""
-    paths = [registry_path(t, source) for t in TARGETS] + ([NOWCAST_PATH] if source == "live" else [])
+    paths = [registry_path(t, source) for t in TARGETS] + ([NOWCAST_PATH, EXPORT_PATH] if source == "live" else [])
     return tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in paths)
 
 
-def load_air(source: str) -> tuple[dict, dict, dict]:
-    """Load the saved forecasters and each city's 30-day air forecast (adjusted with today's
-    readings for live models). Returns ``(forecasters, forecasts, readings_as_of)``."""
-    forecasters, forecasts, readings_as_of = {}, {}, {}
+def _forecasts_from_models(source: str) -> tuple[dict, dict]:
+    forecasters, forecasts = {}, {}
     for target in TARGETS:
         for city in saved_cities(target, source):
             forecasters[(target, city)] = load_forecaster(city, target, source)
-    signals = load_signals() if source == "live" else {}
     for city in saved_cities("AQI", source):
         df = forecasters[("AQI", city)].forecast(MAX_HORIZON)
         for target in ("PM2.5", "NO2"):
             fc = forecasters.get((target, city))
             if fc is not None:
                 df[TARGETS[target]] = fc.forecast(MAX_HORIZON)[TARGETS[target]].to_numpy()
+        forecasts[city] = df
+    return forecasters, forecasts
+
+
+def load_air(source: str) -> tuple[dict, dict, dict]:
+    """Each city's 30-day air forecast (adjusted with today's readings for live models) and
+    what to show about its models. Returns ``(forecasters, forecasts, readings_as_of)``.
+
+    Live models: from the precomputed export when it matches the saved models (no model
+    libraries loaded; see ``src/forecast_export.py``), else from the models themselves."""
+    exported = load_export(source) if source == "live" else None
+    forecasters, forecasts = exported if exported else _forecasts_from_models(source)
+    readings_as_of = {}
+    signals = load_signals() if source == "live" else {}
+    for city, df in list(forecasts.items()):
         if source == "live":   # start today from today's readings so far
             df, used = apply_signals(city, df, signals)
             if used:

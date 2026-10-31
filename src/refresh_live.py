@@ -8,7 +8,8 @@ Steps:
 3. Optional (``--evaluate``): rerun the live model comparison per target, which may change
    the winning model. Slower; worth doing every few weeks. Needs ``data/Aqi.zip``.
 4. ``src.train_final_models --source live``: refit each city's selected model on all the
-   data, so forecasts start the day after the latest complete day.
+   data, so forecasts start the day after the latest complete day; then
+   ``src.forecast_export`` saves their 30-day forecasts for the API.
 5. ``src.nowcast``: save today's readings so far; the API starts today's forecast from them.
 6. Optional (``--upload``): pack ``models/live`` and the data into one bundle and upload it
    to Supabase Storage, where a deployed API picks it up (``src.live_bundle``).
@@ -62,6 +63,7 @@ def main() -> None:
         if args.evaluate:
             run("-m", "src.run_forecasting", "--source", "live", "--windows", "5", "--target", target)
         run("-m", "src.train_final_models", "--source", "live", "--target", target)
+    run("-m", "src.forecast_export")              # lets the API serve them without the model libraries
     if args.skip_download:
         run("-m", "src.nowcast")                  # signals from the recent files as they are
     if args.upload:

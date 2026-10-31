@@ -5,8 +5,9 @@ committing them daily would bloat the repository. Instead the job packs them int
 ``live_bundle.tar.gz`` and uploads it to a public Supabase Storage bucket; the API
 downloads it when it starts and whenever it has changed (see ``src/api/refresher.py``).
 
-Contents: ``models/live/``, ``data/processed/live_city_day.csv`` and
-``data/processed/live_nowcast.json`` (nothing else is ever extracted).
+Contents: ``models/live/``, ``data/processed/live_city_day.csv``,
+``data/processed/live_nowcast.json`` and ``data/processed/live_forecasts.json`` (nothing
+else is ever extracted).
 
 Environment:
     LIVE_BUNDLE_URL        public download URL (API side), e.g.
@@ -39,7 +40,8 @@ BUNDLE_PATH = PROJECT_ROOT / "data" / "live_bundle.tar.gz"
 ETAG_PATH = PROJECT_ROOT / "data" / "cache" / "live_bundle_etag.json"
 OBJECT_NAME = "live_bundle.tar.gz"
 # Paths (relative to the project root) a bundle may contain.
-CONTENT = ("models/live", "data/processed/live_city_day.csv", "data/processed/live_nowcast.json")
+CONTENT = ("models/live", "data/processed/live_city_day.csv", "data/processed/live_nowcast.json",
+           "data/processed/live_forecasts.json")
 
 
 def pack(out: Path = BUNDLE_PATH, root: Path = PROJECT_ROOT) -> Path:

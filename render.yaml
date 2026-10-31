@@ -1,0 +1,27 @@
+# Render Blueprint for the Airware API (FastAPI). Render: New > Blueprint > pick this repository.
+# Setup steps and what each setting is for: docs/deployment.md
+services:
+  - type: web
+    name: airware-api
+    runtime: python
+    region: singapore            # the closest Render region to India
+    plan: free                   # 512 MB; the API needs ~170 MB. "starter" stays awake (no cold starts)
+    buildCommand: pip install -r requirements.lock.txt --extra-index-url https://download.pytorch.org/whl/cpu
+    startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true             # redeploys on every push to main
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.5            # same as the models were trained with (requirements.lock.txt)
+      - key: LIVE_BUNDLE_URL     # the daily-refreshed models and data (docs/live_refresh.md)
+        value: https://oopbjwhsauqmoqgheljm.supabase.co/storage/v1/object/public/live/live_bundle.tar.gz
+      - key: LIVE_REFRESH_MINUTES
+        value: "60"
+      - key: ALLOWED_ORIGINS     # the Vercel site address(es), comma-separated; set after the frontend is deployed
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: OPENAQ_API_KEY
+        sync: false

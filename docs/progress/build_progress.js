@@ -10,7 +10,7 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "30 October 2026";
+const LAST_UPDATED = "31 October 2026";
 const LATEST_COMMIT = "2e89295 Daily refresh for a deployed site, and the API reloads by itself";
 
 const AT_A_GLANCE = [
@@ -32,7 +32,7 @@ const AT_A_GLANCE = [
   ["Live data: today's readings in the forecast", "Done", "Today's and the next days' forecast adjusted with station readings so far; backtested"],
   ["Live data: automatic daily refresh", "Done", "GitHub Actions job runs daily at 06:00 IST; first run succeeded and the bundle is in Supabase Storage; the API side starts once deployed"],
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
-  ["Deployment", "Not started", "Vercel (frontend), Render or Railway (backend)"],
+  ["Deployment", "Prepared", "Render Blueprint and Vercel steps ready (docs/deployment.md); API memory cut from ~490 MB to ~170 MB to fit Render's 512 MB"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
   ["Course mid-sem submission (19-30 Oct)", "Results ready", "Presentation still to prepare (report content can be reused)"],
   ["Course final submission (16-27 Nov)", "Results ready", "Presentation still to prepare (report content can be reused)"],
@@ -183,7 +183,7 @@ const REMAINING = [
   ["Frontend: forecast detail page", "Frontend", "City forecast page (/forecast); the other pages are built"],
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
   ["Live data: API settings", "Deployment", "Set LIVE_BUNDLE_URL, LIVE_REFRESH_MINUTES and OPENAQ_API_KEY on the API host (docs/live_refresh.md, step 4)"],
-  ["Deployment", "All of the above", "Vercel + Render/Railway; handle the ~20 s model-loading startup"],
+  ["Deployment", "You (accounts)", "Follow docs/deployment.md: Render Blueprint for the API, then Vercel for the site, then connect them"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
   ["Mid-sem report/presentation (due 7 Nov)", "You + me", "Classical models; the deadline moved and the guidelines changed, so they are to be shared"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
@@ -205,6 +205,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["31 Oct 2026", "Deployment prepared: Render Blueprint (render.yaml) and step-by-step guide. The API now serves the daily job's precomputed forecasts, cutting its memory from about 490 MB to 170 MB and startup from 11 s to 1.5 s. The scheduled daily refresh ran on its own this morning."],
   ["30 Oct 2026", "Daily refresh switched on: Supabase bucket and GitHub secrets set up, first workflow run succeeded, bundle (26 MB, models trained to 29 Oct) verified by downloading it."],
   ["30 Oct 2026", "Daily refresh built for the deployed site: a scheduled GitHub Actions job fetches the last days of readings, retrains the 18 live models and publishes them; the API downloads them and reloads by itself, no restart or redeploy. Setup steps in docs/live_refresh.md; switched on when the site is deployed."],
   ["30 Oct 2026", "Today's forecast now starts from the readings so far today (Delhi showed 256 when stations read about 107): in the winter-season backtest it cuts today's AQI error by about 57% and the next two days by 12% and 5%. Dashboard shows when the readings were last updated."],
