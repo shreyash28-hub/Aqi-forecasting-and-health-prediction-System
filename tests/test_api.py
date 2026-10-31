@@ -43,15 +43,20 @@ def test_forecast_matches_saved_models(client, horizon):
     r = client.get(f"/api/forecast/Delhi?horizon={horizon}")
     assert r.status_code == 200
     body = r.json()
-    assert len(body["days"]) == horizon
     svc = client.app.state.models
-    expected = forecast_air("Delhi", horizon, svc.source)
+    assert len(body["days"]) == len(svc.air_forecast("Delhi", horizon)) >= min(horizon, 28)
+    expected = forecast_air("Delhi", 30, svc.source)
+    first = pd.Timestamp(body["origin_date"]) + pd.Timedelta(days=1)
     if svc.source == "live":   # today's readings so far nudge the first days (src/nowcast.py)
         expected, used = apply_signals("Delhi", expected, load_signals())
         assert (used is not None) == (body["readings_as_of"] is not None)
+        # models a day or two old: the forecast starts today, not on a day already past
+        today = pd.Timestamp.now(tz="Asia/Kolkata").tz_localize(None).normalize()
+        first = max(first, today)
+        expected = expected[expected["date"] >= first]
+    expected = expected.iloc[:horizon]
     got = np.array([d["aqi"] for d in body["days"]])
     assert np.allclose(got, expected["aqi"].round(1), atol=0.051)
-    first = pd.Timestamp(body["origin_date"]) + pd.Timedelta(days=1)
     assert body["days"][0]["date"] == first.date().isoformat()
     assert {"AQI", "PM2.5", "NO2"} <= set(body["models"])
 

@@ -232,7 +232,13 @@ class ModelService:
     # ------------------------------------------------------------------ forecasts
 
     def air_forecast(self, city: str, horizon: int) -> pd.DataFrame:
-        return self.forecasts[city].iloc[:horizon].copy()
+        df = self.forecasts[city]
+        if self.source == "live":
+            # Models a day or two old would otherwise start at a day already past: start today.
+            today = pd.Timestamp.now(tz="Asia/Kolkata").tz_localize(None).normalize()
+            upcoming = df[df["date"] >= today]
+            df = upcoming if len(upcoming) else df
+        return df.iloc[:horizon].copy()
 
     @staticmethod
     def forecast_days(air: pd.DataFrame) -> list[dict]:

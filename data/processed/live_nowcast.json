@@ -1,98 +1,98 @@
 {
  "Delhi": {
-  "date": "2026-10-30",
-  "as_of": "2026-10-30T18:00:00",
+  "date": "2026-10-31",
+  "as_of": "2026-10-31T10:00:00",
   "aqi": {
-   "value": 94.62,
-   "hours": 19
+   "value": 111.27,
+   "hours": 11
   },
   "pm25": {
-   "value": 27.76,
-   "hours": 19
+   "value": 61.12,
+   "hours": 11
   },
   "no2": {
-   "value": 25.17,
-   "hours": 19
+   "value": 27.24,
+   "hours": 11
   }
  },
  "Bengaluru": {
-  "date": "2026-10-30",
-  "as_of": "2026-10-30T18:00:00",
+  "date": "2026-10-31",
+  "as_of": "2026-10-31T10:00:00",
   "aqi": {
-   "value": 106.59,
-   "hours": 19
+   "value": 107.04,
+   "hours": 11
   },
   "pm25": {
-   "value": 44.85,
-   "hours": 19
+   "value": 49.98,
+   "hours": 11
   },
   "no2": {
-   "value": 16.49,
-   "hours": 19
+   "value": 15.4,
+   "hours": 11
   }
  },
  "Chennai": {
-  "date": "2026-10-30",
-  "as_of": "2026-10-30T18:00:00",
+  "date": "2026-10-31",
+  "as_of": "2026-10-31T10:00:00",
   "aqi": {
-   "value": 113.31,
-   "hours": 19
+   "value": 98.26,
+   "hours": 11
   },
   "pm25": {
-   "value": 37.93,
-   "hours": 19
+   "value": 36.23,
+   "hours": 11
   },
   "no2": {
-   "value": 9.26,
-   "hours": 19
+   "value": 9.81,
+   "hours": 11
   }
  },
  "Hyderabad": {
-  "date": "2026-10-30",
-  "as_of": "2026-10-30T18:00:00",
+  "date": "2026-10-31",
+  "as_of": "2026-10-31T10:00:00",
   "aqi": {
-   "value": 64.28,
-   "hours": 19
+   "value": 59.81,
+   "hours": 11
   },
   "pm25": {
-   "value": 31.93,
-   "hours": 19
+   "value": 23.17,
+   "hours": 11
   },
   "no2": {
-   "value": 8.27,
-   "hours": 19
+   "value": 6.7,
+   "hours": 11
   }
  },
  "Lucknow": {
-  "date": "2026-10-30",
-  "as_of": "2026-10-30T18:00:00",
+  "date": "2026-10-31",
+  "as_of": "2026-10-31T10:00:00",
   "aqi": {
-   "value": 59.66,
-   "hours": 19
+   "value": 41.8,
+   "hours": 11
   },
   "pm25": {
-   "value": 12.6,
-   "hours": 19
+   "value": 3.99,
+   "hours": 11
   },
   "no2": {
-   "value": 16.14,
-   "hours": 19
+   "value": 19.69,
+   "hours": 11
   }
  },
  "Ahmedabad": {
-  "date": "2026-10-30",
-  "as_of": "2026-10-30T18:00:00",
+  "date": "2026-10-31",
+  "as_of": "2026-10-31T10:00:00",
   "aqi": {
-   "value": 115.94,
-   "hours": 19
+   "value": 101.19,
+   "hours": 11
   },
   "pm25": {
-   "value": 40.25,
-   "hours": 19
+   "value": 37.74,
+   "hours": 11
   },
   "no2": {
-   "value": 20.98,
-   "hours": 19
+   "value": 21.95,
+   "hours": 11
   }
  }
 }
