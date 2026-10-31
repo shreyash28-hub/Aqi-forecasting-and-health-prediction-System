@@ -11,7 +11,7 @@ const {
 // =========================================================================== CONTENT
 
 const LAST_UPDATED = "31 October 2026";
-const LATEST_COMMIT = "2e89295 Daily refresh for a deployed site, and the API reloads by itself";
+const LATEST_COMMIT = "fee000c Consistent live forecasts, a stored hospital list, and a Forecast page fallback";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -35,7 +35,7 @@ const AT_A_GLANCE = [
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Done", "Live site on Vercel, API on Render (free plan); daily models and hourly readings update by themselves"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
-  ["Course mid-sem submission (19-30 Oct)", "Results ready", "Presentation still to prepare (report content can be reused)"],
+  ["Course mid-sem submission (19 Oct - 7 Nov)", "Done", "8-slide deck, Phase 2 analysis (reports/phase2) and demo notebook ready to present"],
   ["Course final submission (16-27 Nov)", "Results ready", "Presentation still to prepare (report content can be reused)"],
 ];
 
@@ -144,6 +144,17 @@ DONE.push({
 });
 
 DONE.push({
+  title: "Mid-sem (Phase 2) deliverables",
+  items: [
+    "Phase 2 analysis (python -m src.phase2, results in reports/phase2): preprocessing summary, ADF and KPSS tests, decomposition, ACF/PACF plots, ARIMA AIC grids, fitted parameters, residual diagnostics (Ljung-Box, Jarque-Bera), hold-out forecast plots and RMSE/MSE/MAE/MAPE tables for ARIMA, SARIMA and Holt-Winters against three naive baselines, plus written interim observations.",
+    "Result: the best classical model beats the best naive forecast in all six cities on mean RMSE over six 30-day windows (SARIMA in Delhi -30%, Lucknow -28%, Bengaluru -24%; ARIMA in Chennai -13%; Holt-Winters in Ahmedabad -5% and Hyderabad -0.2%).",
+    "Assumption checks: ARIMA and SARIMA leave white-noise residuals in 4 of 6 cities; Holt-Winters in none (no autoregressive term). The runner-up ARIMA order is always within 2 AIC points of the best, while models without an AR term are 185-888 points worse.",
+    "8-slide presentation (docs/phase2/AQI_Forecasting_Phase2_MidSem.pptx, built by docs/phase2/build_deck.js) with speaker notes, covering every Milestone 2 rubric item, including a plan-to-implementation table.",
+    "Demo notebook notebooks/02_classical_models.ipynb: one city end to end with the project's own code (switch city with CITY).",
+  ],
+});
+
+DONE.push({
   title: "Frontend: landing page and dashboard",
   items: [
     "Next.js app in frontend/ with React + TypeScript, Tailwind CSS, shadcn/ui, Motion, ECharts and Lucide icons, following the approved Airware design.",
@@ -184,13 +195,14 @@ const REMAINING = [
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
   ["Deployment: keep an eye on it", "You", "Free Render plan sleeps after 15 min idle (first visit ~1 min); open the site once before a demo, or switch to Starter ($7/month)"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
-  ["Mid-sem report/presentation (due 7 Nov)", "You + me", "Classical models; the deadline moved and the guidelines changed, so they are to be shared"],
+  ["Mid-sem presentation (due 7 Nov)", "You", "Deck and demo notebook ready; check the student IDs on the title slide and rehearse with the speaker notes"],
+  ["Live forecast consistency", "Me", "Raise each day's served AQI to at least the PM2.5 sub-index (Lucknow showed 9/30 inconsistent days on 31 Oct)"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
 ];
 
 const ACTIONS_FOR_YOU = [
   "Push the latest commit to GitHub (git push origin main) so the hospital map and live-data work are in the repository.",
-  "Share the website references for the redesign and the new mid-sem guidelines.",
+  "Share the website references for the redesign.",
   "Test the signed-in pages with a real account: create an account, confirm the email, fill in the profile, check My risk, then History (open and delete a run).",
   "Try the site locally: start the API, then run npm run dev in frontend/ and open http://localhost:3000.",
   "Fill in the title-page details in docs/Project_Report.docx before submitting it.",
@@ -204,6 +216,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["31 Oct 2026", "Mid-sem (Phase 2) deliverables built: analysis and figures for the classical models (reports/phase2), an 8-slide presentation with speaker notes, and a demo notebook. A classical model beats the naive forecast in all six cities."],
   ["31 Oct 2026", "Lucknow and Delhi forecasts fixed: their AQI and PM2.5 forecasts contradicted each other (Lucknow AQI 56 against 148 measured last November). The models now scale the 2015-2020 seasonal pattern to each city's recent data and no longer fit the yearly cycle twice; every city's forecasts are now consistent."],
   ["31 Oct 2026", "Hospital map made reliable: hospitals within 25 km of each city are stored with the site (5,000+ in total), so the map loads in a fraction of a second instead of depending on the often-overloaded OpenStreetMap lookup service."],
   ["31 Oct 2026", "Forecast page built: for each city, the last 30 measured days running into the 30-day forecast for AQI, PM2.5 and NO2, a week-by-week summary, how reliable each forecast is, and a day-by-day table."],

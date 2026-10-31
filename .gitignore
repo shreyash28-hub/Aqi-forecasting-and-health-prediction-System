@@ -17,6 +17,7 @@ data/Aqi.zip
 
 # Progress doc generator dependencies
 docs/progress/node_modules/
+docs/phase2/node_modules/
 
 # Hospital lookups cached by src/api/hospitals.py
 data/cache/

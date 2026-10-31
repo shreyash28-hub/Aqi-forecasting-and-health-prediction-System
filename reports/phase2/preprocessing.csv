@@ -1,0 +1,7 @@
+City,Start,End,Days,Interpolated days,Interpolated %,Training days (final hold-out),AQI note
+Delhi,2015-01-01,2020-07-01,2009,10,0.5,1979,
+Bengaluru,2015-03-21,2020-07-01,1930,20,1.0,1900,
+Chennai,2015-03-24,2020-07-01,1927,43,2.2,1897,
+Hyderabad,2015-03-31,2020-07-01,1920,40,2.1,1890,
+Lucknow,2015-03-21,2020-07-01,1930,37,1.9,1900,
+Ahmedabad,2017-10-11,2020-07-01,995,41,4.1,965,recomputed without CO

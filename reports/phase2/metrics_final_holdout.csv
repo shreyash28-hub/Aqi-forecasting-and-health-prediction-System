@@ -1,0 +1,37 @@
+city,model,rmse,mse,mae,mape,config
+Ahmedabad,SARIMA,32.982,1087.796,30.701,36.652,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs"
+Ahmedabad,Seasonal naive (weekly),33.317,1110.0,29.571,35.663,Seasonal naive (weekly)
+Ahmedabad,Holt-Winters,38.079,1450.04,35.882,42.508,"Holt-Winters (add. damped trend, add. seasonal m=7)"
+Ahmedabad,Naive (last value),38.815,1506.571,36.5,43.421,Naive (last value)
+Ahmedabad,ARIMA,42.659,1819.753,40.479,48.021,"ARIMA(2, 0, 2)"
+Ahmedabad,Seasonal naive (annual),78.858,6218.536,70.321,81.201,Seasonal naive (annual)
+Bengaluru,Holt-Winters,8.547,73.056,6.986,13.948,"Holt-Winters (add. damped trend, add. seasonal m=7)"
+Bengaluru,Naive (last value),9.6,92.167,7.967,13.826,Naive (last value)
+Bengaluru,SARIMA,14.555,211.84,13.217,25.959,"SARIMA(2, 0, 1)x(0, 0, 1, 7) + 3 annual Fourier pairs"
+Bengaluru,Seasonal naive (weekly),15.776,248.867,12.933,25.605,Seasonal naive (weekly)
+Bengaluru,ARIMA,18.79,353.076,17.631,34.086,"ARIMA(2, 0, 1)"
+Bengaluru,Seasonal naive (annual),20.504,420.433,15.9,31.688,Seasonal naive (annual)
+Chennai,SARIMA,20.685,427.851,14.852,14.185,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs"
+Chennai,Naive (last value),21.143,447.033,15.1,14.137,Naive (last value)
+Chennai,Holt-Winters,21.43,459.235,15.352,14.254,"Holt-Winters (add. damped trend, add. seasonal m=7)"
+Chennai,Seasonal naive (weekly),25.025,626.233,20.167,18.496,Seasonal naive (weekly)
+Chennai,ARIMA,27.977,782.695,19.801,16.844,"ARIMA(2, 0, 2)"
+Chennai,Seasonal naive (annual),34.469,1188.133,27.067,26.763,Seasonal naive (annual)
+Delhi,ARIMA,35.723,1276.111,28.369,25.657,"ARIMA(2, 0, 2)"
+Delhi,SARIMA,38.51,1483.028,31.014,28.075,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs"
+Delhi,Naive (last value),41.058,1685.767,29.633,20.843,Naive (last value)
+Delhi,Holt-Winters,41.612,1731.574,30.272,21.395,"Holt-Winters (add. damped trend, add. seasonal m=7)"
+Delhi,Seasonal naive (weekly),52.779,2785.667,41.667,34.646,Seasonal naive (weekly)
+Delhi,Seasonal naive (annual),77.894,6067.433,67.833,58.055,Seasonal naive (annual)
+Hyderabad,Naive (last value),14.08,198.233,11.3,29.388,Naive (last value)
+Hyderabad,Holt-Winters,16.578,274.843,13.706,35.786,"Holt-Winters (add. damped trend, add. seasonal m=7)"
+Hyderabad,Seasonal naive (annual),23.873,569.9,18.7,46.298,Seasonal naive (annual)
+Hyderabad,SARIMA,29.475,868.783,27.665,68.46,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs"
+Hyderabad,Seasonal naive (weekly),35.253,1242.767,30.433,76.582,Seasonal naive (weekly)
+Hyderabad,ARIMA,35.843,1284.718,34.368,83.511,"ARIMA(3, 0, 1)"
+Lucknow,Holt-Winters,35.752,1278.213,24.344,21.715,"Holt-Winters (add. damped trend, add. seasonal m=7)"
+Lucknow,Naive (last value),36.882,1360.267,24.467,21.277,Naive (last value)
+Lucknow,ARIMA,45.544,2074.28,41.313,49.012,"ARIMA(2, 0, 2)"
+Lucknow,SARIMA,49.364,2436.766,45.548,55.959,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs"
+Lucknow,Seasonal naive (weekly),55.638,3095.533,39.2,45.465,Seasonal naive (weekly)
+Lucknow,Seasonal naive (annual),84.536,7146.267,74.133,90.367,Seasonal naive (annual)

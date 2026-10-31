@@ -1,0 +1,19 @@
+City,Model,Configuration,AIC,Coefficients,alpha (level),beta (trend),gamma (season),phi (damping)
+Delhi,ARIMA,"ARIMA(2, 0, 2)",-650.5,"const=5.4332, ar.L1=1.4741, ar.L2=-0.4796, ma.L1=-0.597, ma.L2=-0.2243, sigma2=0.0418",,,,
+Delhi,SARIMA,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",-668.8,"intercept=0.2091, ar.L1=1.2886, ar.L2=-0.3271, ma.L1=-0.438, ma.L2=-0.2468, ma.S.L7=-0.0189, sigma2=0.0412",,,,
+Delhi,Holt-Winters,"Holt-Winters (add. damped trend, add. seasonal m=7)",-6003.5,,0.935,0.0,0.006,0.8
+Bengaluru,ARIMA,"ARIMA(2, 0, 1)",324.2,"const=4.4859, ar.L1=1.4431, ar.L2=-0.4563, ma.L1=-0.8763, sigma2=0.069",,,,
+Bengaluru,SARIMA,"SARIMA(2, 0, 1)x(0, 0, 1, 7) + 3 annual Fourier pairs",332.6,"intercept=0.2296, ar.L1=1.3079, ar.L2=-0.3591, ma.L1=-0.7597, ma.S.L7=0.0, sigma2=0.0695",,,,
+Bengaluru,Holt-Winters,"Holt-Winters (add. damped trend, add. seasonal m=7)",-4756.0,,0.461,0.0,0.057,0.955
+Chennai,ARIMA,"ARIMA(2, 0, 2)",172.1,"const=4.7036, ar.L1=1.6043, ar.L2=-0.6066, ma.L1=-0.9212, ma.L2=-0.0346, sigma2=0.0637",,,,
+Chennai,SARIMA,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",208.8,"intercept=0.2572, ar.L1=1.2523, ar.L2=-0.3075, ma.L1=-0.5541, ma.L2=-0.1153, ma.S.L7=-0.0591, sigma2=0.0642",,,,
+Chennai,Holt-Winters,"Holt-Winters (add. damped trend, add. seasonal m=7)",-4942.6,,0.728,0.0,0.007,0.946
+Hyderabad,ARIMA,"ARIMA(3, 0, 1)",-373.8,"const=4.6192, ar.L1=1.591, ar.L2=-0.7298, ar.L3=0.1314, ma.L1=-0.8613, sigma2=0.0477",,,,
+Hyderabad,SARIMA,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",-359.5,"intercept=0.1707, ar.L1=1.1574, ar.L2=-0.1947, ma.L1=-0.4561, ma.L2=-0.2343, ma.S.L7=-0.0468, sigma2=0.049",,,,
+Hyderabad,Holt-Winters,"Holt-Winters (add. damped trend, add. seasonal m=7)",-5355.2,,0.703,0.0,0.026,0.94
+Lucknow,ARIMA,"ARIMA(2, 0, 2)",133.1,"const=5.2288, ar.L1=1.4094, ar.L2=-0.4169, ma.L1=-0.6676, ma.L2=-0.1371, sigma2=0.0623",,,,
+Lucknow,SARIMA,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",74.4,"intercept=0.3002, ar.L1=1.2856, ar.L2=-0.343, ma.L1=-0.5795, ma.L2=-0.1423, ma.S.L7=0.0128, sigma2=0.06",,,,
+Lucknow,Holt-Winters,"Holt-Winters (add. damped trend, add. seasonal m=7)",-4996.1,,0.705,0.0,0.021,0.939
+Ahmedabad,ARIMA,"ARIMA(2, 0, 2)",-65.9,"const=4.9605, ar.L1=1.2697, ar.L2=-0.29, ma.L1=-0.4914, ma.L2=-0.2777, sigma2=0.0539",,,,
+Ahmedabad,SARIMA,"SARIMA(2, 0, 2)x(0, 0, 1, 7) + 3 annual Fourier pairs",-63.1,"intercept=0.1097, ar.L1=1.2698, ar.L2=-0.292, ma.L1=-0.4643, ma.L2=-0.3226, ma.S.L7=0.0287, sigma2=0.0535",,,,
+Ahmedabad,Holt-Winters,"Holt-Winters (add. damped trend, add. seasonal m=7)",-2594.0,,0.667,0.0,0.063,0.991

@@ -1,0 +1,37 @@
+city,model,rmse,mse,mae,mape
+Ahmedabad,ARIMA,62.865,4518.624,52.912,33.945
+Ahmedabad,Holt-Winters,57.443,3733.285,48.167,32.195
+Ahmedabad,Naive (last value),60.75,4186.754,51.369,34.435
+Ahmedabad,SARIMA,57.876,3728.19,50.486,36.067
+Ahmedabad,Seasonal naive (annual),84.781,7547.626,68.525,50.26
+Ahmedabad,Seasonal naive (weekly),75.157,6306.494,59.978,38.625
+Bengaluru,ARIMA,22.83,550.635,19.116,24.41
+Bengaluru,Holt-Winters,21.31,510.321,17.803,22.069
+Bengaluru,Naive (last value),25.855,787.344,23.056,29.055
+Bengaluru,SARIMA,19.346,393.726,15.782,20.002
+Bengaluru,Seasonal naive (annual),28.94,969.1,23.722,27.936
+Bengaluru,Seasonal naive (weekly),25.545,719.3,21.178,26.02
+Chennai,ARIMA,37.446,1654.264,27.484,24.713
+Chennai,Holt-Winters,40.731,1942.571,31.108,29.924
+Chennai,Naive (last value),44.612,2343.244,34.489,33.884
+Chennai,SARIMA,37.991,1656.344,30.297,30.149
+Chennai,Seasonal naive (annual),60.121,4002.817,42.861,42.254
+Chennai,Seasonal naive (weekly),42.866,2107.972,32.483,29.881
+Delhi,ARIMA,106.955,16010.066,91.056,37.783
+Delhi,Holt-Winters,99.256,14617.477,82.66,32.777
+Delhi,Naive (last value),98.906,14617.1,82.044,32.283
+Delhi,SARIMA,69.213,5637.894,55.884,26.168
+Delhi,Seasonal naive (annual),102.294,10950.767,78.456,40.175
+Delhi,Seasonal naive (weekly),123.216,19480.5,103.222,45.235
+Hyderabad,ARIMA,28.217,909.774,24.764,43.493
+Hyderabad,Holt-Winters,25.836,733.219,21.161,33.814
+Hyderabad,Naive (last value),25.884,739.328,20.883,32.178
+Hyderabad,SARIMA,27.693,784.311,23.605,40.131
+Hyderabad,Seasonal naive (annual),31.431,1090.92,25.444,37.502
+Hyderabad,Seasonal naive (weekly),30.887,1029.644,26.044,43.721
+Lucknow,ARIMA,88.269,10132.004,76.622,40.381
+Lucknow,Holt-Winters,85.573,9670.488,71.357,35.267
+Lucknow,Naive (last value),83.164,9141.15,69.65,33.233
+Lucknow,SARIMA,60.007,3787.84,48.547,31.078
+Lucknow,Seasonal naive (annual),87.068,7887.667,71.011,47.083
+Lucknow,Seasonal naive (weekly),104.062,13471.5,87.811,46.908

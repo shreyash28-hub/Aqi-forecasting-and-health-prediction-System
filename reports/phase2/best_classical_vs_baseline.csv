@@ -1,0 +1,7 @@
+City,Best classical model,Mean RMSE,Mean MAE,Mean MAPE %,Best baseline,Baseline RMSE,RMSE vs baseline %,Windows beating every baseline
+Ahmedabad,Holt-Winters,57.44,48.17,32.2,Naive (last value),60.75,-5.4,4/6
+Bengaluru,SARIMA,19.35,15.78,20.0,Seasonal naive (weekly),25.55,-24.3,2/6
+Chennai,ARIMA,37.45,27.48,24.7,Seasonal naive (weekly),42.87,-12.6,4/6
+Delhi,SARIMA,69.21,55.88,26.2,Naive (last value),98.91,-30.0,4/6
+Hyderabad,Holt-Winters,25.84,21.16,33.8,Naive (last value),25.88,-0.2,2/6
+Lucknow,SARIMA,60.01,48.55,31.1,Naive (last value),83.16,-27.8,4/6
