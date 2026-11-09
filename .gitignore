@@ -25,3 +25,8 @@ data/cache/
 # (data/openaq/stations.json is tracked: the daily refresh needs the station list)
 data/openaq/raw/
 data/openaq/recent/
+
+# Personal prep notes, kept on this computer only (never pushed)
+docs/health_system_qa.md
+docs/health_system_qa.docx
+docs/interview/

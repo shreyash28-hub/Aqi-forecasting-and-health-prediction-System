@@ -10,8 +10,8 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "31 October 2026";
-const LATEST_COMMIT = "fee000c Consistent live forecasts, a stored hospital list, and a Forecast page fallback";
+const LAST_UPDATED = "9 November 2026";
+const LATEST_COMMIT = "69d0db9 Mid-sem (Phase 2) deliverables: classical model analysis, 8-slide deck, demo notebook";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -35,7 +35,7 @@ const AT_A_GLANCE = [
   ["Recommendation assistant", "Not started", "Keyword matching + precautions list"],
   ["Deployment", "Done", "Live site on Vercel, API on Render (free plan); daily models and hourly readings update by themselves"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
-  ["Course mid-sem submission (19 Oct - 7 Nov)", "Done", "8-slide deck, Phase 2 analysis (reports/phase2) and demo notebook ready to present"],
+  ["Course mid-sem submission (Phase 2)", "Complete", "Completed: 8-slide deck, analysis (reports/phase2) and demo notebook"],
   ["Course final submission (16-27 Nov)", "Results ready", "Presentation still to prepare (report content can be reused)"],
 ];
 
@@ -195,7 +195,6 @@ const REMAINING = [
   ["Recommendation assistant", "Frontend", "Keyword matching + curated precautions, personalised with AQI and risk"],
   ["Deployment: keep an eye on it", "You", "Free Render plan sleeps after 15 min idle (first visit ~1 min); open the site once before a demo, or switch to Starter ($7/month)"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
-  ["Mid-sem presentation (due 7 Nov)", "You", "Deck and demo notebook ready; check the student IDs on the title slide and rehearse with the speaker notes"],
   ["Live forecast consistency", "Me", "Raise each day's served AQI to at least the PM2.5 sub-index (Lucknow showed 9/30 inconsistent days on 31 Oct)"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
 ];
@@ -216,6 +215,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["9 Nov 2026", "Phase 2 (mid-sem) marked complete. The final (Phase 3) is next: LSTM, XGBoost and Prophet compared with the classical models."],
   ["31 Oct 2026", "Mid-sem (Phase 2) deliverables built: analysis and figures for the classical models (reports/phase2), an 8-slide presentation with speaker notes, and a demo notebook. A classical model beats the naive forecast in all six cities."],
   ["31 Oct 2026", "Lucknow and Delhi forecasts fixed: their AQI and PM2.5 forecasts contradicted each other (Lucknow AQI 56 against 148 measured last November). The models now scale the 2015-2020 seasonal pattern to each city's recent data and no longer fit the yearly cycle twice; every city's forecasts are now consistent."],
   ["31 Oct 2026", "Hospital map made reliable: hospitals within 25 km of each city are stored with the site (5,000+ in total), so the map loads in a fraction of a second instead of depending on the often-overloaded OpenStreetMap lookup service."],
