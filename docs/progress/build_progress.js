@@ -155,6 +155,14 @@ DONE.push({
 });
 
 DONE.push({
+  title: "AQI and PM2.5 forecasts made consistent",
+  items: [
+    "India's AQI is the largest pollutant sub-index, so a day's AQI can never be below what its PM2.5 or NO2 implies. The AQI and pollutant forecasts come from separate models and could disagree; the site now raises each day's AQI to at least that level before showing it or using it for health risk.",
+    "On the live forecasts of 12 Nov this corrects Delhi on 27 of 29 days (by about 25 AQI points on average) and Lucknow on 7; the other four cities were already consistent.",
+  ],
+});
+
+DONE.push({
   title: "Winter test of the live models",
   items: [
     "Ran the live models on last winter (four 30-day windows, Nov 2025 to Feb 2026), which the regular Apr-Oct test windows never covered. Report: reports/forecasting/live/winter.md.",
@@ -216,7 +224,6 @@ const REMAINING = [
   ["Live models: choose with winter included", "Me", "Select each city's model over all nine test windows (Apr-Oct plus winter); the winter test shows it changes most AQI choices"],
   ["Deployment: keep an eye on it", "You", "Free Render plan sleeps after 15 min idle (first visit ~1 min); open the site once before a demo, or switch to Starter ($7/month)"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
-  ["Live forecast consistency", "Me", "Raise each day's served AQI to at least the PM2.5 sub-index (Lucknow 9/30 days on 31 Oct; Delhi 101/120 days in the winter test)"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
 ];
 
@@ -236,6 +243,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["12 Nov 2026", "AQI forecasts can no longer fall below what the PM2.5 or NO2 forecast implies (fixes Delhi on 27 of 29 days and Lucknow on 7 in the live forecasts)."],
   ["12 Nov 2026", "Air-quality assistant built (chat on My risk, grounded in the forecast and the saved profile, with an emergency short-cut and a daily limit); it switches on when the API key is added. Winter test of the live models: PM2.5 holds up, AQI needs model choices that include winter."],
   ["9 Nov 2026", "Phase 2 (mid-sem) marked complete. The final (Phase 3) is next: LSTM, XGBoost and Prophet compared with the classical models."],
   ["31 Oct 2026", "Mid-sem (Phase 2) deliverables built: analysis and figures for the classical models (reports/phase2), an 8-slide presentation with speaker notes, and a demo notebook. A classical model beats the naive forecast in all six cities."],

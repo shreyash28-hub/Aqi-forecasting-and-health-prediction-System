@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
+from src.aqi import floor_to_pollutants
 from src.data_loader import PROJECT_ROOT, TARGETS
 from src.health.data import CATEGORIES, PERSON_NUMERIC, load_health_dataset, score_to_level
 from src.health.store import HealthRiskPredictor, load_health_predictor
@@ -94,7 +95,7 @@ def load_air(source: str) -> tuple[dict, dict, dict]:
             df, used = apply_signals(city, df, signals)
             if used:
                 readings_as_of[city] = signals[city]["as_of"]
-        forecasts[city] = df
+        forecasts[city], _ = floor_to_pollutants(df)   # AQI never below its PM2.5 / NO2 sub-index
     return forecasters, forecasts, readings_as_of
 
 

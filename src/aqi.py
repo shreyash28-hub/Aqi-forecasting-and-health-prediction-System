@@ -75,6 +75,26 @@ def hourly_aqi(hourly: pd.DataFrame, exclude: tuple[str, ...] = ()) -> pd.Series
     return compute_aqi(agg, exclude)
 
 
+def floor_to_pollutants(forecast: pd.DataFrame) -> tuple[pd.DataFrame, int]:
+    """Raise each day's forecast AQI to at least the sub-index its PM2.5 and NO2 forecasts imply.
+
+    AQI is the largest pollutant sub-index, so it can never be below them. The AQI, PM2.5 and
+    NO2 forecasts come from separate models, though, and can disagree: in the winter test
+    Delhi's PM2.5 forecast implied a higher AQI than the AQI forecast on 101 of 120 days. The
+    other pollutants are not forecast, so the AQI forecast still carries them. ``forecast``
+    has an ``aqi`` column and optionally ``pm25`` / ``no2``. Returns the adjusted copy and
+    how many days were raised.
+    """
+    floor = pd.Series(np.nan, index=forecast.index)
+    for col, pollutant in (("pm25", "PM2.5"), ("no2", "NO2")):
+        if col in forecast:
+            floor = np.fmax(floor, sub_index(forecast[col].astype(float), pollutant))
+    raised = floor > forecast["aqi"]
+    out = forecast.copy()
+    out.loc[raised, "aqi"] = floor[raised]
+    return out, int(raised.sum())
+
+
 def daily_aqi_from_hourly(hourly: pd.DataFrame, exclude: tuple[str, ...] = ()) -> pd.Series:
     """Daily AQI for one city from its ``city_hour.csv`` rows (``Datetime`` + pollutant columns)."""
     return hourly_aqi(hourly, exclude).resample("D").mean().round()

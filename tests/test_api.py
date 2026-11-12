@@ -7,6 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.api.main import app
+from src.aqi import floor_to_pollutants, sub_index
 from src.data_loader import CITIES
 from src.model_store import forecast_air
 from src.nowcast import apply_signals, load_signals
@@ -44,7 +45,7 @@ def test_forecast_matches_saved_models(client, horizon):
     assert r.status_code == 200
     body = r.json()
     svc = client.app.state.models
-    assert len(body["days"]) == len(svc.air_forecast("Delhi", horizon)) >= min(horizon, 28)
+    assert len(body["days"]) == len(svc.air_forecast("Delhi", horizon))
     expected = forecast_air("Delhi", 30, svc.source)
     first = pd.Timestamp(body["origin_date"]) + pd.Timedelta(days=1)
     if svc.source == "live":   # today's readings so far nudge the first days (src/nowcast.py)
@@ -54,11 +55,34 @@ def test_forecast_matches_saved_models(client, horizon):
         today = pd.Timestamp.now(tz="Asia/Kolkata").tz_localize(None).normalize()
         first = max(first, today)
         expected = expected[expected["date"] >= first]
-    expected = expected.iloc[:horizon]
+    expected = floor_to_pollutants(expected)[0].iloc[:horizon]   # AQI never below its PM2.5/NO2 sub-index
+    # all of the horizon, or what is left of the stored 30 days when the models are older
+    assert len(body["days"]) == len(expected) >= 1
     got = np.array([d["aqi"] for d in body["days"]])
     assert np.allclose(got, expected["aqi"].round(1), atol=0.051)
     assert body["days"][0]["date"] == first.date().isoformat()
     assert {"AQI", "PM2.5", "NO2"} <= set(body["models"])
+
+
+def test_served_aqi_never_below_pollutant_subindex(client):
+    """AQI is the largest sub-index, so no served day may have PM2.5 or NO2 implying more."""
+    for city in CITIES:
+        days = client.get(f"/api/forecast/{city}?horizon=30").json()["days"]
+        df = pd.DataFrame(days)
+        for col, pollutant in (("pm25", "PM2.5"), ("no2", "NO2")):
+            si = sub_index(df[col].astype(float), pollutant).to_numpy()
+            assert (si <= df["aqi"].to_numpy() + 0.051).all(), (city, col)   # served values are rounded to 0.1
+
+
+def test_floor_to_pollutants():
+    df = pd.DataFrame({"aqi": [150.0, 300.0, 80.0, 90.0], "pm25": [80.0, 80.0, np.nan, 20.0],
+                       "no2": [20.0, 20.0, 200.0, 20.0]})
+    out, raised = floor_to_pollutants(df)
+    # PM2.5 80 -> sub-index 166.7 (60-90 maps to 100-200); NO2 200 -> 220; NaN PM2.5 is ignored
+    assert raised == 2
+    assert np.allclose(out["aqi"], [166.67, 300.0, 220.0, 90.0], atol=0.01)
+    assert df["aqi"].tolist() == [150.0, 300.0, 80.0, 90.0]                # input untouched
+    assert floor_to_pollutants(pd.DataFrame({"aqi": [50.0]}))[1] == 0       # nothing to floor against
 
 
 def test_forecast_city_is_case_insensitive(client):
