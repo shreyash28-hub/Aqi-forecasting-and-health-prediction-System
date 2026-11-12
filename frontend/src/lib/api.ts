@@ -241,5 +241,23 @@ export function meApi(token: string) {
     history: (limit = 50, signal?: AbortSignal) => request<HistoryItem[]>(`/api/me/history?limit=${limit}`, { headers: auth, signal }),
     historyRun: (id: string, signal?: AbortSignal) => request<HistoryDetail>(`/api/me/history/${encodeURIComponent(id)}`, { headers: auth, signal }),
     deleteRun: (id: string) => request<void>(`/api/me/history/${encodeURIComponent(id)}`, { method: "DELETE", headers: auth }),
+    ask: (body: { message: string; history: AssistantTurn[]; city?: string }, signal?: AbortSignal) =>
+      request<AssistantResponse>("/api/me/assistant", { method: "POST", headers: auth, body: JSON.stringify(body), signal }),
   };
+}
+
+export interface AssistantTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface AssistantResponse {
+  /** Markdown-light text: paragraphs, "- " lists and **bold**. */
+  reply: string;
+  /** The message described an emergency: fixed reply with 112 / 108, no model call. */
+  emergency: boolean;
+  tools_used: string[];
+  model: string | null;
+  remaining_today: number;
+  disclaimer: string;
 }

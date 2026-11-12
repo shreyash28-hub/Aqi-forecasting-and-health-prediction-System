@@ -29,6 +29,9 @@ when today's readings were last fetched, and the last bundle check with any erro
    - `SUPABASE_URL`, `SUPABASE_ANON_KEY`: from your local `.env` (the **anon** key; the
      service-role key never goes on the API).
    - `OPENAQ_API_KEY`: from `.env`.
+   - `ANTHROPIC_API_KEY`: for the air-quality assistant (an Anthropic API key; every question is
+     a paid model call). Leave it empty to switch the assistant off; the rest of the site works
+     without it.
    - `ALLOWED_ORIGINS`: leave empty for now; set it after step 2 below.
 4. **Apply**. The first build takes ~5-10 minutes (PyTorch is large). Then open
    `https://<service>.onrender.com/api/health`: it should show 6 cities and 18 forecasters.

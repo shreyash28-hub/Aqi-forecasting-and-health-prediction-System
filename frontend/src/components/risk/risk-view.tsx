@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Pencil, RefreshCw } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
+import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { ErrorState } from "@/components/common";
 import { PrimaryButton } from "@/components/forms";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -105,6 +106,9 @@ function RiskBody({ token, profile, initial }: { token: string; profile: SavedPr
       </div>
       {error && <p className="mb-4 rounded-[7px] bg-destructive/10 px-3 py-2 text-[13px] text-destructive" role="alert">Couldn&apos;t calculate the estimate: {error}</p>}
       <RiskResult data={result} busy={busy} />
+      <div className="grid grid-cols-12 gap-4">
+        <AssistantPanel token={token} city={result.city} />
+      </div>
     </>
   );
 }

@@ -22,5 +22,8 @@ uvicorn[standard]>=0.30
 httpx>=0.27          # Supabase Auth + PostgREST calls
 python-dotenv>=1.0   # loads .env
 
+# Air-quality assistant (src/assistant): Claude via the Anthropic SDK
+anthropic>=2.8
+
 # Tests
 pytest>=8

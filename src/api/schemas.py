@@ -190,3 +190,31 @@ class HistoryItem(BaseModel):
 class HistoryDetail(HistoryItem):
     models: dict
     days: list[RiskDay]
+
+
+# ---------------------------------------------------------------------------- assistant
+
+class AssistantTurn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=4000)
+
+
+class AssistantRequest(BaseModel):
+    """One question to the assistant. The browser sends the recent turns of the conversation;
+    nothing is stored on the server."""
+    model_config = ConfigDict(extra="forbid")
+
+    message: str = Field(min_length=1, max_length=1000)
+    history: list[AssistantTurn] = Field(default_factory=list, max_length=12)
+    city: str | None = Field(default=None, description="City selected on the site; defaults to the profile's city")
+
+
+class AssistantResponse(BaseModel):
+    reply: str = Field(description="Markdown text")
+    emergency: bool = Field(description="True when the message described an emergency (fixed reply, no model call)")
+    tools_used: list[str]
+    model: str | None
+    remaining_today: int = Field(description="Questions left today for this user")
+    disclaimer: str = DISCLAIMER

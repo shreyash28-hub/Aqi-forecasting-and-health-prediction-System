@@ -1,0 +1,1460 @@
+{
+  "task": "aqi_forecast",
+  "target": "AQI",
+  "source": "live",
+  "seasonal_prior": true,
+  "horizon_days": 30,
+  "selection_metric": "rmse",
+  "multi_window_selection": "lowest mean RMSE across windows",
+  "n_windows": 4,
+  "window_step_days": null,
+  "window_ends": [
+    "2025-11-30",
+    "2025-12-30",
+    "2026-01-29",
+    "2026-02-28"
+  ],
+  "lstm_seeds": [
+    42,
+    43,
+    44
+  ],
+  "aqi_excluded_pollutants": {},
+  "generated_at": "2026-11-12T03:55:32+00:00",
+  "cities": {
+    "Ahmedabad": {
+      "final_holdout": {
+        "test_start": "2026-01-30",
+        "test_end": "2026-02-28",
+        "best_model": "Prophet",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Naive (last value)",
+        "ranking": [
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "rmse": 27.525610621489484,
+            "mse": 757.6592400858548,
+            "mae": 22.21537678862207,
+            "mape": 15.352601848789973,
+            "config": "Prophet (weekly, additive) + 2015-2020 seasonal prior x1.37",
+            "rank": 1
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "rmse": 32.09620953736855,
+            "mse": 1030.1666666666679,
+            "mae": 24.166666666666686,
+            "mape": 14.821347078808145,
+            "config": "Naive (last value)",
+            "rank": 2
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "rmse": 32.435719670831894,
+            "mse": 1052.075910564791,
+            "mae": 23.85490163226335,
+            "mape": 14.838883945402623,
+            "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar) + 2015-2020 seasonal prior x1.37",
+            "rank": 3
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "rmse": 36.7252694546254,
+            "mse": 1349.6259727706092,
+            "mae": 28.69134929051209,
+            "mape": 17.66792190854531,
+            "config": "LSTM(1x64) lookback=60, direct 30-step, 46 epochs (early stop), mean of seeds [42, 43, 44] + 2015-2020 seasonal prior x1.37",
+            "rank": 4
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "rmse": 36.82107639201585,
+            "mse": 1355.7916666666667,
+            "mae": 28.208333333333332,
+            "mape": 17.707919671468012,
+            "config": "Seasonal naive (weekly)",
+            "rank": 5
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "rmse": 42.55944762515713,
+            "mse": 1811.3065821584926,
+            "mae": 35.05532647554755,
+            "mape": 21.964919539030458,
+            "config": "Holt-Winters (add. damped trend, add. seasonal m=7) + 2015-2020 seasonal prior x1.37",
+            "rank": 6
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "rmse": 49.983738860304214,
+            "mse": 2498.374150455086,
+            "mae": 42.98779859826786,
+            "mape": 27.359545116563282,
+            "config": "SARIMA(1, 0, 2)x(0, 0, 1, 7) + 2015-2020 seasonal prior x1.37",
+            "rank": 7
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "rmse": 50.124634800410135,
+            "mse": 2512.4790138744866,
+            "mae": 43.12123588007861,
+            "mape": 27.445950479543264,
+            "config": "ARIMA(3, 0, 0) + 2015-2020 seasonal prior x1.37",
+            "rank": 8
+          }
+        ]
+      },
+      "multi_window": {
+        "windows": [
+          {
+            "window": 0,
+            "test_start": "2026-01-30",
+            "test_end": "2026-02-28"
+          },
+          {
+            "window": 1,
+            "test_start": "2025-12-31",
+            "test_end": "2026-01-29"
+          },
+          {
+            "window": 2,
+            "test_start": "2025-12-01",
+            "test_end": "2025-12-30"
+          },
+          {
+            "window": 3,
+            "test_start": "2025-11-01",
+            "test_end": "2025-11-30"
+          }
+        ],
+        "best_model": "XGBoost",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Seasonal naive (weekly)",
+        "most_frequent_window_winner": "XGBoost",
+        "ranking": [
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "mean_rmse": 35.69916686406647,
+            "std_rmse": 8.877118553187168,
+            "mean_mae": 28.183711001652544,
+            "mean_mape": 19.766273435131577,
+            "mean_rank": 3.0,
+            "win_rate": 0.5,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "mean_rmse": 38.33736702602038,
+            "std_rmse": 18.604827305729675,
+            "mean_mae": 33.15588049973067,
+            "mean_mape": 24.413335156324372,
+            "mean_rank": 4.0,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "mean_rmse": 39.51197949671105,
+            "std_rmse": 9.594539921078688,
+            "mean_mae": 33.59046847613604,
+            "mean_mape": 22.8411570811533,
+            "mean_rank": 5.75,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "mean_rmse": 39.521802466499636,
+            "std_rmse": 9.63360976450299,
+            "mean_mae": 33.59171047476708,
+            "mean_mape": 22.83804946090172,
+            "mean_rank": 5.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "mean_rmse": 41.0571088038294,
+            "std_rmse": 4.372557855786102,
+            "mean_mae": 34.89891793284443,
+            "mean_mape": 25.13922153603184,
+            "mean_rank": 5.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "mean_rmse": 44.94654347790398,
+            "std_rmse": 29.10627950629889,
+            "mean_mae": 37.286883696309744,
+            "mean_mape": 26.93137158522776,
+            "mean_rank": 4.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "mean_rmse": 45.00365514539547,
+            "std_rmse": 38.903623679789334,
+            "mean_mae": 39.10089231699939,
+            "mean_mape": 27.0988325835868,
+            "mean_rank": 3.5,
+            "win_rate": 0.25,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "mean_rmse": 48.18431758500365,
+            "std_rmse": 39.49832614340144,
+            "mean_mae": 42.35546979720434,
+            "mean_mape": 29.318029268795904,
+            "mean_rank": 4.75,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.0,
+            "n_windows": 4
+          }
+        ]
+      },
+      "failed": [
+        {
+          "window": 0,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 9 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 1,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 2,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 3,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        }
+      ]
+    },
+    "Bengaluru": {
+      "final_holdout": {
+        "test_start": "2026-01-30",
+        "test_end": "2026-02-28",
+        "best_model": "SARIMA",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Naive (last value)",
+        "ranking": [
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "rmse": 16.62123182440692,
+            "mse": 276.2653473606774,
+            "mae": 13.935500710176692,
+            "mape": 15.758335978863958,
+            "config": "SARIMA(1, 0, 1)x(0, 0, 1, 7) + 2015-2020 seasonal prior x1.50",
+            "rank": 1
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "rmse": 16.625668059351717,
+            "mse": 276.41283841974786,
+            "mae": 13.933464586649416,
+            "mape": 15.64781751268924,
+            "config": "ARIMA(3, 0, 0) + 2015-2020 seasonal prior x1.50",
+            "rank": 2
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "rmse": 20.669817102444892,
+            "mse": 433.3904729678184,
+            "mae": 17.40396181723195,
+            "mape": 22.17254879462293,
+            "config": "LSTM(1x64) lookback=60, direct 30-step, 27 epochs (early stop), mean of seeds [42, 43, 44] + 2015-2020 seasonal prior x1.50",
+            "rank": 3
+          },
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "rmse": 23.13967397074156,
+            "mse": 535.4445114722145,
+            "mae": 18.83174251007755,
+            "mape": 24.59077700554404,
+            "config": "Prophet (weekly, additive) + 2015-2020 seasonal prior x1.50",
+            "rank": 4
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "rmse": 24.09609612956597,
+            "mse": 580.6218486852842,
+            "mae": 19.251725661445917,
+            "mape": 20.502219325084013,
+            "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar) + 2015-2020 seasonal prior x1.50",
+            "rank": 5
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "rmse": 25.91292644821723,
+            "mse": 671.4797571107162,
+            "mae": 21.744366741545168,
+            "mape": 28.012542633338178,
+            "config": "Holt-Winters (add. damped trend, add. seasonal m=7) + 2015-2020 seasonal prior x1.50",
+            "rank": 6
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "rmse": 26.86540526401935,
+            "mse": 721.7499999999987,
+            "mae": 22.416666666666647,
+            "mape": 29.490294759328766,
+            "config": "Naive (last value)",
+            "rank": 7
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "rmse": 28.95686447114051,
+            "mse": 838.4999999999994,
+            "mae": 22.41666666666666,
+            "mape": 24.642461868509677,
+            "config": "Seasonal naive (weekly)",
+            "rank": 8
+          }
+        ]
+      },
+      "multi_window": {
+        "windows": [
+          {
+            "window": 0,
+            "test_start": "2026-01-30",
+            "test_end": "2026-02-28"
+          },
+          {
+            "window": 1,
+            "test_start": "2025-12-31",
+            "test_end": "2026-01-29"
+          },
+          {
+            "window": 2,
+            "test_start": "2025-12-01",
+            "test_end": "2025-12-30"
+          },
+          {
+            "window": 3,
+            "test_start": "2025-11-01",
+            "test_end": "2025-11-30"
+          }
+        ],
+        "best_model": "ARIMA",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Naive (last value)",
+        "most_frequent_window_winner": "ARIMA",
+        "ranking": [
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "mean_rmse": 30.094793482196486,
+            "std_rmse": 13.538810330744003,
+            "mean_mae": 26.181546304131764,
+            "mean_mape": 28.001438556336513,
+            "mean_rank": 2.25,
+            "win_rate": 0.5,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "mean_rmse": 30.400694721130655,
+            "std_rmse": 13.504194142667552,
+            "mean_mae": 26.418657011329216,
+            "mean_mape": 28.015073127387502,
+            "mean_rank": 2.75,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "mean_rmse": 32.046352965445834,
+            "std_rmse": 7.16997914123156,
+            "mean_mae": 27.52258771929823,
+            "mean_mape": 32.10822692519832,
+            "mean_rank": 4.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "mean_rmse": 33.27411373539229,
+            "std_rmse": 12.357819667451263,
+            "mean_mae": 28.73563860688902,
+            "mean_mape": 30.865224308122514,
+            "mean_rank": 5.0,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "mean_rmse": 33.31648699779738,
+            "std_rmse": 7.682773955259999,
+            "mean_mae": 28.06309061883691,
+            "mean_mape": 33.10878221448287,
+            "mean_rank": 4.75,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "mean_rmse": 34.32020219148139,
+            "std_rmse": 9.153863321648538,
+            "mean_mae": 27.174402601330907,
+            "mean_mape": 31.096952138475103,
+            "mean_rank": 5.0,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "mean_rmse": 38.40858777566017,
+            "std_rmse": 17.08512771924473,
+            "mean_mae": 32.27034006668053,
+            "mean_mape": 38.25489447189251,
+            "mean_rank": 5.0,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "mean_rmse": 39.23535036743715,
+            "std_rmse": 11.972444948342902,
+            "mean_mae": 32.92263146460957,
+            "mean_mape": 35.077749059954044,
+            "mean_rank": 6.75,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          }
+        ]
+      },
+      "failed": [
+        {
+          "window": 0,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 9 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 1,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 2,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 3,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        }
+      ]
+    },
+    "Chennai": {
+      "final_holdout": {
+        "test_start": "2026-01-30",
+        "test_end": "2026-02-28",
+        "best_model": "Prophet",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Naive (last value)",
+        "ranking": [
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "rmse": 36.50141820727559,
+            "mse": 1332.35353114243,
+            "mae": 29.0371923959266,
+            "mape": 31.27362716882415,
+            "config": "Prophet (weekly, additive) + 2015-2020 seasonal prior x1.20",
+            "rank": 1
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "rmse": 39.83079113974727,
+            "mse": 1586.4919228181698,
+            "mae": 32.9432340526624,
+            "mape": 38.64538181863584,
+            "config": "Holt-Winters (add. damped trend, add. seasonal m=7) + 2015-2020 seasonal prior x1.20",
+            "rank": 2
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "rmse": 40.00679228864656,
+            "mse": 1601.0480012604469,
+            "mae": 28.881014143931647,
+            "mape": 29.68051176881171,
+            "config": "LSTM(1x64) lookback=60, direct 30-step, 24 epochs (early stop), mean of seeds [42, 43, 44] + 2015-2020 seasonal prior x1.20",
+            "rank": 3
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "rmse": 42.797028854056364,
+            "mse": 1831.5856787349333,
+            "mae": 31.20001076158753,
+            "mape": 27.258922450386724,
+            "config": "SARIMA(1, 0, 0)x(0, 0, 1, 7) + 2015-2020 seasonal prior x1.20",
+            "rank": 4
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "rmse": 42.83306931940368,
+            "mse": 1834.6718273208405,
+            "mae": 31.203446499765278,
+            "mape": 27.238502544141202,
+            "config": "ARIMA(1, 0, 0) + 2015-2020 seasonal prior x1.20",
+            "rank": 5
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "rmse": 43.1880577629202,
+            "mse": 1865.2083333333321,
+            "mae": 36.12499999999998,
+            "mape": 44.19064387853558,
+            "config": "Naive (last value)",
+            "rank": 6
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "rmse": 45.39676595562246,
+            "mse": 2060.866359229563,
+            "mae": 34.81451257091112,
+            "mape": 30.475769000846785,
+            "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar) + 2015-2020 seasonal prior x1.20",
+            "rank": 7
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "rmse": 46.40851215025106,
+            "mse": 2153.7500000000005,
+            "mae": 34.75,
+            "mape": 31.048422245726155,
+            "config": "Seasonal naive (weekly)",
+            "rank": 8
+          }
+        ]
+      },
+      "multi_window": {
+        "windows": [
+          {
+            "window": 0,
+            "test_start": "2026-01-30",
+            "test_end": "2026-02-28"
+          },
+          {
+            "window": 1,
+            "test_start": "2025-12-31",
+            "test_end": "2026-01-29"
+          },
+          {
+            "window": 2,
+            "test_start": "2025-12-01",
+            "test_end": "2025-12-30"
+          },
+          {
+            "window": 3,
+            "test_start": "2025-11-01",
+            "test_end": "2025-11-30"
+          }
+        ],
+        "best_model": "XGBoost",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Seasonal naive (weekly)",
+        "most_frequent_window_winner": "Prophet",
+        "ranking": [
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "mean_rmse": 46.90018988466215,
+            "std_rmse": 18.321938582542273,
+            "mean_mae": 37.12924316621602,
+            "mean_mape": 33.7220414363437,
+            "mean_rank": 3.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "mean_rmse": 47.18782478071785,
+            "std_rmse": 19.197656467942604,
+            "mean_mae": 37.119538796566125,
+            "mean_mape": 32.73411257469856,
+            "mean_rank": 4.0,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "mean_rmse": 51.67463014242116,
+            "std_rmse": 21.7898886228809,
+            "mean_mae": 44.43416066996601,
+            "mean_mape": 45.19032500966035,
+            "mean_rank": 3.75,
+            "win_rate": 0.5,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "mean_rmse": 52.01651490139602,
+            "std_rmse": 19.700727818142553,
+            "mean_mae": 43.586083636217616,
+            "mean_mape": 41.04638247445728,
+            "mean_rank": 3.75,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "mean_rmse": 52.79891522622026,
+            "std_rmse": 20.218563572674423,
+            "mean_mae": 44.47229946694685,
+            "mean_mape": 42.08785824297795,
+            "mean_rank": 4.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "mean_rmse": 57.52838653407152,
+            "std_rmse": 17.537724552436238,
+            "mean_mae": 46.178455837870544,
+            "mean_mape": 44.761805804587475,
+            "mean_rank": 6.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "mean_rmse": 67.74387899423591,
+            "std_rmse": 45.04859801215861,
+            "mean_mae": 60.71990379923244,
+            "mean_mape": 62.54314229322621,
+            "mean_rank": 5.0,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "mean_rmse": 69.57281242613688,
+            "std_rmse": 45.25362719467845,
+            "mean_mae": 62.11857607380521,
+            "mean_mape": 64.1550507023426,
+            "mean_rank": 5.5,
+            "win_rate": 0.25,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          }
+        ]
+      },
+      "failed": [
+        {
+          "window": 0,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 9 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 1,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 2,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 3,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        }
+      ]
+    },
+    "Delhi": {
+      "final_holdout": {
+        "test_start": "2026-01-30",
+        "test_end": "2026-02-28",
+        "best_model": "LSTM",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Naive (last value)",
+        "ranking": [
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "rmse": 32.58626932619882,
+            "mse": 1062.006332378836,
+            "mae": 27.261960403537074,
+            "mape": 10.496842833109616,
+            "config": "LSTM(1x64) lookback=60, direct 30-step, 35 epochs (early stop), mean of seeds [42, 43, 44] + 2015-2020 seasonal prior x1.27",
+            "rank": 1
+          },
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "rmse": 37.95793104754116,
+            "mse": 1440.804529409889,
+            "mae": 29.99872513507835,
+            "mape": 12.377048220871572,
+            "config": "Prophet (weekly, additive) + 2015-2020 seasonal prior x1.27",
+            "rank": 2
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "rmse": 38.507279585437644,
+            "mse": 1482.8105810710629,
+            "mae": 30.529718302831395,
+            "mape": 12.18089841831384,
+            "config": "Holt-Winters (add. damped trend, add. seasonal m=7) + 2015-2020 seasonal prior x1.27",
+            "rank": 3
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "rmse": 41.001652407762826,
+            "mse": 1681.1355001670029,
+            "mae": 33.853745837506715,
+            "mape": 12.705560852548489,
+            "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar) + 2015-2020 seasonal prior x1.27",
+            "rank": 4
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "rmse": 46.59821557407828,
+            "mse": 2171.393694688272,
+            "mae": 39.82164921312087,
+            "mape": 14.249201849241668,
+            "config": "SARIMA(1, 0, 2)x(0, 0, 1, 7) + 2015-2020 seasonal prior x1.27",
+            "rank": 5
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "rmse": 46.659413411431586,
+            "mse": 2177.1008598988815,
+            "mae": 39.892951289232805,
+            "mape": 14.266176956125772,
+            "config": "ARIMA(3, 0, 0) + 2015-2020 seasonal prior x1.27",
+            "rank": 6
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "rmse": 65.22908349297366,
+            "mse": 4254.8333333333285,
+            "mae": 52.66666666666663,
+            "mape": 22.394140001798668,
+            "config": "Naive (last value)",
+            "rank": 7
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "rmse": 76.17250159998687,
+            "mse": 5802.250000000004,
+            "mae": 61.416666666666686,
+            "mape": 24.61597238798857,
+            "config": "Seasonal naive (weekly)",
+            "rank": 8
+          }
+        ]
+      },
+      "multi_window": {
+        "windows": [
+          {
+            "window": 0,
+            "test_start": "2026-01-30",
+            "test_end": "2026-02-28"
+          },
+          {
+            "window": 1,
+            "test_start": "2025-12-31",
+            "test_end": "2026-01-29"
+          },
+          {
+            "window": 2,
+            "test_start": "2025-12-01",
+            "test_end": "2025-12-30"
+          },
+          {
+            "window": 3,
+            "test_start": "2025-11-01",
+            "test_end": "2025-11-30"
+          }
+        ],
+        "best_model": "Prophet",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Seasonal naive (weekly)",
+        "most_frequent_window_winner": "LSTM",
+        "ranking": [
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "mean_rmse": 70.34654182152786,
+            "std_rmse": 30.45778464907314,
+            "mean_mae": 59.098798049311014,
+            "mean_mape": 18.230983430297076,
+            "mean_rank": 2.5,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "mean_rmse": 72.38680018439965,
+            "std_rmse": 40.767084899322235,
+            "mean_mae": 60.91807690681203,
+            "mean_mape": 17.679931099061406,
+            "mean_rank": 4.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "mean_rmse": 82.28296121003262,
+            "std_rmse": 13.435921619817439,
+            "mean_mae": 65.8344298245614,
+            "mean_mape": 21.125757876425943,
+            "mean_rank": 4.75,
+            "win_rate": 0.25,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "mean_rmse": 88.15828112498392,
+            "std_rmse": 36.5821005982371,
+            "mean_mae": 75.13181026374774,
+            "mean_mape": 22.041929366644393,
+            "mean_rank": 5.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "mean_rmse": 88.27816752494763,
+            "std_rmse": 47.039552331050324,
+            "mean_mae": 79.6435467522235,
+            "mean_mape": 22.020285457570957,
+            "mean_rank": 4.0,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "mean_rmse": 88.48833604252351,
+            "std_rmse": 46.93674161885346,
+            "mean_mae": 79.9045925372965,
+            "mean_mape": 22.090141301774498,
+            "mean_rank": 4.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "mean_rmse": 88.924754124,
+            "std_rmse": 52.716991901810914,
+            "mean_mae": 80.37864523260302,
+            "mean_mape": 22.066844620556466,
+            "mean_rank": 4.25,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "mean_rmse": 92.10814111424352,
+            "std_rmse": 27.013838966606627,
+            "mean_mae": 78.96854204476705,
+            "mean_mape": 24.249322855301017,
+            "mean_rank": 6.0,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          }
+        ]
+      },
+      "failed": [
+        {
+          "window": 0,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 9 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 1,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 2,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 3,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        }
+      ]
+    },
+    "Hyderabad": {
+      "final_holdout": {
+        "test_start": "2026-01-30",
+        "test_end": "2026-02-28",
+        "best_model": "Prophet",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Seasonal naive (weekly)",
+        "ranking": [
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "rmse": 7.713913031673907,
+            "mse": 59.50445426022853,
+            "mae": 6.533679726329609,
+            "mape": 6.806075144820724,
+            "config": "Prophet (weekly, additive) + 2015-2020 seasonal prior x0.33",
+            "rank": 1
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "rmse": 8.80814017448254,
+            "mse": 77.5833333333333,
+            "mae": 7.2499999999999964,
+            "mape": 7.349982421921129,
+            "config": "Seasonal naive (weekly)",
+            "rank": 2
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "rmse": 10.341456703488442,
+            "mse": 106.95017752933326,
+            "mae": 8.760992336853539,
+            "mape": 8.654865938558823,
+            "config": "LSTM(1x64) lookback=60, direct 30-step, 16 epochs (early stop), mean of seeds [42, 43, 44] + 2015-2020 seasonal prior x0.33",
+            "rank": 3
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "rmse": 10.414542064257978,
+            "mse": 108.46268640819882,
+            "mae": 8.608926844477566,
+            "mape": 8.48554594457163,
+            "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar) + 2015-2020 seasonal prior x0.33",
+            "rank": 4
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "rmse": 10.921422920084055,
+            "mse": 119.27747859933731,
+            "mae": 9.27205492899868,
+            "mape": 9.158139966279965,
+            "config": "SARIMA(1, 0, 0)x(0, 0, 1, 7) + 2015-2020 seasonal prior x0.33",
+            "rank": 5
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "rmse": 10.941050349601362,
+            "mse": 119.70658275251208,
+            "mae": 9.302123364683668,
+            "mape": 9.189670300568066,
+            "config": "ARIMA(1, 0, 0) + 2015-2020 seasonal prior x0.33",
+            "rank": 6
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "rmse": 11.66588589404932,
+            "mse": 136.0928936929789,
+            "mae": 10.051271278368445,
+            "mape": 9.933472345600935,
+            "config": "Holt-Winters (add. damped trend, add. seasonal m=7) + 2015-2020 seasonal prior x0.33",
+            "rank": 7
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "rmse": 12.775301692458488,
+            "mse": 163.20833333333272,
+            "mae": 10.958333333333313,
+            "mape": 10.803394741090866,
+            "config": "Naive (last value)",
+            "rank": 8
+          }
+        ]
+      },
+      "multi_window": {
+        "windows": [
+          {
+            "window": 0,
+            "test_start": "2026-01-30",
+            "test_end": "2026-02-28"
+          },
+          {
+            "window": 1,
+            "test_start": "2025-12-31",
+            "test_end": "2026-01-29"
+          },
+          {
+            "window": 2,
+            "test_start": "2025-12-01",
+            "test_end": "2025-12-30"
+          },
+          {
+            "window": 3,
+            "test_start": "2025-11-01",
+            "test_end": "2025-11-30"
+          }
+        ],
+        "best_model": "SARIMA",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Seasonal naive (weekly)",
+        "most_frequent_window_winner": "SARIMA",
+        "ranking": [
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "mean_rmse": 8.90799956033297,
+            "std_rmse": 3.820683794719421,
+            "mean_mae": 7.053984145161559,
+            "mean_mape": 7.15893028013971,
+            "mean_rank": 2.75,
+            "win_rate": 0.5,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "mean_rmse": 10.022400990109436,
+            "std_rmse": 5.44361793421105,
+            "mean_mae": 8.059071640086886,
+            "mean_mape": 8.094756542808197,
+            "mean_rank": 3.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "mean_rmse": 10.06508306696536,
+            "std_rmse": 3.728081636474756,
+            "mean_mae": 8.167488848061415,
+            "mean_mape": 8.166113030607235,
+            "mean_rank": 3.25,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "mean_rmse": 12.100084460297081,
+            "std_rmse": 7.65666171983968,
+            "mean_mae": 10.072043027302662,
+            "mean_mape": 11.227797939136169,
+            "mean_rank": 4.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.5,
+            "n_windows": 4
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "mean_rmse": 13.459358234499497,
+            "std_rmse": 11.12232343788855,
+            "mean_mae": 11.360862079039226,
+            "mean_mape": 11.387919685470909,
+            "mean_rank": 5.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "mean_rmse": 14.066777822936777,
+            "std_rmse": 9.482392447656137,
+            "mean_mae": 11.6475725952813,
+            "mean_mape": 11.845933129191247,
+            "mean_rank": 5.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "mean_rmse": 14.237664872512969,
+            "std_rmse": 11.61150623477637,
+            "mean_mae": 12.04734195402299,
+            "mean_mape": 12.079042168098153,
+            "mean_rank": 5.75,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "mean_rmse": 18.01147679438209,
+            "std_rmse": 8.47286624805357,
+            "mean_mae": 15.971099154636594,
+            "mean_mape": 16.114773573060972,
+            "mean_rank": 5.75,
+            "win_rate": 0.25,
+            "beat_baseline_rate": 0.25,
+            "n_windows": 4
+          }
+        ]
+      },
+      "failed": [
+        {
+          "window": 0,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 9 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 1,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 2,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 3,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        }
+      ]
+    },
+    "Lucknow": {
+      "final_holdout": {
+        "test_start": "2026-01-30",
+        "test_end": "2026-02-28",
+        "best_model": "Prophet",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Naive (last value)",
+        "ranking": [
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "rmse": 27.276029269108093,
+            "mse": 743.9817726892414,
+            "mae": 22.638723166133826,
+            "mape": 28.84937225151416,
+            "config": "Prophet (weekly, additive) + 2015-2020 seasonal prior x0.81",
+            "rank": 1
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "rmse": 32.760740557203945,
+            "mse": 1073.2661218564276,
+            "mae": 28.276967884232466,
+            "mape": 35.6231697989406,
+            "config": "ARIMA(2, 0, 0) + 2015-2020 seasonal prior x0.81",
+            "rank": 2
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "rmse": 34.924357493687374,
+            "mse": 1219.7107463468774,
+            "mae": 29.857260575340018,
+            "mape": 37.703831069697415,
+            "config": "SARIMA(2, 0, 0)x(0, 0, 1, 7) + 2015-2020 seasonal prior x0.81",
+            "rank": 3
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "rmse": 39.34565646567292,
+            "mse": 1548.0806827147492,
+            "mae": 33.021271394360475,
+            "mape": 41.273004421013084,
+            "config": "XGBoost recursive (21 features: lags 1-28, rolling [7, 14, 30], calendar) + 2015-2020 seasonal prior x0.81",
+            "rank": 4
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "rmse": 40.598132140941324,
+            "mse": 1648.2083333333328,
+            "mae": 36.29166666666666,
+            "mape": 39.217901662719626,
+            "config": "Naive (last value)",
+            "rank": 5
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "rmse": 41.7477764368485,
+            "mse": 1742.8768374210824,
+            "mae": 36.357453630953465,
+            "mape": 38.854651711881495,
+            "config": "Holt-Winters (add. damped trend, add. seasonal m=7) + 2015-2020 seasonal prior x0.81",
+            "rank": 6
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "rmse": 45.52677565554374,
+            "mse": 2093.5339316298137,
+            "mae": 39.49014721432087,
+            "mape": 50.28561361263191,
+            "config": "LSTM(1x64) lookback=60, direct 30-step, 29 epochs (early stop), mean of seeds [42, 43, 44] + 2015-2020 seasonal prior x0.81",
+            "rank": 7
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "rmse": 45.95468782761269,
+            "mse": 2111.8333333333335,
+            "mae": 36.75000000000001,
+            "mape": 45.572065957584734,
+            "config": "Seasonal naive (weekly)",
+            "rank": 8
+          }
+        ]
+      },
+      "multi_window": {
+        "windows": [
+          {
+            "window": 0,
+            "test_start": "2026-01-30",
+            "test_end": "2026-02-28"
+          },
+          {
+            "window": 1,
+            "test_start": "2025-12-31",
+            "test_end": "2026-01-29"
+          },
+          {
+            "window": 2,
+            "test_start": "2025-12-01",
+            "test_end": "2025-12-30"
+          },
+          {
+            "window": 3,
+            "test_start": "2025-11-01",
+            "test_end": "2025-11-30"
+          }
+        ],
+        "best_model": "Prophet",
+        "best_model_beats_baseline": true,
+        "best_baseline": "Seasonal naive (weekly)",
+        "most_frequent_window_winner": "Prophet",
+        "ranking": [
+          {
+            "model": "Prophet",
+            "kind": "model",
+            "mean_rmse": 38.59916932182787,
+            "std_rmse": 11.250497707415192,
+            "mean_mae": 30.079990396117147,
+            "mean_mape": 27.42294978261898,
+            "mean_rank": 1.0,
+            "win_rate": 1.0,
+            "beat_baseline_rate": 1.0,
+            "n_windows": 4
+          },
+          {
+            "model": "ARIMA",
+            "kind": "model",
+            "mean_rmse": 43.69553343864186,
+            "std_rmse": 8.819673743607497,
+            "mean_mae": 36.44335381239595,
+            "mean_mape": 34.89740692252294,
+            "mean_rank": 2.75,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 1.0,
+            "n_windows": 4
+          },
+          {
+            "model": "SARIMA",
+            "kind": "model",
+            "mean_rmse": 44.70433692754431,
+            "std_rmse": 7.9525380456113295,
+            "mean_mae": 37.67713525752683,
+            "mean_mape": 36.179263784194866,
+            "mean_rank": 3.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 1.0,
+            "n_windows": 4
+          },
+          {
+            "model": "LSTM",
+            "kind": "model",
+            "mean_rmse": 48.975409096387324,
+            "std_rmse": 5.8507251056576015,
+            "mean_mae": 42.912498056535945,
+            "mean_mape": 42.203443040904496,
+            "mean_rank": 4.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "XGBoost",
+            "kind": "model",
+            "mean_rmse": 57.758062456702405,
+            "std_rmse": 23.03536312134635,
+            "mean_mae": 50.88713522619803,
+            "mean_mape": 43.77145649658018,
+            "mean_rank": 4.5,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.75,
+            "n_windows": 4
+          },
+          {
+            "model": "Seasonal naive (weekly)",
+            "kind": "baseline",
+            "mean_rmse": 60.64744411764906,
+            "std_rmse": 14.932164251307263,
+            "mean_mae": 49.24910012099213,
+            "mean_mape": 40.01222029683803,
+            "mean_rank": 6.25,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          },
+          {
+            "model": "Holt-Winters",
+            "kind": "model",
+            "mean_rmse": 71.48320581406158,
+            "std_rmse": 31.782325220679635,
+            "mean_mae": 61.85570900985641,
+            "mean_mape": 48.760315467682396,
+            "mean_rank": 7.0,
+            "win_rate": 0.0,
+            "beat_baseline_rate": 0.0,
+            "n_windows": 4
+          },
+          {
+            "model": "Naive (last value)",
+            "kind": "baseline",
+            "mean_rmse": 73.76428077262814,
+            "std_rmse": 31.885447210035238,
+            "mean_mae": 64.0623903508772,
+            "mean_mape": 51.89790593954966,
+            "mean_rank": 7.0,
+            "win_rate": 0.0,
+            "beat_baseline_rate": null,
+            "n_windows": 4
+          }
+        ]
+      },
+      "failed": [
+        {
+          "window": 0,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 9 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 1,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 2,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        },
+        {
+          "window": 3,
+          "model": "Seasonal naive (annual)",
+          "error": "IndexError: boolean index did not match indexed array along axis 0; size of axis is 0 but size of corresponding boolean axis is 30"
+        }
+      ]
+    }
+  }
+}

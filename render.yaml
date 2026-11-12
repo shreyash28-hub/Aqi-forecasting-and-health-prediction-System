@@ -27,3 +27,5 @@ services:
         sync: false
       - key: OPENAQ_API_KEY
         sync: false
+      - key: ANTHROPIC_API_KEY  # the air-quality assistant; without it /api/me/assistant answers 503
+        sync: false

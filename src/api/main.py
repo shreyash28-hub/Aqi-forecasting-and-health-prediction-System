@@ -21,7 +21,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api import hospitals, me
+from src.api import assistant, hospitals, me
 from src.api import refresher
 from src.api.schemas import (CityInfo, ForecastResponse, HealthStatus, ObservedResponse, RiskRequest, RiskResponse,
                              Target)
@@ -36,6 +36,9 @@ async def lifespan(app: FastAPI):
     stop_refresh = refresher.start(app.state.models)
     if not hasattr(app.state, "supabase"):  # tests may inject a client
         app.state.supabase = SupabaseClient.from_env()
+    if not hasattr(app.state, "assistant"):
+        from src.assistant.chat import Assistant
+        app.state.assistant = Assistant.from_env()
     yield
     if stop_refresh is not None:
         stop_refresh.set()
@@ -57,6 +60,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(me.router)
+app.include_router(assistant.router)
 app.include_router(hospitals.router)
 
 

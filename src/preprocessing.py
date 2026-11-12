@@ -106,6 +106,20 @@ def rolling_origin_splits(df: pd.DataFrame, test_days: int = TEST_DAYS,
         yield w, df.iloc[:start], df.iloc[start:end]
 
 
+def dated_splits(df: pd.DataFrame, ends, test_days: int = TEST_DAYS, min_train: int = 180):
+    """``test_days``-day test windows ending on the given dates, each training on everything
+    before it (expanding window). For testing a chosen season, e.g. winter, which stepping
+    back from the end of the series can't reach. The latest end is window 0; windows that
+    would leave fewer than ``min_train`` training days are skipped. Yields
+    ``(window_id, train, test)``."""
+    for w, end in enumerate(sorted(pd.to_datetime(list(ends)), reverse=True)):
+        stop = int(df.index.searchsorted(end, side="right"))
+        start = stop - test_days
+        if start < min_train:
+            continue
+        yield w, df.iloc[:start], df.iloc[start:stop]
+
+
 # AQI is strictly positive and right-skewed; models are fitted on log1p(AQI).
 def to_model_space(s: pd.Series) -> pd.Series:
     return np.log1p(s)
