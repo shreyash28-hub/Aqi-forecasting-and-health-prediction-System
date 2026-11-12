@@ -6,7 +6,7 @@ station readings (OpenAQ), and today's forecast is nudged with the readings so f
 
 | What | How often | Where it runs | What it does |
 |---|---|---|---|
-| **Daily refresh** | once a day, 06:00 IST | GitHub Actions (`.github/workflows/refresh-live.yml`) | fetches the last days of readings, merges them into the daily data, retrains the 18 live models, uploads one bundle to Supabase Storage |
+| **Daily refresh** | daily at 02:37 IST, again at 04:37 IST as a backup (GitHub often starts scheduled runs hours late) | GitHub Actions (`.github/workflows/refresh-live.yml`) | fetches the last days of readings, merges them into the daily data, retrains the 18 live models, uploads one bundle to Supabase Storage |
 | **Hourly top-up** | every `LIVE_REFRESH_MINUTES` (e.g. 60) | inside the API | downloads the newest hourly readings (about 144 requests) for today's figure; checks for a new daily bundle; reloads the forecasts |
 
 Nothing is committed daily (the models are ~25 MB and change every run), and a running API

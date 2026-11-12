@@ -31,7 +31,7 @@ const AT_A_GLANCE = [
   ["Live 2026 data: station download + daily AQI", "Done", "24 CPCB stations (4 per city), Feb 2025 to today; daily AQI matches CPCB bulletins"],
   ["Live 2026 data: retrain + forecast from today", "Done", "18 live models (6 cities x AQI, PM2.5, NO2); the site now forecasts from today; daily refresh command"],
   ["Live data: today's readings in the forecast", "Done", "Today's and the next days' forecast adjusted with station readings so far; backtested"],
-  ["Live data: automatic daily refresh", "Done", "GitHub Actions job runs daily at 06:00 IST; first run succeeded and the bundle is in Supabase Storage; the API side starts once deployed"],
+  ["Live data: automatic daily refresh", "Done", "GitHub Actions job runs daily at 02:37 IST (backup run 04:37 IST); the live API downloads the new bundle by itself"],
   ["Air-quality assistant", "Built, needs API key", "Chat on My risk, answers from the forecast and the saved profile; switched on once the API key is added"],
   ["Deployment", "Done", "Live site on Vercel, API on Render (free plan); daily models and hourly readings update by themselves"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
@@ -243,6 +243,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["12 Nov 2026", "Daily refresh moved to 02:37 IST with a backup run at 04:37 IST: GitHub had been starting the 06:00 run around midday, so mornings used day-old models."],
   ["12 Nov 2026", "AQI forecasts can no longer fall below what the PM2.5 or NO2 forecast implies (fixes Delhi on 27 of 29 days and Lucknow on 7 in the live forecasts)."],
   ["12 Nov 2026", "Air-quality assistant built (chat on My risk, grounded in the forecast and the saved profile, with an emergency short-cut and a daily limit); it switches on when the API key is added. Winter test of the live models: PM2.5 holds up, AQI needs model choices that include winter."],
   ["9 Nov 2026", "Phase 2 (mid-sem) marked complete. The final (Phase 3) is next: LSTM, XGBoost and Prophet compared with the classical models."],

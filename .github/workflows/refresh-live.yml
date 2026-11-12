@@ -5,8 +5,13 @@
 name: Refresh live forecasts
 
 on:
+  # GitHub starts scheduled runs late when it is busy: the old 06:00 IST slot ran at 11:30-13:00
+  # IST. So: start soon after midnight IST (yesterday is complete) and run again two hours
+  # later as a backup. A second run is harmless: it re-downloads the last six days, so it also
+  # fills in readings the first run was too early for.
   schedule:
-    - cron: "30 0 * * *"    # 00:30 UTC = 06:00 IST
+    - cron: "7 21 * * *"    # 21:07 UTC = 02:37 IST
+    - cron: "7 23 * * *"    # 23:07 UTC = 04:37 IST (backup)
   workflow_dispatch:
 
 concurrency:
