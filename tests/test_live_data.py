@@ -142,3 +142,44 @@ def test_sarima_with_prior_has_no_annual_terms_and_round_trips(tmp_path, monkeyp
     # without a prior (2015-2020 models) the Fourier pairs stay
     meta_h, _ = model_store.fit_and_save("Y", "SARIMA", series)
     assert "Fourier" in meta_h["config"] and "annual" not in meta_h["params"]
+
+
+# ---------------------------------------------------------------------------- test windows
+
+def _daily(start="2025-02-19", end="2026-11-12"):
+    idx = pd.date_range(start, end, freq="D")
+    return pd.DataFrame({"value": np.arange(len(idx), dtype=float), "is_interpolated": False}, index=idx)
+
+
+def test_window_splits_add_winter_after_rolling_windows():
+    from src.run_forecasting import LIVE_STEP, LIVE_WINTER_ENDS, window_splits
+    df = _daily()
+    wins = list(window_splits(df, 30, 6, LIVE_STEP, extra_window_ends=list(LIVE_WINTER_ENDS)))
+    assert [w for w, _, _ in wins] == list(range(10))
+    ends = [te.index[-1].date().isoformat() for _, _, te in wins]
+    assert ends[0] == "2026-11-12" and ends[6:] == sorted(LIVE_WINTER_ENDS, reverse=True)
+    for _, train, test in wins:                       # each window trains only on earlier days
+        assert len(test) == 30 and train.index[-1] < test.index[0]
+
+
+def test_window_splits_skip_a_winter_window_overlapping_a_rolling_one():
+    from src.run_forecasting import window_splits
+    df = _daily(start="2025-01-01", end="2026-03-15") # the rolling window covers Feb 14 - Mar 15
+    wins = list(window_splits(df, 30, 1, 45, extra_window_ends=["2026-02-28", "2026-01-29"]))
+    ends = [te.index[-1].date().isoformat() for _, _, te in wins]
+    assert ends == ["2026-03-15", "2026-01-29"]       # 2026-02-28 overlaps it and is skipped
+
+
+def test_summary_ignores_candidates_missing_windows():
+    from src.run_forecasting import add_window_rankings, summarise_windows
+    rows = []
+    for w in range(4):
+        hard = w >= 2                                 # windows 2-3 are hard (winter); annual naive can't run there
+        rows += [{"city": "X", "window": w, "model": "Model", "kind": "model", "rmse": 60.0 if hard else 20.0, "error": None},
+                 {"city": "X", "window": w, "model": "Naive", "kind": "baseline", "rmse": 70.0 if hard else 25.0, "error": None},
+                 {"city": "X", "window": w, "model": "Annual naive", "kind": "baseline",
+                  "rmse": None if hard else 10.0, "error": "too short" if hard else None}]
+    s = summarise_windows(add_window_rankings(pd.DataFrame(rows).assign(mae=1.0, mape=1.0)))
+    assert s.iloc[0]["model"] == "Model"              # complete candidates rank first
+    assert s.iloc[0]["best_baseline_mean_rmse"] == 47.5   # Naive's mean, not Annual naive's easy-window 10.0
+    assert bool(s.set_index("model").loc["Annual naive", "incomplete"])

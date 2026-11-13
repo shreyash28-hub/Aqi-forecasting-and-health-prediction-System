@@ -76,6 +76,11 @@ UNITS = {"AQI": "AQI", "PM2.5": "PM2.5 (µg/m³)", "NO2": "NO2 (µg/m³)"}
 
 SOURCES = ("history", "live")
 LIVE_STEP = 45  # days between live test-window ends
+# Live data starts in Feb 2025, so the rolling windows (stepping back from the end, after a year of
+# training) never reach last winter. These four 30-day windows (Nov 2025 - Feb 2026) are added to
+# every live comparison: the winter test showed that choosing models on Apr-Oct alone picked models
+# that lose to the naive forecast in winter (reports/forecasting/live/winter.md).
+LIVE_WINTER_ENDS = ("2025-11-30", "2025-12-30", "2026-01-29", "2026-02-28")
 
 
 def out_dir(target: str = "AQI", source: str = "history"):
@@ -253,11 +258,30 @@ def _worker_init():
     torch.set_num_threads(1)
 
 
+def window_splits(df: pd.DataFrame, test_days: int, n_windows: int, step: int,
+                  window_ends: list | None = None, extra_window_ends: list | None = None):
+    """The test windows for one city: on ``window_ends`` only, or the rolling windows stepping
+    back from the end plus windows on ``extra_window_ends`` (numbered after them; one that
+    would overlap a rolling window is skipped)."""
+    if window_ends:
+        yield from dated_splits(df, window_ends, test_days)
+        return
+    rolling = list(rolling_origin_splits(df, test_days, n_windows, step))
+    yield from rolling
+    taken = [(te.index[0], te.index[-1]) for _, _, te in rolling]
+    n = len(rolling)
+    for _, train, test in dated_splits(df, extra_window_ends or [], test_days):
+        if any(test.index[0] <= b and test.index[-1] >= a for a, b in taken):
+            continue
+        yield n, train, test
+        n += 1
+
+
 def run_all(data: dict, model_names: list[str], test_days: int, n_windows: int, jobs: int,
-            step: int = WINDOW_STEP, profiles: dict | None = None, window_ends: list | None = None):
+            step: int = WINDOW_STEP, profiles: dict | None = None, window_ends: list | None = None,
+            extra_window_ends: list | None = None):
     profiles = profiles or {}
-    splits = ((lambda df: dated_splits(df, window_ends, test_days)) if window_ends
-              else (lambda df: rolling_origin_splits(df, test_days, n_windows, step)))
+    splits = lambda df: window_splits(df, test_days, n_windows, step, window_ends, extra_window_ends)  # noqa: E731
     tasks = [(city, w, train, test, model_names, profiles.get(city))
              for city, df in data.items()
              for w, train, test in splits(df)]
@@ -308,9 +332,15 @@ def summarise_windows(metrics: pd.DataFrame) -> pd.DataFrame:
     agg = agg.join(total, on="city")
     agg["win_rate"] = agg["wins"] / agg["windows_total"]
     agg["beat_baseline_rate"] = (agg["beat_baseline_windows"] / agg["windows_total"]).where(agg["kind"] == "model")
-    best_base = agg[agg["kind"] == "baseline"].groupby("city")["mean_rmse"].min().rename("best_baseline_mean_rmse")
+    # A candidate that could not run in every window (e.g. the same-day-last-year baseline on the
+    # live winter windows, which have under a year of history) has a mean over easier windows only,
+    # so it is not comparable: rank complete candidates first and pick the best baseline among them.
+    agg["incomplete"] = agg["n_windows"] < agg["windows_total"]
+    base = agg[agg["kind"] == "baseline"]
+    complete = base[~base["incomplete"]]
+    best_base = (complete if len(complete) else base).groupby("city")["mean_rmse"].min().rename("best_baseline_mean_rmse")
     agg = agg.join(best_base, on="city")
-    return agg.sort_values(["city", "mean_rmse"]).reset_index(drop=True)
+    return agg.sort_values(["city", "incomplete", "mean_rmse"]).reset_index(drop=True)
 
 
 def _clean(v):
@@ -325,7 +355,8 @@ def _clean(v):
 
 def build_leaderboard(metrics: pd.DataFrame, summary: pd.DataFrame, test_days: int,
                       target: str = "AQI", source: str = "history", step: int = WINDOW_STEP,
-                      seasonal_prior: bool = False, window_ends: list | None = None) -> dict:
+                      seasonal_prior: bool = False, window_ends: list | None = None,
+                      extra_window_ends: list | None = None) -> dict:
     board = {
         "task": f"{TARGETS[target]}_forecast",
         "target": target,
@@ -337,6 +368,7 @@ def build_leaderboard(metrics: pd.DataFrame, summary: pd.DataFrame, test_days: i
         "n_windows": int(metrics["window"].nunique()),
         "window_step_days": None if window_ends else step,
         "window_ends": window_ends,
+        "extra_window_ends": extra_window_ends,
         "lstm_seeds": list(_resolve("LSTM")[1]) if "LSTM" in set(metrics["model"]) else None,
         "aqi_excluded_pollutants": ({c: list(p) for c, p in AQI_EXCLUDED_POLLUTANTS.items()}
                                     if target == "AQI" and source == "history" else {}),
@@ -440,7 +472,9 @@ def write_summary(diag, metrics, summary, board, test_days, model_order, target:
          + (f"Multi-window: {n_win} {test_days}-day test windows per city ending on "
             f"{', '.join(board['window_ends'])} (expanding training window). " if board.get("window_ends") else
             f"Multi-window: {n_win} non-overlapping {test_days}-day test windows per city, stepping back "
-            f"{step} days from the end (expanding training window); window 0 is the final hold-out. ")
+            f"{step} days from the end (expanding training window); window 0 is the final hold-out. "
+            + (f"The windows ending on {', '.join(board['extra_window_ends'])} are added so the "
+               f"comparison includes winter. " if board.get("extra_window_ends") else ""))
          + f"LSTM metrics are the mean of seeds {board['lstm_seeds']}."
          + (" Ahmedabad AQI is recomputed without CO (see findings.md)." if board["aqi_excluded_pollutants"] else "")
          + (" Data: live CPCB station readings via OpenAQ (src/live_data.py)." if source == "live" else "")
@@ -534,18 +568,23 @@ def main():
     ap.add_argument("--window-ends", nargs="+", metavar="YYYY-MM-DD",
                     help="test windows ending on these dates instead of stepping back from the end "
                          "(e.g. a winter test); results go to a subfolder named by --tag")
-    ap.add_argument("--tag", default="dated", help="subfolder for a --window-ends run (default: dated)")
+    ap.add_argument("--no-winter", action="store_true",
+                    help=f"live: leave out the fixed winter windows ({', '.join(LIVE_WINTER_ENDS)})")
+    ap.add_argument("--tag", help="write the results to this subfolder instead of the deployed ones "
+                                  "(default for --window-ends: dated)")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 1) - 2))
     args = ap.parse_args()
 
     target, source = args.target, args.source
     step = LIVE_STEP if source == "live" else WINDOW_STEP
     use_prior = source == "live" and not args.no_prior
+    extra_ends = list(LIVE_WINTER_ENDS) if source == "live" and not (args.window_ends or args.no_winter) else None
     out, figs = out_dir(target, source), fig_dir(target, source)
     if source == "live" and args.no_prior:  # keep the comparison run apart from the real results
         out, figs = out / "no_prior", figs / "no_prior"
-    if args.window_ends:                    # likewise for a run on chosen dates
-        out, figs = out / args.tag, figs / args.tag
+    tag = args.tag or ("dated" if args.window_ends else None)
+    if tag:                                 # likewise for a run on chosen dates or a trial run
+        out, figs = out / tag, figs / tag
     out.mkdir(parents=True, exist_ok=True)
     figs.mkdir(parents=True, exist_ok=True)
 
@@ -560,10 +599,11 @@ def main():
 
     t0 = time.perf_counter()
     raw_metrics, seed_runs, preds = run_all(data, args.models, args.test_days, args.windows, args.jobs,
-                                            step, profiles, args.window_ends)
+                                            step, profiles, args.window_ends, extra_ends)
     metrics = add_window_rankings(raw_metrics)
     summary = summarise_windows(metrics)
-    board = build_leaderboard(metrics, summary, args.test_days, target, source, step, use_prior, args.window_ends)
+    board = build_leaderboard(metrics, summary, args.test_days, target, source, step, use_prior, args.window_ends,
+                              extra_ends)
 
     diag.to_csv(out / "stationarity.csv", index=False)
     metrics.to_csv(out / "metrics.csv", index=False)

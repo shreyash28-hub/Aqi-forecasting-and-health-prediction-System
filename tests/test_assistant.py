@@ -186,8 +186,13 @@ def test_refusal_and_api_errors(client):
     FAKE_CLIENT.error = anthropic.APIConnectionError(request=httpx.Request("POST", "https://api.anthropic.com"))
     r = ask(client)
     assert r.status_code == 503 and "couldn't be reached" in r.json()["detail"]
+    no_credit = httpx.Response(400, request=httpx.Request("POST", "https://api.anthropic.com"),
+                               json={"error": {"message": "Your credit balance is too low"}})
+    FAKE_CLIENT.error = anthropic.BadRequestError("Your credit balance is too low", response=no_credit, body=None)
+    r = ask(client)
+    assert r.status_code == 503 and r.json()["detail"] == chat.UNAVAILABLE_TEXT   # no billing details for users
     FAKE_CLIENT.error = None
-    assert ask(client).json()["remaining_today"] == 28                      # the failed call was given back
+    assert ask(client).json()["remaining_today"] == 28                      # the failed calls were given back
 
 
 def test_validation(client):

@@ -91,11 +91,18 @@ def load_air(source: str) -> tuple[dict, dict, dict]:
     readings_as_of = {}
     signals = load_signals() if source == "live" else {}
     for city, df in list(forecasts.items()):
+        # Floor the raw forecast first: AQI is never below its own PM2.5 / NO2 sub-index, so the
+        # two *models'* forecasts agree with each other before anything else touches the numbers.
+        df, _ = floor_to_pollutants(df)
         if source == "live":   # start today from today's readings so far
+            # Today's readings are real measurements, not a forecast: when, say, only the AQI
+            # reading has enough hours yet and PM2.5's hasn't, the AQI nowcast must be allowed to
+            # move below the (stale, forecast-only) PM2.5 floor rather than being pulled back up to
+            # match it. Re-flooring after this point would silently undo the correction.
             df, used = apply_signals(city, df, signals)
             if used:
                 readings_as_of[city] = signals[city]["as_of"]
-        forecasts[city], _ = floor_to_pollutants(df)   # AQI never below its PM2.5 / NO2 sub-index
+        forecasts[city] = df
     return forecasters, forecasts, readings_as_of
 
 

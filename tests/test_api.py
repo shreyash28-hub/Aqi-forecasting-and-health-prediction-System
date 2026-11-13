@@ -47,6 +47,7 @@ def test_forecast_matches_saved_models(client, horizon):
     svc = client.app.state.models
     assert len(body["days"]) == len(svc.air_forecast("Delhi", horizon))
     expected = forecast_air("Delhi", 30, svc.source)
+    expected, _ = floor_to_pollutants(expected)   # AQI never below its PM2.5/NO2 sub-index (before nowcast)
     first = pd.Timestamp(body["origin_date"]) + pd.Timedelta(days=1)
     if svc.source == "live":   # today's readings so far nudge the first days (src/nowcast.py)
         expected, used = apply_signals("Delhi", expected, load_signals())
@@ -55,7 +56,7 @@ def test_forecast_matches_saved_models(client, horizon):
         today = pd.Timestamp.now(tz="Asia/Kolkata").tz_localize(None).normalize()
         first = max(first, today)
         expected = expected[expected["date"] >= first]
-    expected = floor_to_pollutants(expected)[0].iloc[:horizon]   # AQI never below its PM2.5/NO2 sub-index
+    expected = expected.iloc[:horizon]
     # all of the horizon, or what is left of the stored 30 days when the models are older
     assert len(body["days"]) == len(expected) >= 1
     got = np.array([d["aqi"] for d in body["days"]])
@@ -65,13 +66,21 @@ def test_forecast_matches_saved_models(client, horizon):
 
 
 def test_served_aqi_never_below_pollutant_subindex(client):
-    """AQI is the largest sub-index, so no served day may have PM2.5 or NO2 implying more."""
+    """AQI is the largest sub-index, so no served day may have PM2.5 or NO2 implying more - except
+    a day the nowcast has corrected for one pollutant but not (yet) the other, from real station
+    readings rather than the forecast; that effect is confined to the first few days and fades
+    (src/nowcast.py)."""
     for city in CITIES:
-        days = client.get(f"/api/forecast/{city}?horizon=30").json()["days"]
-        df = pd.DataFrame(days)
+        body = client.get(f"/api/forecast/{city}?horizon=30").json()
+        df = pd.DataFrame(body["days"])
+        touched = 3 if body.get("readings_as_of") else 0
         for col, pollutant in (("pm25", "PM2.5"), ("no2", "NO2")):
+            # aqi and the pollutant are rounded to 0.1 independently, and a breakpoint band's slope
+            # can be > 1 (PM2.5 90-120 -> 200-300 is 3.33), so a 0.05 rounding error on the
+            # pollutant can read as a larger gap on the AQI scale: 1.0 comfortably covers display
+            # rounding while still catching a real inconsistency (tens of points, per the winter test)
             si = sub_index(df[col].astype(float), pollutant).to_numpy()
-            assert (si <= df["aqi"].to_numpy() + 0.051).all(), (city, col)   # served values are rounded to 0.1
+            assert (si[touched:] <= df["aqi"].to_numpy()[touched:] + 1.0).all(), (city, col)
 
 
 def test_floor_to_pollutants():

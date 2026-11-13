@@ -84,6 +84,12 @@ def floor_to_pollutants(forecast: pd.DataFrame) -> tuple[pd.DataFrame, int]:
     other pollutants are not forecast, so the AQI forecast still carries them. ``forecast``
     has an ``aqi`` column and optionally ``pm25`` / ``no2``. Returns the adjusted copy and
     how many days were raised.
+
+    Apply this to the raw model forecast, before anything derived from real station readings
+    (``src.nowcast.apply_signals``). Flooring afterwards would let a stale forecast for one
+    pollutant override a same-day correction to another that is grounded in real data, which
+    defeats the point of the nowcast on exactly the days it matters most (see
+    ``src.api.services.load_air``).
     """
     floor = pd.Series(np.nan, index=forecast.index)
     for col, pollutant in (("pm25", "PM2.5"), ("no2", "NO2")):

@@ -146,6 +146,7 @@ class HealthStatus(BaseModel):
     health_models: list[str]
     startup_seconds: float
     accounts_enabled: bool
+    assistant_enabled: bool = Field(default=False, description="An Anthropic API key is set, so /api/me/assistant answers")
     live: dict | None = Field(default=None, description=(
         "Live forecasts: where they are served from (precomputed export or the models), their "
         "issue date, and the last bundle and readings refreshes with any error"))

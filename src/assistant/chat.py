@@ -18,6 +18,7 @@ API re-runs it on a fallback model (server-side ``fallbacks: "default"``).
 """
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
@@ -29,6 +30,8 @@ import anthropic
 from src.api import hospitals
 from src.api.services import ModelService, UnknownCity
 from src.assistant.tools import ToolLog, build_tools
+
+logger = logging.getLogger("airware.assistant")
 
 MODEL = os.getenv("ASSISTANT_MODEL", "claude-opus-5-5")
 EFFORT = os.getenv("ASSISTANT_EFFORT", "low")
@@ -68,6 +71,7 @@ EMERGENCY = re.compile(
 REFUSAL_TEXT = ("I can't help with that one. I can answer questions about air quality, the forecast, "
                 "and precautions to take.")
 EMPTY_TEXT = "Sorry, I couldn't put an answer together. Please try asking in a different way."
+UNAVAILABLE_TEXT = "The assistant is unavailable right now. Please try again later."
 
 
 class AssistantError(Exception):
@@ -160,14 +164,20 @@ class Assistant:
                 max_iterations=MAX_ITERATIONS,
             )
             final = runner.until_done()
-        except (anthropic.AuthenticationError, anthropic.PermissionDeniedError):
-            raise AssistantError(503, "The assistant isn't set up correctly on the server (API key).")
+        # Users get a plain message; the real reason (bad key, no credit, ...) goes to the server log.
+        except (anthropic.AuthenticationError, anthropic.PermissionDeniedError) as e:
+            logger.error("assistant: API key rejected: %s", e)
+            raise AssistantError(503, UNAVAILABLE_TEXT)
         except anthropic.RateLimitError:
             raise AssistantError(503, "The assistant is busy right now. Please try again in a minute.")
         except (anthropic.APIConnectionError, anthropic.APITimeoutError):
             raise AssistantError(503, "The assistant couldn't be reached. Please try again.")
+        except anthropic.BadRequestError as e:            # e.g. "credit balance is too low"
+            logger.error("assistant: request refused (%s): %s", e.status_code, e)
+            raise AssistantError(503, UNAVAILABLE_TEXT)
         except anthropic.APIStatusError as e:
-            raise AssistantError(502, f"The assistant failed ({e.status_code}). Please try again.")
+            logger.error("assistant: API error (%s): %s", e.status_code, e)
+            raise AssistantError(502, "The assistant failed. Please try again.")
 
         if final.stop_reason == "refusal":
             text = REFUSAL_TEXT
