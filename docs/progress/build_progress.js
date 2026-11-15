@@ -10,8 +10,8 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "13 November 2026";
-const LATEST_COMMIT = "5c69fb6 Run the daily refresh after midnight IST, with a backup run";
+const LAST_UPDATED = "15 November 2026";
+const LATEST_COMMIT = "968915b Delhi's live AQI model to XGBoost (winter included), and a real nowcast/floor bug";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -32,7 +32,7 @@ const AT_A_GLANCE = [
   ["Live 2026 data: retrain + forecast from today", "Done", "18 live models (6 cities x AQI, PM2.5, NO2); the site now forecasts from today; daily refresh command"],
   ["Live data: today's readings in the forecast", "Done", "Today's and the next days' forecast adjusted with station readings so far; backtested"],
   ["Live data: automatic daily refresh", "Done", "GitHub Actions job runs daily at 02:37 IST (backup run 04:37 IST); the live API downloads the new bundle by itself"],
-  ["Air-quality assistant", "Built, needs API key", "Chat on My risk, answers from the forecast and the saved profile; switched on once the API key is added"],
+  ["Air-quality assistant", "Postponed", "Taken out of the site for now; to be rebuilt later"],
   ["Deployment", "Done", "Live site on Vercel, API on Render (free plan); daily models and hourly readings update by themselves"],
   ["Project report (4 evaluation criteria)", "Done", "15-page Word report in docs/Project_Report.docx; fill in title-page details"],
   ["Course mid-sem submission (Phase 2)", "Complete", "Completed: 8-slide deck, analysis (reports/phase2) and demo notebook"],
@@ -144,17 +144,6 @@ DONE.push({
 });
 
 DONE.push({
-  title: "Air-quality assistant",
-  items: [
-    "Chat panel on My risk: signed-in users ask about the air, their own risk and precautions, in English or Hindi; suggested questions to start.",
-    "Answers come from the site's own data through five tools: the city forecast, recent measurements, the user's own risk estimate, a curated precautions list and nearby hospitals. The model is told never to give numbers it did not get from these.",
-    "Safety: messages describing an emergency (can't breathe, chest pain) get a fixed reply with 112 / 108 and the nearest hospitals without calling the model; no diagnosis, medicines or doses; every answer is labelled as decision support.",
-    "Limits: signed-in users only, 30 questions per user per day, nothing stored on the server; the question and the profile details needed to answer it go to the model provider.",
-    "12 automated tests with a fake model client (no API cost).",
-  ],
-});
-
-DONE.push({
   title: "Delhi's live AQI model switched to XGBoost",
   items: [
     "Compared every model over 10 test windows (the usual 6 recent ones plus 4 covering last winter, since the regular live comparison never reached winter). For Delhi, XGBoost's mean error is 62 against ARIMA's 65, and in winter alone 72 against 88, clearly better where it mattered.",
@@ -236,7 +225,7 @@ const HEALTH_RESULTS = [
 
 const REMAINING = [
   // [task, needs, notes]
-  ["Assistant: add billing credit", "You", "The key is in place and the server-side error handling is fixed, but the Anthropic account has no credit yet (a test question returned a credit-balance error); add credit, then a real answer can be checked"],
+  ["Air-quality assistant", "Later", "Removed from the site for now; to be rebuilt when you decide to return to it"],
   ["Live models: decide on the rest", "You + me", "Delhi's AQI is now on the winter-inclusive comparison; Ahmedabad, Bengaluru, Hyderabad and Lucknow's AQI, and most cities' PM2.5/NO2, would also change model - see reports/forecasting/live/selection_all_seasons.md"],
   ["Deployment: keep an eye on it", "You", "Free Render plan sleeps after 15 min idle (first visit ~1 min); open the site once before a demo, or switch to Starter ($7/month)"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
@@ -259,10 +248,11 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["15 Nov 2026", "Air-quality assistant taken out of the site (chat panel, API endpoint and its settings); postponed, to be rebuilt later."],
   ["13 Nov 2026", "Delhi's live AQI model switched to XGBoost after comparing all models on 10 windows including last winter; found and fixed a real bug in the process (the AQI/pollutant consistency floor could override a same-day real-reading correction, fixed for all cities, not just Delhi)."],
   ["12 Nov 2026", "Daily refresh moved to 02:37 IST with a backup run at 04:37 IST: GitHub had been starting the 06:00 run around midday, so mornings used day-old models."],
   ["12 Nov 2026", "AQI forecasts can no longer fall below what the PM2.5 or NO2 forecast implies (fixes Delhi on 27 of 29 days and Lucknow on 7 in the live forecasts)."],
-  ["12 Nov 2026", "Air-quality assistant built (chat on My risk, grounded in the forecast and the saved profile, with an emergency short-cut and a daily limit); it switches on when the API key is added. Winter test of the live models: PM2.5 holds up, AQI needs model choices that include winter."],
+  ["12 Nov 2026", "Winter test of the live models: PM2.5 holds up, AQI needs model choices that include winter."],
   ["9 Nov 2026", "Phase 2 (mid-sem) marked complete. The final (Phase 3) is next: LSTM, XGBoost and Prophet compared with the classical models."],
   ["31 Oct 2026", "Mid-sem (Phase 2) deliverables built: analysis and figures for the classical models (reports/phase2), an 8-slide presentation with speaker notes, and a demo notebook. A classical model beats the naive forecast in all six cities."],
   ["31 Oct 2026", "Lucknow and Delhi forecasts fixed: their AQI and PM2.5 forecasts contradicted each other (Lucknow AQI 56 against 148 measured last November). The models now scale the 2015-2020 seasonal pattern to each city's recent data and no longer fit the yearly cycle twice; every city's forecasts are now consistent."],
