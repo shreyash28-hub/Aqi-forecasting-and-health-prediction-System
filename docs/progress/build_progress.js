@@ -259,6 +259,8 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["16 Nov 2026", "Site looked down after idle periods (the free API server sleeps): it is now pinged every 10 minutes to stay awake, and the site retries and shows a \"starting\" notice instead of empty boxes while it wakes."],
+  ["16 Nov 2026", "Final project report written on the university's mini-project template (docs/Airware_Mini_Project_Report.docx and .pdf, 23 pages): literature review of 12 papers, use-case, class and ER diagrams, screenshots of the live site, pseudo code, source excerpts, and the classical vs machine-learning comparison; team and mentor details filled in."],
   ["16 Nov 2026", "Nine more live models switched after the winter-inclusive comparison (four old choices lost to the naive forecast in winter); four near-ties kept until a second winter is available. Forecast consistency rule refined."],
   ["15 Nov 2026", "Air-quality assistant taken out of the site (chat panel, API endpoint and its settings); postponed, to be rebuilt later."],
   ["13 Nov 2026", "Delhi's live AQI model switched to XGBoost after comparing all models on 10 windows including last winter; found and fixed a real bug in the process (the AQI/pollutant consistency floor could override a same-day real-reading correction, fixed for all cities, not just Delhi)."],

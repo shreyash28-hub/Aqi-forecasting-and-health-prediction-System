@@ -178,16 +178,67 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit & { signal?: AbortSignal }): Promise<T> {
-  let res: Response;
+// The API runs on a free plan that sleeps after 15 idle minutes and takes up to a minute to
+// start again. Requests slower than SLOW_MS are reported to listeners (the "starting" notice),
+// and read-only requests that fail while it boots are retried for about a minute.
+const SLOW_MS = 4000;
+const RETRY_DELAYS_MS = [2000, 3000, 5000, 8000, 10000, 10000, 10000, 12000];
+const slowListeners = new Set<(slow: boolean) => void>();
+let slowCount = 0;
+
+/** Subscribe to "some API request is taking long" changes; returns an unsubscribe function. */
+export function onApiSlow(listener: (slow: boolean) => void): () => void {
+  slowListeners.add(listener);
+  return () => { slowListeners.delete(listener); };
+}
+
+function changeSlow(delta: number) {
+  slowCount = Math.max(0, slowCount + delta);
+  slowListeners.forEach((l) => l(slowCount > 0));
+}
+
+function sleep(ms: number, signal?: AbortSignal | null) {
+  return new Promise<void>((resolve, reject) => {
+    const t = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => { clearTimeout(t); reject(new DOMException("Aborted", "AbortError")); }, { once: true });
+  });
+}
+
+async function fetchOnce(path: string, init?: RequestInit): Promise<Response> {
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    const res = await fetch(`${API_URL}${path}`, {
       ...init,
       headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
     });
+    // 502/503/504 come from the hosting platform while the API is starting, not from the API
+    if ([502, 503, 504].includes(res.status)) throw new ApiError(res.status, "The forecast service is starting.");
+    return res;
   } catch (e) {
-    if ((e as Error).name === "AbortError") throw e;
+    if ((e as Error).name === "AbortError" || e instanceof ApiError) throw e;
     throw new ApiError(0, "Can't reach the forecast service.");
+  }
+}
+
+async function request<T>(path: string, init?: RequestInit & { signal?: AbortSignal; safeToRetry?: boolean }): Promise<T> {
+  // never repeat a request that saves something; GETs and calculations that store nothing are safe
+  const readOnly = init?.safeToRetry ?? (!init?.method || init.method === "GET");
+  let slow = false;
+  const timer = setTimeout(() => { slow = true; changeSlow(+1); }, SLOW_MS);
+  let res: Response;
+  try {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        res = await fetchOnce(path, init);
+        break;
+      } catch (e) {
+        const retriable = e instanceof ApiError && readOnly && attempt < RETRY_DELAYS_MS.length;
+        if (!retriable) throw e;
+        await sleep(RETRY_DELAYS_MS[attempt], init?.signal);
+      }
+    }
+  } finally {
+    clearTimeout(timer);
+    if (slow) changeSlow(-1);
   }
   if (res.status === 204) return undefined as T;
   if (!res.ok) {
@@ -208,7 +259,7 @@ export const api = {
   observed: (city: string, days: number, signal?: AbortSignal) =>
     request<ObservedResponse>(`/api/observed/${encodeURIComponent(city)}?days=${days}`, { signal }),
   predictRisk: (body: { city: string; horizon: number; profile: Profile }, signal?: AbortSignal) =>
-    request<RiskResponse>("/api/risk/predict", { method: "POST", body: JSON.stringify(body), signal }),
+    request<RiskResponse>("/api/risk/predict", { method: "POST", body: JSON.stringify(body), signal, safeToRetry: true }),  // stores nothing
   forecastLeaderboard: (target: "AQI" | "PM2.5" | "NO2" = "AQI", signal?: AbortSignal) =>
     request<ForecastLeaderboard>(`/api/leaderboard/forecast?target=${encodeURIComponent(target)}`, { signal }),
   healthLeaderboard: (signal?: AbortSignal) => request<HealthLeaderboard>("/api/leaderboard/health", { signal }),

@@ -4,6 +4,7 @@ import { MotionConfig } from "motion/react";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ServerWakeNotice } from "@/components/layout/server-wake-notice";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <MotionConfig reducedMotion="user">
         <AuthProvider>
           <TooltipProvider>{children}</TooltipProvider>
+          <ServerWakeNotice />
         </AuthProvider>
       </MotionConfig>
     </ThemeProvider>
