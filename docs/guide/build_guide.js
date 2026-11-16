@@ -106,7 +106,9 @@ const titlePage = [
   center("Data  ·  Time-series forecasting  ·  Health-risk models  ·  FastAPI  ·  Supabase  ·  Next.js", { size: 22, color: "5A6270" }),
   new Paragraph({ spacing: { before: 2400 }, children: [] }),
   center("Course: Time Series and Analysis Project", { size: 22 }),
-  center("Prepared: October 2026", { size: 22 }),
+  center("Team: Shreyash Singh (S24CSEU1290)  ·  Bhoomi Singh (S24CSEU0886)  ·  Vansh Mittal (S24CSEU1950)", { size: 22 }),
+  center("Mentor: Madhuri Gupta", { size: 22 }),
+  center("First prepared October 2026  ·  Updated 17 November 2026", { size: 22 }),
 ];
 
 // ------------------------------------------------------------------ content
@@ -118,51 +120,67 @@ add(H1("1. What the project does"));
 add(P("Airware answers two questions for people in Indian cities. First: **how clean will the air be over the next 7 or 30 days?** Second: **what does that air mean for my own health?** The first question is a time-series forecasting problem. The second is a prediction problem that combines the forecast with a person's saved health profile."));
 add(H2("1.1 The two linked pipelines"));
 add(table(["Pipeline", "Input", "Output", "Main techniques"], [
-  ["AQI forecasting", "Daily AQI, PM2.5 and NO2 history for six cities (2015 to mid-2020)", "Daily AQI, PM2.5 and NO2 for the next 7 or 30 days", "ARIMA, SARIMA, Holt-Winters, Prophet, XGBoost, LSTM, compared with naive baselines"],
+  ["AQI forecasting", "Daily AQI, PM2.5 and NO2 for six cities: 2015 to mid-2020 for the course comparison, and live station data from February 2025 to today for the website", "Daily AQI, PM2.5 and NO2 for the next 7 or 30 days, starting today", "ARIMA, SARIMA, Holt-Winters, Prophet, XGBoost, LSTM, compared with naive baselines"],
   ["Health-risk prediction", "A person's profile plus the forecast AQI, PM2.5 and NO2 for each day", "Risk level (Low to Severe), risk score, confidence, borderline flag", "Random Forest, XGBoost, MLP (neural network), selected by cross-validation"],
 ], [1.3, 2.2, 2.2, 2.6], "The two pipelines"));
-add(P("Two supporting features sit around them: a hospital map that shows contact details (never booking) when risk is High or Severe, and a light assistant that gives precautions matched to the risk. The map and assistant are the next build steps."));
+add(P("Two supporting features sit around them: a **hospital map** that shows contact details (never booking) when risk is High or Severe, and **precautions** matched to the risk level. A conversational assistant was built and then postponed (section 13)."));
 add(H2("1.2 The user's journey"));
 add(N("The visitor opens the site. Current and forecast AQI for any of the six cities is **public**, with no login.", "journey"));
 add(N("The user signs in (Supabase Auth) and fills a health profile **once**: age, gender, health condition, smoking, occupation, area type, mask use and hours outdoors are required. BMI, exercise hours and family history are optional.", "journey"));
 add(N("The backend combines the saved profile with the forecast for the chosen city and horizon.", "journey"));
 add(N("The health models return, for each day, a risk level, a risk score, a confidence and a borderline flag. The page shows this day by day, following the forecast curve.", "journey"));
-add(N("Every estimate is saved to the user's history. If risk reaches High or Severe, the page warns the user and (later) shows nearby hospitals.", "journey"));
+add(N("Every estimate is saved to the user's history. If risk reaches High or Severe, the page warns the user and shows nearby hospitals on a map with their phone numbers and addresses.", "journey"));
 add(N("Every result is labelled as an estimate for decision support, not a medical diagnosis.", "journey"));
 add(gap());
 add(callout("Scope note", "The course rubric covers the AQI time-series forecasting part. The health prediction, hospital map and website are an extension built on top of it, so the forecasting part is documented in the most depth here."));
+add(H2("1.3 Team and responsibilities"));
+add(P("The work is split so that each person owns a complete part of the system and can explain it on their own. The three parts meet at the API: the models Bhoomi built are the ones the backend refits every night, and the pages Vansh built get all their data from it."));
+add(table(["Member", "Owns", "Main files"], [
+  ["**Shreyash Singh** (S24CSEU1290)", "**Backend, data pipeline, evaluation and testing.** The FastAPI service and all 15 endpoints; live station data from OpenAQ and the daily AQI calculation; the Supabase database, sign-in and row-level security; the nightly refresh job and the model bundle; same-day correction and the AQI consistency floor; deployment on Render and keeping it awake. **Model evaluation and selection:** rolling-origin test windows, naive baselines, metrics, the winter test and the rule for switching models. **Testing:** the 84 automated tests and the live checks.", "`src/api/`, `src/openaq.py`, `src/live_data.py`, `src/aqi.py`, `src/nowcast.py`, `src/refresh_live.py`, `src/live_bundle.py`, `src/forecast_export.py`, `src/run_forecasting.py`, `src/evaluation.py`, `scripts/selection_report.py`, `supabase/`, `tests/`, `.github/workflows/`"],
+  ["**Bhoomi Singh** (S24CSEU0886)", "**Data preparation and time-series models.** Exploring and cleaning the 2015-2020 CPCB data, gap filling, the Ahmedabad CO correction, stationarity tests and STL decomposition; building the six forecasting models (ARIMA, SARIMA, Holt-Winters, LSTM, XGBoost, Prophet), the naive baselines and the seasonal prior; the Phase 2 analysis, deck and notebook.", "`src/data_loader.py`, `src/preprocessing.py`, `src/models/`, `src/train_final_models.py`, `src/model_store.py`, `src/phase2.py`, `notebooks/`"],
+  ["**Vansh Mittal** (S24CSEU1950)", "**Website and health-risk models.** The Next.js site: design, landing page, dashboard, forecast, My risk, history and models pages, charts and the hospital map; deployment on Vercel. The health dataset preparation, the Random Forest, XGBoost and MLP models and the boundary rule. The project report and presentation.", "`frontend/`, `src/health/`, `docs/report/`"],
+], [1.5, 4.4, 2.6], "Who owns what"));
+add(callout("How the parts connect", "Bhoomi's models produce the forecasts; Shreyash's evaluation decides which model each city uses and his nightly job retrains it; the API serves the forecasts and runs Vansh's health models on them; Vansh's pages show the result."));
 
 // ============================================================ 2
 add(H1("2. System architecture"));
-add(P("The system has four layers. The browser never talks to the models or the database directly, except for one thing: signing in with Supabase."));
-add(figure(fig("fig_architecture.png"), "Overall architecture: website, API, models and database.", 540));
+add(P("The system has three columns: data sources on the left, model training and the nightly refresh in the middle, and the serving side (API, website, database) on the right. The browser never talks to the models or the database directly, except for one thing: signing in with Supabase."));
+add(figure(fig("fig_architecture_live.png"), "Overall architecture: data sources, training and nightly refresh, and the serving side.", 560));
 add(table(["Layer", "Technology", "Responsibility"], [
-  ["Frontend", "Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui, Motion, ECharts, Lucide", "Pages, charts, forms, light and dark themes. Calls the API and signs users in."],
-  ["Backend API", "FastAPI (Python)", "Loads the saved models once, serves forecasts and risk estimates, checks sign-in tokens, saves history."],
-  ["Models", "statsmodels, Prophet, XGBoost, PyTorch (LSTM), scikit-learn", "Forecast AQI, PM2.5 and NO2; predict health risk. Saved to disk and loaded at startup."],
+  ["Frontend", "Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui, Motion, ECharts, Leaflet, Lucide; hosted on Vercel", "Pages, charts, the hospital map, light and dark themes. Calls the API and signs users in."],
+  ["Backend API", "FastAPI (Python); hosted on Render", "Serves forecasts, measured data, risk estimates, hospitals and leaderboards; checks sign-in tokens; saves history; applies today's readings to the forecast."],
+  ["Models", "statsmodels, Prophet, XGBoost, PyTorch (LSTM), scikit-learn", "Forecast AQI, PM2.5 and NO2 (18 forecasters: 6 cities x 3 targets); predict health risk."],
+  ["Live data and automation", "OpenAQ API, GitHub Actions, Supabase Storage", "Downloads new station readings every night, refits all 18 forecasters and publishes them as one bundle that the API picks up by itself."],
   ["Database and auth", "Supabase (PostgreSQL, Supabase Auth, Row Level Security)", "Stores profiles and history privately per user; handles accounts."],
-], [1.2, 3, 3.2], "Layers and responsibilities"));
+], [1.3, 3, 3.1], "Layers and responsibilities"));
 add(H2("2.1 Why this split"));
-add(B("**Models are loaded once, not trained per request.** Training happens offline. The API only loads the saved result, so a forecast takes well under a second after a 20-second startup."));
+add(B("**Models are trained offline, never per request.** The nightly job refits the models and saves their 30-day forecasts; the API only reads those, so it answers in well under a second and fits in a small server (section 7.6)."));
 add(B("**The API is the only door to user data.** The website sends the user's Supabase token to the API, and the API talks to Supabase with that same token. The database therefore enforces privacy itself (section 8)."));
 add(B("**Public and private data are separated.** Forecasts, leaderboards and precautions are public; profiles and history are private."));
 add(H2("2.2 Repository map"));
 add(...code([
-  "src/                   Python: data loading, models, evaluation, API",
-  "  data_loader.py       Loads city_day.csv, builds the daily AQI series",
-  "  aqi.py               CPCB AQI calculation (used for the Ahmedabad fix)",
-  "  preprocessing.py     Stationarity tests, STL, log transform, train/test split",
+  "src/                   Python: data, models, evaluation, live data, API",
+  "  data_loader.py       Loads city_day.csv (2015-2020), builds the daily series",
+  "  aqi.py               CPCB AQI calculation, consistency floor",
+  "  preprocessing.py     Stationarity tests, STL, test windows, seasonal prior",
   "  models/              ARIMA/SARIMA/Holt-Winters, Prophet, XGBoost, LSTM, baselines",
-  "  evaluation.py        Rolling-origin evaluation and metrics",
-  "  model_store.py       Save and load the deployed forecasters",
+  "  run_forecasting.py   Rolling-origin comparison and leaderboards",
+  "  evaluation.py        Metrics",
+  "  train_final_models.py, model_store.py   Retrain winners, save and load them",
+  "  openaq.py, live_data.py                 Live station readings -> daily AQI",
+  "  nowcast.py           Today's readings applied to the forecast",
+  "  refresh_live.py, live_bundle.py, forecast_export.py   Nightly refresh",
   "  health/              Health data, model training, backtest, predictor store",
-  "  api/                 FastAPI app (main, services, me, schemas, supabase_client)",
-  "models/                Saved models: aqi/, pm25/, no2/, health/",
-  "reports/               Generated results, leaderboards and figures",
+  "  api/                 FastAPI app (main, services, me, hospitals, refresher, ...)",
+  "models/                Saved models: aqi/, pm25/, no2/ (2015-2020), live/, health/",
+  "data/hospitals.json    Stored hospital list from OpenStreetMap",
+  "reports/               Results, leaderboards and figures (live/ for the live models)",
+  "scripts/               One-off tools: downloads, reports, live checks",
   "supabase/              SQL schema and setup guide",
   "frontend/              The Next.js website",
-  "docs/                  Design spec, report, progress file, this guide",
-  "tests/                 41 automated API tests",
+  ".github/workflows/     Nightly refresh and keep-awake jobs",
+  "docs/                  Report, progress file, deployment notes, this guide",
+  "tests/                 84 automated tests",
 ]));
 
 // ============================================================ 3
@@ -205,6 +223,14 @@ add(B("**Person columns** are age, gender, occupation, area type, condition (non
 add(B("**The risk label** follows a documented formula: a vulnerability multiplier (age, condition, smoking, family history, BMI, exercise) times an effective-exposure term (the air values adjusted by outdoor hours, mask use and area type), plus noise, cut into four risk bands."));
 add(P("This is a constructed dataset: real air-quality values joined to person profiles by a documented formula. It is not a set of clinical records, and results should be read as an illustration of the method rather than medical evidence. This note is kept in the data-loading code (`src/health/data.py`) as well."));
 add(P("Sanity checks on the data behave sensibly: average risk rises from AQI near 86 (Low) to near 515 (Severe); mask use lowers risk; industrial areas score higher than residential ones."));
+add(H2("3.6 Live data: forecasting from today"));
+add(P("The Kaggle data ends on 1 July 2020, so a website built on it alone could only forecast 2020. The live site therefore uses **current readings from the same CPCB stations**, collected through **OpenAQ**, a free public platform that republishes official monitoring data (free API key)."));
+add(B("**Stations:** 24 CPCB stations, four per city, chosen because they report all the key pollutants most reliably. The list is fixed in `data/openaq/stations.json`."));
+add(B("**History:** hourly readings from February 2025 to today. `scripts/download_openaq.py` downloads the full history once; every night `src/openaq.py` downloads just the last six days."));
+add(B("**From hours to days** (`src/live_data.py`): the four stations are averaged hour by hour, the CPCB method (section 3.2) turns the hourly values into an hourly AQI, and a day's AQI is the mean of its hours. A day only counts if **at least 16 hours** were measured, in Indian Standard Time."));
+add(B("**Cleaning:** negative values, sensors stuck on the same number for 12 hours, hours where PM2.5 exceeds PM10 (impossible, since PM2.5 is part of PM10) and a station far above the other three in its city are removed before averaging."));
+add(B("**Validation:** the daily AQI agrees with CPCB's own bulletins, for example Delhi on 20 and 21 October 2025: 346 and 362 here against 345 and 351 published."));
+add(callout("Missing week in January 2026", "OpenAQ has no readings from any station between 11 and 19 January 2026. Every station in every city stops and restarts at the same moment, so the gap is at the data provider, not in the sensors or our code; a re-download confirmed it is still empty. Those days are skipped, never filled in for scoring."));
 
 // ============================================================ 4
 add(H1("4. Time-series theory used"));
@@ -257,7 +283,7 @@ add(...code([
   "MAPE = mean( |y - yhat| / y ) * 100      average miss as a percentage",
 ]));
 add(P("The winner for each city is the model with the **lowest mean RMSE across the six windows**. It is deployed only if it also beats the best naive baseline; otherwise the baseline itself is deployed (this happens for Hyderabad PM2.5 and Ahmedabad NO2)."));
-add(H2("5.3 Results"));
+add(H2("5.3 Results on the 2015-2020 data (the course comparison)"));
 add(table(["City", "Deployed model", "Mean RMSE", "Best baseline RMSE", "Improvement"], [
   ["Delhi", "SARIMA", "69.21", "98.91", "-30%"],
   ["Lucknow", "Prophet", "55.90", "83.16", "-33%"],
@@ -265,9 +291,10 @@ add(table(["City", "Deployed model", "Mean RMSE", "Best baseline RMSE", "Improve
   ["Chennai", "ARIMA", "37.45", "42.87", "-13%"],
   ["Hyderabad", "Prophet", "22.39", "25.88", "-13%"],
   ["Ahmedabad", "Holt-Winters", "57.44", "60.75", "-5%"],
-], [1.3, 1.6, 1.2, 1.7, 1.3], "AQI forecasting: deployed model per city (mean over 6 windows of 30 days)"));
+], [1.3, 1.6, 1.2, 1.7, 1.3], "AQI forecasting on 2015-2020: selected model per city (mean over 6 windows of 30 days)"));
 add(...figure(fig("fig_model_heatmap.png"), "Mean RMSE of every model in every city. No single model wins everywhere.", 500));
 add(P("**Reading the results.** Different cities prefer different models, which is why selection is automatic and per city. Gains over the baseline are large for Delhi and Lucknow (strong seasonal swings) and small for Ahmedabad (noisy, heavily gap-filled data). Errors are largest in Delhi simply because its AQI is highest and most variable."));
+add(P("**Classical versus machine learning.** A classical model wins in four cities and Prophet in two. Averaged over all cities, SARIMA ranks best (average rank 3.4), then Prophet (4.3), Holt-Winters (4.4), ARIMA and XGBoost (4.6) and LSTM (4.8). The machine-learning models can be excellent in one city and poor in another: the LSTM is strong in Lucknow but 31% worse than the naive forecast in Hyderabad. This agrees with published comparisons: a classical model with the right seasonal structure is hard to beat, so the safest approach is to compare all of them and pick per city."));
 add(H2("5.4 Pollutant forecasts"));
 add(P("PM2.5 and NO2 go through the same pipeline, because they have usable history in all six cities and improve the health model. PM10, SO2 and O3 are not forecast: they have too little data in several cities and do not improve the health model."));
 add(table(["City", "PM2.5 model", "NO2 model"], [
@@ -277,8 +304,50 @@ add(table(["City", "PM2.5 model", "NO2 model"], [
 add(H2("5.5 From experiment to deployment"));
 add(N("Evaluation picks the winner per city and target (`python -m src.run_forecasting`).", "deploy"));
 add(N("`python -m src.train_final_models` retrains each winner on the **full** history and saves it in its native format (joblib, XGBoost `.ubj`, PyTorch `state_dict`, Prophet JSON) under `models/aqi/<city>/`, with a `registry.json` index.", "deploy"));
-add(N("At startup the API loads every saved model with `load_forecaster(city).forecast(horizon)` and caches a 30-day forecast per city. Reloaded models reproduce the in-memory forecasts exactly.", "deploy"));
+add(N("Each saved model is reloaded and must reproduce the in-memory forecast exactly before it counts. For the live site, the nightly job then exports every model's 30-day forecast (`src/forecast_export.py`), and the API serves those (section 7.6).", "deploy"));
 add(...figure(rep("forecast_delhi.png"), "Example: Delhi's 30-day forecast against the actual values of the final test window.", 460));
+add(P("The website uses a second set of models, trained the same way on the live data (section 5.6). The 2015-2020 models above stay unchanged as the course comparison."));
+
+add(H2("5.6 The live models and the winter test"));
+add(P("The live series starts in February 2025, so it is much shorter than the 2015-2020 data. Three adjustments make the same pipeline work on it."));
+add(B("**Seasonal prior.** Less than two years of data is too little for a model to learn the yearly cycle by itself. Each city's average yearly shape from 2015-2020 is therefore subtracted before fitting and added back to the forecast. Because some cities' seasons have changed since 2020, the shape is **scaled per city** by a regression on the training data (between 0 and 1.5; for example Lucknow 0.68, Delhi 1.18). SARIMA and Prophet then drop their own yearly terms so the cycle is not counted twice."));
+add(B("**Test windows.** Six 30-day windows, 45 days apart, from March to November 2026, **plus four fixed winter windows** covering November 2025 to February 2026."));
+add(B("**Same rule:** lowest mean RMSE wins and must beat the best naive forecast. A baseline that cannot run in every window (same-date-last-year needs a full year of history, which the winter windows do not have) is not compared on its easier subset."));
+add(H3("Why winter was added"));
+add(P("The first live comparison used spring-to-autumn windows only. A **winter test** on the four winter windows showed that winter errors roughly doubled, and that in winter the deployed AQI model lost to the naive forecast in three of six cities. Winter is exactly when the forecast matters most in north India, so the models were re-chosen on all ten windows."));
+add(H3("The switching rule"));
+add(P("One winter of data cannot settle small differences, so a model was only replaced when the evidence was clear:"));
+add(B("**Switch** if the current model loses to the naive forecast over all ten windows, or the new winner is **at least 5% better** in mean RMSE **and no worse in winter**."));
+add(B("**Keep** the current model otherwise (a near-tie). The near-ties are rechecked in March 2027, when there will be two winters of data."));
+add(P("This changed ten of the eighteen choices (Delhi's AQI first, then nine more) and lowered the summed error by 5-8% over all windows and by 10-12% in winter. Four of the old choices had been losing to the naive forecast once winter was counted."));
+add(table(["City", "AQI", "PM2.5", "NO2", "AQI error: all windows / winter", "Best naive"], [
+  ["Delhi", "XGBoost", "XGBoost", "LSTM (kept)", "62.1 / 72.4", "86.5"],
+  ["Lucknow", "SARIMA (kept)", "Prophet", "ARIMA", "35.2 / 44.7", "49.8"],
+  ["Ahmedabad", "ARIMA", "ARIMA", "XGBoost", "32.3 / 39.5", "33.4"],
+  ["Bengaluru", "ARIMA", "Prophet", "Naive (last value)", "29.2 / 30.1", "30.8"],
+  ["Chennai", "XGBoost", "LSTM (kept)", "ARIMA", "33.3 / 46.9", "39.7"],
+  ["Hyderabad", "Holt-Winters (kept)", "Holt-Winters", "Prophet", "13.1 / 13.5", "13.7"],
+], [1.2, 1.5, 1.4, 1.5, 1.9, 1.1], "Deployed live models (\"kept\" = near-tie, not switched)"));
+add(P("Across the 18 live forecasters, nine are machine-learning or deep-learning models, eight are classical and one (Bengaluru NO2) is the naive forecast, because no model beat it there. The full before-and-after comparison is in `reports/forecasting/live/selection_all_seasons.md`."));
+
+add(H2("5.7 Today's readings and the consistency floor"));
+add(P("Two corrections are applied every time a forecast is served (`src/nowcast.py`, `src/aqi.py`)."));
+add(H3("Same-day correction (nowcast)"));
+add(P("The models only see complete days, so on its own the forecast for today ignores how today is actually going (once it said 256 for Delhi while the stations read about 107 by midday). The API therefore compares today's readings so far with the forecast and nudges the first days towards them, in log space:"));
+add(...code([
+  "r   = log(1 + reading so far) - log(1 + forecast for today)",
+  "w   = hours / (hours + 6)            more hours measured -> more weight",
+  "F_k = exp( log(1 + F_k) + w * 0.7^k * r ) - 1      k = 0 (today), 1, 2, ...",
+]));
+add(P("The factor 0.7 per day makes the effect fade over a few days. A backtest at a 13:00 cut-off showed today's AQI error falling by about 57%, tomorrow's by about 12% and the third day's by about 5%."));
+add(H3("AQI consistency floor"));
+add(P("AQI is the **largest** pollutant sub-index, so the AQI can never be lower than what the PM2.5 or NO2 level implies. The AQI, PM2.5 and NO2 forecasts come from separate models, though, and sometimes disagreed (in Delhi's winter, on most days). The floor raises each day's AQI to at least the sub-index of the PM2.5 and NO2 forecasts."));
+add(callout("Getting the order right", [
+  "The floor is applied **before** the same-day correction, so the separate models first agree with each other.",
+  "It is applied **again after** it, so that real readings that move AQI and PM2.5 by different amounts still give a consistent answer.",
+  "In the second pass a pollutant with **no reading yet today while AQI has one** is left out: its value is still only a forecast and must not override an AQI correction based on real measurements.",
+  "Two earlier versions each got one part of this wrong; the tests now check every served day.",
+]));
 
 // ============================================================ 6
 add(H1("6. The health-risk models"));
@@ -341,13 +410,17 @@ add(table(["File", "Role"], [
   ["`src/api/services.py`", "`ModelService`: loads all models at startup; forecast, risk and leaderboard logic"],
   ["`src/api/schemas.py`", "Request and response definitions with validation (for example, required profile fields)"],
   ["`src/api/me.py`", "Signed-in endpoints: profile, saved runs, history"],
+  ["`src/api/hospitals.py`", "Hospital search: stored list first, OpenStreetMap's Overpass service only outside it"],
+  ["`src/api/refresher.py`", "Downloads the nightly model bundle and today's readings every hour while the API runs"],
   ["`src/api/supabase_client.py`", "Small client for Supabase's auth and table API"],
 ], [2.2, 5.2], "Backend files"));
 add(H2("7.2 Endpoints"));
 add(table(["Endpoint", "Auth", "What it does"], [
-  ["`GET /api/health`", "Public", "Is the service up and are models loaded"],
+  ["`GET /api/health`", "Public", "Is the service up; which forecasts it serves, their date, and the last refresh and any error (the first place to look when something is off)"],
   ["`GET /api/cities`", "Public", "Cities, forecast start date, deployed model per target"],
-  ["`GET /api/forecast/{city}?horizon=7|30`", "Public", "Daily AQI, PM2.5, NO2 forecast"],
+  ["`GET /api/forecast/{city}?horizon=7|30`", "Public", "Daily AQI, PM2.5, NO2 forecast from today, with the time of the latest reading used"],
+  ["`GET /api/observed/{city}?days=`", "Public", "Measured daily AQI, PM2.5, NO2 for recent days, and today so far"],
+  ["`GET /api/hospitals?city=` or `?lat=&lon=`", "Public", "Named hospitals near a city or a location, nearest first, with contact details"],
   ["`POST /api/risk/predict`", "Public", "Risk for a profile sent in the request (not saved); used for the example profiles"],
   ["`GET /api/profile/schema`", "Public", "Describes the profile fields"],
   ["`GET /api/leaderboard/forecast?target=`", "Public", "Forecast model ranking per city (AQI, PM2.5, NO2)"],
@@ -369,7 +442,22 @@ add(N("The browser sends the user's Supabase access token as `Authorization: Bea
 add(N("The API asks Supabase Auth who owns the token. Invalid or expired tokens get a 401.", "auth"));
 add(N("Every table call is then made **with the user's own token**, so Supabase's row-level security (section 8) applies. Even a bug in the API could not read another user's rows. The powerful service-role key is not used for user data and is never placed in the frontend.", "auth"));
 add(H2("7.5 Testing"));
-add(P("41 automated tests cover the endpoints, validation and the history flow. The signed-in tests use an in-memory stand-in for Supabase that enforces the same per-user rules. `scripts/check_accounts_live.py` runs the full flow against the real Supabase project with a real test user (8 of 8 checks passed)."));
+add(P("**84 automated tests** (`pytest`, folder `tests/`) run in about 40 seconds. They cover:"));
+add(B("**Endpoints and validation:** every public and signed-in endpoint, bad inputs (unknown city, wrong horizon, missing profile fields) and the error codes."));
+add(B("**Forecast correctness:** what the API serves must equal what the saved models produce, after today's readings and the floor are applied; and no served day may have a PM2.5 or NO2 level implying a higher AQI than the one shown."));
+add(B("**Live refresh:** new readings or a new model bundle change the forecast without a restart, and a broken file keeps the old forecast."));
+add(B("**Model selection:** the test windows (including the winter ones) and the rule that a candidate missing windows is not compared unfairly."));
+add(B("**Privacy:** signed-in tests use an in-memory stand-in for Supabase that enforces the same per-user rules, so one user can never read another's data."));
+add(B("**Hospitals:** the search and the OpenStreetMap fallback, with the outside service mocked."));
+add(P("`scripts/check_accounts_live.py` runs the full signed-in flow against the real Supabase project (8 of 8 checks passed). Every saved model is also reloaded and must reproduce its training-time forecast exactly."));
+add(H2("7.6 Nightly refresh and serving"));
+add(N("**02:37 IST** (backup run at 04:37 IST): GitHub Actions starts `python -m src.refresh_live`. It downloads the last six days of readings, merges the complete days, refits all 18 forecasters (about 90 seconds), exports their 30-day forecasts and records today's readings so far.", "refresh"));
+add(N("Everything is packed into one bundle and uploaded to Supabase Storage. Nothing is committed to git.", "refresh"));
+add(N("The API downloads the bundle at startup and checks for a new one every hour, together with fresh readings for today; it reloads in the background without a restart.", "refresh"));
+add(N("The API serves the **exported forecasts** rather than loading the models. Loading all 18 models with their libraries took about 490 MB, too close to the server's 512 MB; serving the exported forecasts needs about 170 MB.", "refresh"));
+add(callout("Why 02:37 IST", "The job originally ran at 06:00 IST, but GitHub started it five to seven hours late every day, so mornings showed day-old models. Starting soon after midnight (with a backup two hours later) means yesterday is complete and the new forecast is ready before people wake up. Running twice is harmless: the second run re-downloads the same six days."));
+add(H2("7.7 Hospitals"));
+add(P("The public OpenStreetMap search service (Overpass) was often overloaded and timed out, so `scripts/build_hospitals.py` stores every named hospital within 25 km of each city centre in `data/hospitals.json` (from 267 in Lucknow to 1,135 in Bengaluru). The API answers from this list in about 0.2 seconds and only asks Overpass for searches outside the stored areas. The site shows contact details only (phone, address, website, directions), never booking, with a reminder to call 112 or 108 in an emergency."));
 
 // ============================================================ 8
 add(H1("8. The database and sign-in (Supabase)"));
@@ -409,10 +497,12 @@ add(table(["Route", "Needs login", "Shows"], [
   ["`/profile`", "Yes", "Three-step health-profile form, saved once and editable"],
   ["`/risk`", "Yes", "Personal day-by-day risk, charts, precautions for the selected day, saves each new estimate"],
   ["`/history`, `/history/[id]`", "Yes", "Past estimates, full detail view, delete"],
-  ["`/models`", "No", "Leaderboards for AQI, PM2.5, NO2 and health models"],
-  ["`/forecast`", "No", "Placeholder, built later"],
+  ["`/models`", "No", "Leaderboards for AQI, PM2.5, NO2 and health models, with the test windows"],
+  ["`/forecast`", "No", "One city in depth: week-by-week summary, how reliable each model is, the last 30 measured days joined to the 30-day forecast, PM2.5 and NO2 against India's 24-hour standards, day-by-day table"],
+  ["`/hospitals`", "No", "Hospital map and list for a city or the user's location, contact details only"],
 ], [1.7, 0.9, 4.8], "Pages"));
-add(...figure(fig("fig_dashboard.png"), "The dashboard (overview) page.", 440));
+add(...figure(fig("ui_dashboard_c.png"), "The dashboard on the deployed site.", 470));
+add(...figure(fig("ui_grid.png"), "Other pages of the deployed site: landing page, forecast page, hospital map and model leaderboard.", 500));
 add(H2("9.3 How data reaches a page"));
 add(B("`useAsync` is a small hook that runs a request when its inputs change, cancels the previous one, and keeps the last data on screen while a new request loads."));
 add(B("`AuthProvider` keeps the Supabase session; `RequireAuth` sends signed-out visitors to `/sign-in?next=...` and returns them afterwards."));
@@ -427,6 +517,12 @@ add(H2("9.5 Showing risk clearly"));
 add(B("Each day card shows the level (or a range on borderline days), confidence, AQI and the score out of 100."));
 add(B("The risk-score chart has the four level bands behind the line; the AQI chart is separate (no two-scale charts)."));
 add(B("**Precautions follow the selected day** (tomorrow by default), using that day's alert level, with a note when risk rises later in the week."));
+add(H2("9.6 When the server is asleep"));
+add(P("The API runs on Render's free plan, which **stops the service after 15 minutes without requests**. The next visitor then waits 30 to 60 seconds while it starts again, and the site used to sit on empty grey boxes, which looked broken. Three changes handle this:"));
+add(N("**Keep it awake.** A GitHub Actions job (`keep-api-awake.yml`) calls `/api/health` every 10 minutes, so the service rarely sleeps. One always-on free service uses about 744 of the 750 free hours a month.", "wake"));
+add(N("**Explain the wait.** If any request takes longer than 4 seconds, a notice appears: \"Starting the forecast service... can take up to a minute. The page will fill in by itself.\"", "wake"));
+add(N("**Retry instead of failing.** Requests that only read data (and the example risk estimate, which saves nothing) are retried for about a minute if the server is unreachable or answers 502, 503 or 504 while starting. Requests that save something are never repeated, so nothing can be saved twice.", "wake"));
+add(P("GitHub sometimes starts scheduled jobs late, so an occasional cold start can still happen; the notice and retries cover it. A paid Render plan (about $7 a month) would remove sleeping completely."));
 
 // ============================================================ 10
 add(H1("10. End-to-end walkthrough"));
@@ -458,36 +554,85 @@ add(...code([
 add(P("Open http://localhost:3000 for the site and http://localhost:8000/docs for the API documentation. The backend needs `SUPABASE_URL` and `SUPABASE_ANON_KEY` in the git-ignored `.env`; the frontend needs `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `frontend/.env.local`."));
 add(H2("11.2 Retrain or regenerate"));
 add(...code([
-  "python -m src.run_forecasting       # evaluate forecasters (--target for PM2.5, NO2)",
-  "python -m src.train_final_models    # retrain winners on full history, save",
+  "# 2015-2020 course comparison",
+  "python -m src.run_forecasting --target AQI          # also PM2.5, NO2",
+  "python -m src.train_final_models --target AQI",
+  "",
+  "# live models (what the website uses)",
+  "python -m src.refresh_live                          # download, rebuild, refit, export",
+  "python -m src.run_forecasting --source live --target AQI --tag all_seasons   # trial comparison",
+  "python scripts/selection_report.py --tag all_seasons                          # before/after table",
+  "",
   "python -m src.health.train          # train and save the health models",
-  "pytest                              # 41 API tests",
+  "pytest                              # 84 tests",
 ]));
+add(P("A comparison run with `--tag` writes its results to a subfolder and never changes what is deployed. Changing a deployed model is a deliberate step: retrain it and update that city's entry in the live leaderboard, which the nightly job reads."));
 add(H2("11.3 Quality checks"));
-add(B("**Models:** naive-baseline comparison, six rolling windows, three LSTM seeds, reload-equals-original checks."));
-add(B("**API:** 41 automated tests; a live check against the real Supabase project."));
+add(B("**Models:** naive-baseline comparison on every window, three LSTM seeds, reload-equals-original checks, the winter test."));
+add(B("**API:** 84 automated tests; a live check against the real Supabase project; `/api/health` on the deployed API."));
 add(B("**Frontend:** TypeScript type check, ESLint, production build, and screenshots at three widths in light and dark."));
+add(H2("11.4 Deployment"));
+add(table(["Part", "Where", "Notes"], [
+  ["Website", "Vercel: aqi-forecasting-and-health-predicti.vercel.app", "Rebuilds automatically on every push to the main branch"],
+  ["API", "Render (free plan, Singapore): airware-api.onrender.com", "Blueprint in `render.yaml`; installs exact library versions from `requirements.lock.txt`"],
+  ["Database, sign-in, model bundle", "Supabase", "Row-level security; public storage bucket for the nightly bundle"],
+  ["Nightly refresh, keep-awake", "GitHub Actions", "Secrets: OpenAQ key, Supabase URL and service-role key (only the job has it)"],
+], [1.8, 3, 2.6], "Where everything runs"));
 
 // ============================================================ 12
 add(H1("12. Limits and what comes next"));
 add(H2("12.1 Known limits"));
-add(B("**Data period.** The training data ends on 1 July 2020, so forecasts start from there. Showing today's AQI needs live data (planned: OpenAQ station data, a daily refresh job and periodic retraining with the naive-baseline check)."));
+add(B("**Short live history.** The live data starts in February 2025 and contains one winter, so close model choices cannot be settled yet; they are rechecked in March 2027."));
+add(B("**Horizon.** Accuracy falls with the horizon and in the most volatile seasons, so a 30-day forecast shows the trend rather than exact daily values."));
+add(B("**Data gaps.** Station data occasionally has gaps at the provider (no readings anywhere on 11-19 January 2026)."));
 add(B("**Error compounds.** Health-risk error now comes mostly from air-forecast error, especially in Delhi and Ahmedabad."));
-add(B("**Seasonality in Holt-Winters.** The model picks weekly seasonality; a proper yearly version needs the series deseasonalised first."));
 add(B("**No single model dominates.** Averaging the top two or three models per city could make forecasts more stable."));
+add(B("**Free hosting.** The API can still sleep now and then (section 9.6)."));
 add(B("**Health dataset.** The risk labels come from a documented formula, so the models learn that formula; they are a demonstration of the method, not a validated clinical tool."));
-add(H2("12.2 Remaining build steps"));
+add(H2("12.2 What comes next"));
 add(table(["Step", "Notes"], [
-  ["Forecast detail page", "`/forecast`: one city in depth"],
-  ["Hospital map", "Leaflet with OpenStreetMap tiles; hospital name, address, phone and website from the Overpass API; shown when alert level is High or Severe; contact details only, no booking"],
-  ["Recommendation assistant", "Intent matching over a curated precautions list, personalised with AQI and risk; an LLM can be added later"],
-  ["Live 2026 data", "OpenAQ station data, daily refresh, retraining"],
-  ["Deployment", "Frontend on Vercel; FastAPI on Render or Railway (handle the 20-second model load)"],
-  ["Course submissions", "Mid-sem (19 to 30 Oct): classical models. Final (16 to 27 Nov): ML/DL models and the comparison"],
+  ["Recheck the near-ties", "March 2027, with two winters of live data: AQI in Lucknow and Hyderabad, PM2.5 in Chennai, NO2 in Delhi"],
+  ["Weather inputs and ensembles", "Add weather forecasts (wind, temperature, humidity) and test averaging the top models per city"],
+  ["Precautions assistant", "Built once (section 13) and postponed; can be restored from the code history"],
+  ["Alerts and coverage", "Notify users when their risk rises; add more cities as the station network allows"],
+  ["Course submission", "Final (16 to 27 Nov): ML/DL models and the comparison; the report is done (`docs/Airware_Mini_Project_Report.docx`, 23 pages)"],
 ], [2, 5.4], "Remaining work"));
 
 // ============================================================ 13
-add(H1("13. Glossary"));
+add(H1("13. Recent changes (November 2026)"));
+add(P("This chapter explains, in order, what changed in the last part of the project and why. Each change is described the same way: the problem, the change, and the result."));
+const change = (title, problem, did, result) => [H2(title), P(`**Problem.** ${problem}`), P(`**Change.** ${did}`), P(`**Result.** ${result}`)];
+add(...change("13.1 Winter test of the live models (12 Nov)",
+  "The live models had been chosen on spring-to-autumn windows only, but north India's worst air is in winter.",
+  "Every model was re-tested on four fixed 30-day windows covering November 2025 to February 2026 (`--window-ends`, `--tag winter`). The deployed models were not changed at this stage.",
+  "Winter errors roughly doubled; PM2.5 models still beat the naive forecast in all six cities, but AQI models did so in only three. The seasonal prior cut the best model's winter error by about 11%. This set up the re-selection below."));
+add(...change("13.2 AQI consistency floor (12 Nov, corrected 13 and 16 Nov)",
+  "The separate AQI and PM2.5 models disagreed: in Delhi's winter the PM2.5 forecast implied a higher AQI than the AQI forecast on most days, which is impossible because AQI is the largest sub-index.",
+  "The AQI is now raised to at least the sub-index of the PM2.5 and NO2 forecasts (section 5.7). The first version ran after the same-day correction and could override real readings with a stale forecast; the second ran only before it and let real readings drift apart again. The final version floors before and after, skipping a pollutant that has no reading yet today.",
+  "No served day shows a PM2.5 or NO2 level implying a higher AQI than the one shown, and corrections based on real readings are never overridden. A test checks every served day."));
+add(...change("13.3 Daily refresh moved earlier (12 Nov)",
+  "GitHub started the 06:00 IST refresh five to seven hours late every day, so mornings used day-old models.",
+  "The job now runs at 02:37 IST with a backup at 04:37 IST.",
+  "New forecasts are normally ready before morning. A second run is harmless because it re-downloads the same six days."));
+add(...change("13.4 Models re-chosen with winter included (13 and 16 Nov)",
+  "Four deployed models lost to the naive forecast once winter was counted, and several others were clearly beaten.",
+  "Selection was rerun on ten windows (six recent, four winter) with the switching rule in section 5.6: switch only if the current model loses to the naive forecast, or the new one is at least 5% better and no worse in winter. Delhi's AQI moved to XGBoost first (winter error 72 against 88), then nine more choices changed; four near-ties were kept.",
+  "Summed error fell by 5-8% over all windows and 10-12% in winter. The deployed set is now nine machine-learning, eight classical and one naive forecaster."));
+add(...change("13.5 Air-quality assistant built, then postponed (12 to 15 Nov)",
+  "Users wanted to ask questions such as \"is it safe to walk tomorrow?\" in their own words.",
+  "A chat assistant was built on a large language model, answering only from the site's own forecasts, the user's saved risk and a curated precautions list, with a fixed emergency reply and a daily limit. It was then removed from the site and the code on the team's decision, to be revisited later; the full version is kept in the code history.",
+  "The site works exactly as before without it; precautions are still shown on the risk pages."));
+add(...change("13.6 Final project report (16 Nov)",
+  "The course needs a report on the university's mini-project template.",
+  "A 23-page report was written on the template: literature review, use-case, class and ER diagrams, screenshots of the live site, pseudo code, source excerpts and the classical versus machine-learning comparison.",
+  "`docs/Airware_Mini_Project_Report.docx` and `.pdf`."));
+add(...change("13.7 Site looked down after idle periods (16 Nov)",
+  "Render's free plan stops the API after 15 idle minutes; the next visitor waited up to a minute on empty boxes and the site looked broken.",
+  "A keep-awake job, a \"starting\" notice and automatic retries for read-only requests (section 9.6).",
+  "Tested locally with the API switched off and then started mid-load: the notice appeared and the page filled in by itself."));
+
+// ============================================================ 14
+add(H1("14. Glossary"));
 add(table(["Term", "Meaning"], [
   ["AQI", "Air Quality Index, 0 to 500; the highest pollutant sub-index of the day"],
   ["CPCB", "Central Pollution Control Board, India's pollution regulator; source of the data"],
@@ -513,6 +658,13 @@ add(table(["Term", "Meaning"], [
   ["RLS", "Row Level Security: database rules that limit each user to their own rows"],
   ["Token (JWT)", "A signed proof of sign-in that the browser sends with each request"],
   ["Anon key, service-role key", "Public Supabase key (safe in the website) and the all-powerful private key (never in the website)"],
+  ["OpenAQ", "Free public platform that republishes official air-quality readings; source of the live data"],
+  ["Seasonal prior", "A city's average yearly shape from 2015-2020, removed before fitting the live models and added back after"],
+  ["Nowcast", "Adjusting today's and the next few days' forecast towards the readings measured so far today"],
+  ["Consistency floor", "Raising the AQI forecast to at least what the PM2.5 and NO2 forecasts imply"],
+  ["Near-tie", "A model comparison too close to decide with one winter of data; the current model is kept"],
+  ["Model bundle", "The nightly package of refitted models, data and forecasts that the API downloads"],
+  ["Cold start", "The delay while a sleeping free server starts again on the first request"],
 ], [2, 5.4], "Glossary"));
 
 // ------------------------------------------------------------------ document
@@ -532,7 +684,7 @@ const doc = new Document({
   },
   numbering: { config: [
     { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 270 } } } }] },
-    ...["numbers", "journey", "aqi", "deploy", "risk", "auth"].map((ref) => ({ reference: ref,
+    ...["numbers", "journey", "aqi", "deploy", "risk", "auth", "refresh", "wake"].map((ref) => ({ reference: ref,
       levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 340 } } } }] })),
   ] },
   sections: [
