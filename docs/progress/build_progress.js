@@ -10,8 +10,8 @@ const {
 
 // =========================================================================== CONTENT
 
-const LAST_UPDATED = "15 November 2026";
-const LATEST_COMMIT = "968915b Delhi's live AQI model to XGBoost (winter included), and a real nowcast/floor bug";
+const LAST_UPDATED = "16 November 2026";
+const LATEST_COMMIT = "b6a1b61 Remove the air-quality assistant for now (postponed)";
 
 const AT_A_GLANCE = [
   // [area, status, note]
@@ -144,6 +144,17 @@ DONE.push({
 });
 
 DONE.push({
+  title: "Live models chosen with winter included (9 more switches)",
+  items: [
+    "Rule: switch a city's model if the current one loses to the naive forecast once winter is counted, or if the new one is at least 5% better over all 10 test windows and no worse in winter; otherwise keep it, since one winter of data cannot settle a smaller gap.",
+    "Switched: AQI Ahmedabad and Bengaluru (Holt-Winters to ARIMA); PM2.5 Delhi (Holt-Winters to XGBoost), Lucknow (XGBoost to Prophet), Bengaluru (ARIMA to Prophet); NO2 Ahmedabad (LSTM to XGBoost), Bengaluru (ARIMA to the naive forecast, which no model beat), Lucknow (Holt-Winters to ARIMA), Chennai (Prophet to ARIMA). Four of the old choices lost to the naive forecast once winter was counted.",
+    "Kept as near-ties: AQI Lucknow (SARIMA) and Hyderabad (Holt-Winters), PM2.5 Chennai (LSTM), NO2 Delhi (LSTM). To be rechecked in March 2027 with a second winter of data.",
+    "Last winter's data: 102 of 120 days measured; 11-19 January 2026 is missing at the data provider for every station (re-download confirmed it is still empty). Unmeasured days are never scored.",
+    "Forecast consistency refined: today's readings can still correct the AQI when only the AQI has a reading, but when the pollutants have readings too, the AQI is kept at or above what they imply.",
+  ],
+});
+
+DONE.push({
   title: "Delhi's live AQI model switched to XGBoost",
   items: [
     "Compared every model over 10 test windows (the usual 6 recent ones plus 4 covering last winter, since the regular live comparison never reached winter). For Delhi, XGBoost's mean error is 62 against ARIMA's 65, and in winter alone 72 against 88, clearly better where it mattered.",
@@ -226,7 +237,7 @@ const HEALTH_RESULTS = [
 const REMAINING = [
   // [task, needs, notes]
   ["Air-quality assistant", "Later", "Removed from the site for now; to be rebuilt when you decide to return to it"],
-  ["Live models: decide on the rest", "You + me", "Delhi's AQI is now on the winter-inclusive comparison; Ahmedabad, Bengaluru, Hyderabad and Lucknow's AQI, and most cities' PM2.5/NO2, would also change model - see reports/forecasting/live/selection_all_seasons.md"],
+  ["Live models: recheck the near-ties", "Me (March 2027)", "Rerun the comparison with two winters of data; settles AQI Lucknow and Hyderabad, PM2.5 Chennai and NO2 Delhi"],
   ["Deployment: keep an eye on it", "You", "Free Render plan sleeps after 15 min idle (first visit ~1 min); open the site once before a demo, or switch to Starter ($7/month)"],
   ["Frontend redesign", "Your references", "Current look judged too generic; waiting for website references to restyle the real site"],
   ["Final report/presentation (16-27 Nov)", "You + me", "LSTM, XGBoost, Prophet and the comparison"],
@@ -248,6 +259,7 @@ const IMPROVEMENTS = [
 
 const CHANGE_LOG = [
   // newest first: [date, summary]
+  ["16 Nov 2026", "Nine more live models switched after the winter-inclusive comparison (four old choices lost to the naive forecast in winter); four near-ties kept until a second winter is available. Forecast consistency rule refined."],
   ["15 Nov 2026", "Air-quality assistant taken out of the site (chat panel, API endpoint and its settings); postponed, to be rebuilt later."],
   ["13 Nov 2026", "Delhi's live AQI model switched to XGBoost after comparing all models on 10 windows including last winter; found and fixed a real bug in the process (the AQI/pollutant consistency floor could override a same-day real-reading correction, fixed for all cities, not just Delhi)."],
   ["12 Nov 2026", "Daily refresh moved to 02:37 IST with a backup run at 04:37 IST: GitHub had been starting the 06:00 run around midday, so mornings used day-old models."],

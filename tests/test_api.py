@@ -10,7 +10,7 @@ from src.api.main import app
 from src.aqi import floor_to_pollutants, sub_index
 from src.data_loader import CITIES
 from src.model_store import forecast_air
-from src.nowcast import apply_signals, load_signals
+from src.nowcast import apply_signals, load_signals, stale_pollutants
 
 FULL_PROFILE = {"age": 67, "gender": "M", "condition": "COPD", "smoker": False, "bmi": 27.5,
                 "exercise_hours": 1.0, "outdoor_hours": 3.0, "mask_usage": "No",
@@ -50,8 +50,11 @@ def test_forecast_matches_saved_models(client, horizon):
     expected, _ = floor_to_pollutants(expected)   # AQI never below its PM2.5/NO2 sub-index (before nowcast)
     first = pd.Timestamp(body["origin_date"]) + pd.Timedelta(days=1)
     if svc.source == "live":   # today's readings so far nudge the first days (src/nowcast.py)
-        expected, used = apply_signals("Delhi", expected, load_signals())
+        signals = load_signals()
+        expected, used = apply_signals("Delhi", expected, signals)
         assert (used is not None) == (body["readings_as_of"] is not None)
+        if used:   # floored again, leaving out a pollutant with no reading today
+            expected, _ = floor_to_pollutants(expected, skip=stale_pollutants(signals["Delhi"]))
         # models a day or two old: the forecast starts today, not on a day already past
         today = pd.Timestamp.now(tz="Asia/Kolkata").tz_localize(None).normalize()
         first = max(first, today)
@@ -67,20 +70,31 @@ def test_forecast_matches_saved_models(client, horizon):
 
 def test_served_aqi_never_below_pollutant_subindex(client):
     """AQI is the largest sub-index, so no served day may have PM2.5 or NO2 implying more - except
-    a day the nowcast has corrected for one pollutant but not (yet) the other, from real station
-    readings rather than the forecast; that effect is confined to the first few days and fades
-    (src/nowcast.py)."""
+    for a pollutant with no reading today while AQI has one: its forecast is stale and must not
+    override the AQI's correction from real station data (src/nowcast.stale_pollutants)."""
+    signals = load_signals()
     for city in CITIES:
         body = client.get(f"/api/forecast/{city}?horizon=30").json()
         df = pd.DataFrame(body["days"])
-        touched = 3 if body.get("readings_as_of") else 0
+        stale = stale_pollutants(signals[city]) if body.get("readings_as_of") else ()
         for col, pollutant in (("pm25", "PM2.5"), ("no2", "NO2")):
+            if col in stale:
+                continue
             # aqi and the pollutant are rounded to 0.1 independently, and a breakpoint band's slope
             # can be > 1 (PM2.5 90-120 -> 200-300 is 3.33), so a 0.05 rounding error on the
             # pollutant can read as a larger gap on the AQI scale: 1.0 comfortably covers display
             # rounding while still catching a real inconsistency (tens of points, per the winter test)
             si = sub_index(df[col].astype(float), pollutant).to_numpy()
-            assert (si[touched:] <= df["aqi"].to_numpy()[touched:] + 1.0).all(), (city, col)
+            assert (si <= df["aqi"].to_numpy() + 1.0).all(), (city, col)
+
+
+def test_stale_pollutants():
+    assert stale_pollutants({"aqi": {}, "pm25": {}, "no2": {}}) == ()
+    assert stale_pollutants({"aqi": {}, "no2": {}}) == ("pm25",)        # PM2.5 had no reading today
+    assert stale_pollutants({"pm25": {}}) == ()                          # AQI not corrected: nothing stale
+    df = pd.DataFrame({"aqi": [100.0], "pm25": [80.0], "no2": [20.0]})
+    assert floor_to_pollutants(df, skip=("pm25",))[1] == 0              # stale PM2.5 can't raise the AQI
+    assert floor_to_pollutants(df)[1] == 1
 
 
 def test_floor_to_pollutants():

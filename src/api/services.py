@@ -24,7 +24,7 @@ from src.health.data import CATEGORIES, PERSON_NUMERIC, load_health_dataset, sco
 from src.health.store import HealthRiskPredictor, load_health_predictor
 from src.forecast_export import EXPORT_PATH, load_export
 from src.model_store import Forecaster, load_forecaster, registry_path, saved_cities
-from src.nowcast import NOWCAST_PATH, apply_signals, load_signals
+from src.nowcast import NOWCAST_PATH, apply_signals, load_signals, stale_pollutants
 from src.preprocessing import TEST_DAYS
 
 MAX_HORIZON = TEST_DAYS
@@ -95,13 +95,13 @@ def load_air(source: str) -> tuple[dict, dict, dict]:
         # two *models'* forecasts agree with each other before anything else touches the numbers.
         df, _ = floor_to_pollutants(df)
         if source == "live":   # start today from today's readings so far
-            # Today's readings are real measurements, not a forecast: when, say, only the AQI
-            # reading has enough hours yet and PM2.5's hasn't, the AQI nowcast must be allowed to
-            # move below the (stale, forecast-only) PM2.5 floor rather than being pulled back up to
-            # match it. Re-flooring after this point would silently undo the correction.
             df, used = apply_signals(city, df, signals)
             if used:
                 readings_as_of[city] = signals[city]["as_of"]
+                # Floor again: AQI is the largest sub-index, so readings-adjusted values must
+                # still agree. But a pollutant with no reading today while AQI has one is a stale
+                # forecast: it must not pull a real-data AQI correction back up (2026-11-13 bug).
+                df, _ = floor_to_pollutants(df, skip=stale_pollutants(signals[city]))
         forecasts[city] = df
     return forecasters, forecasts, readings_as_of
 

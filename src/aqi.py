@@ -75,7 +75,7 @@ def hourly_aqi(hourly: pd.DataFrame, exclude: tuple[str, ...] = ()) -> pd.Series
     return compute_aqi(agg, exclude)
 
 
-def floor_to_pollutants(forecast: pd.DataFrame) -> tuple[pd.DataFrame, int]:
+def floor_to_pollutants(forecast: pd.DataFrame, skip: tuple[str, ...] = ()) -> tuple[pd.DataFrame, int]:
     """Raise each day's forecast AQI to at least the sub-index its PM2.5 and NO2 forecasts imply.
 
     AQI is the largest pollutant sub-index, so it can never be below them. The AQI, PM2.5 and
@@ -85,15 +85,15 @@ def floor_to_pollutants(forecast: pd.DataFrame) -> tuple[pd.DataFrame, int]:
     has an ``aqi`` column and optionally ``pm25`` / ``no2``. Returns the adjusted copy and
     how many days were raised.
 
-    Apply this to the raw model forecast, before anything derived from real station readings
-    (``src.nowcast.apply_signals``). Flooring afterwards would let a stale forecast for one
-    pollutant override a same-day correction to another that is grounded in real data, which
-    defeats the point of the nowcast on exactly the days it matters most (see
-    ``src.api.services.load_air``).
+    ``skip`` leaves out pollutant columns (``"pm25"``, ``"no2"``). ``src.api.services.load_air``
+    floors the raw model forecast, applies today's readings (``src.nowcast.apply_signals``), then
+    floors again skipping any pollutant that had no reading today while AQI did: that
+    pollutant's forecast is stale, and must not override an AQI correction made from real
+    station data. When both were corrected from readings, the floor holds as usual.
     """
     floor = pd.Series(np.nan, index=forecast.index)
     for col, pollutant in (("pm25", "PM2.5"), ("no2", "NO2")):
-        if col in forecast:
+        if col in forecast and col not in skip:
             floor = np.fmax(floor, sub_index(forecast[col].astype(float), pollutant))
     raised = floor > forecast["aqi"]
     out = forecast.copy()

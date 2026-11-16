@@ -117,6 +117,15 @@ def apply_signals(city: str, air: pd.DataFrame, signals: dict) -> tuple[pd.DataF
     return out, (sig["date"] if used else None)
 
 
+def stale_pollutants(sig: dict) -> tuple[str, ...]:
+    """Pollutant columns with no reading today although AQI has one: after ``apply_signals``
+    their forecast is stale relative to the AQI, so they must not floor it
+    (``src.aqi.floor_to_pollutants(skip=...)``)."""
+    if "aqi" not in sig:
+        return ()
+    return tuple(c for c in ("pm25", "no2") if c not in sig)
+
+
 def refresh_signals(days: int = 6, progress=None) -> dict:
     """Download the latest readings, work out today's signals and save them."""
     from src.openaq import fetch_recent
